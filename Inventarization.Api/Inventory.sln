@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventorization.Api", "Inventorisation\Inventorization.Api.csproj", "{9B2967F9-8CAF-4286-88A6-78B6C37F24C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventorization.Tests", "Inventorisation.Tests\Inventorization.Tests.csproj", "{DB9A2D58-17D1-4AB7-86C8-84D5BC425FF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventorization.Listener", "Inventorization.Listener\Inventorization.Listener.csproj", "{DA02E96C-7E64-42D6-A222-AC8101EAB4BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventorization.Data", "Inventorization.Data\Inventorization.Data.csproj", "{2524D7A7-7D13-47CE-B3E9-674B3B1C3B78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventorization.Business", "Inventorization.Business\Inventorization.Business.csproj", "{D5A8938B-62AA-4FAA-92B3-BDF51D242713}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B2967F9-8CAF-4286-88A6-78B6C37F24C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B2967F9-8CAF-4286-88A6-78B6C37F24C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B2967F9-8CAF-4286-88A6-78B6C37F24C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B2967F9-8CAF-4286-88A6-78B6C37F24C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB9A2D58-17D1-4AB7-86C8-84D5BC425FF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB9A2D58-17D1-4AB7-86C8-84D5BC425FF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB9A2D58-17D1-4AB7-86C8-84D5BC425FF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB9A2D58-17D1-4AB7-86C8-84D5BC425FF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA02E96C-7E64-42D6-A222-AC8101EAB4BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA02E96C-7E64-42D6-A222-AC8101EAB4BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA02E96C-7E64-42D6-A222-AC8101EAB4BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA02E96C-7E64-42D6-A222-AC8101EAB4BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2524D7A7-7D13-47CE-B3E9-674B3B1C3B78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2524D7A7-7D13-47CE-B3E9-674B3B1C3B78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2524D7A7-7D13-47CE-B3E9-674B3B1C3B78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2524D7A7-7D13-47CE-B3E9-674B3B1C3B78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5A8938B-62AA-4FAA-92B3-BDF51D242713}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5A8938B-62AA-4FAA-92B3-BDF51D242713}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5A8938B-62AA-4FAA-92B3-BDF51D242713}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5A8938B-62AA-4FAA-92B3-BDF51D242713}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Сканер</string>
+    <string name="close">Остановить сканирование</string>
+    <string name="hello_world">Дратути</string>
+    <string name="honyware">Honyware</string>
+    <string name="menu_settings">Settings</string>
+    <string name="opticol">Opticol</string>
+    <string name="scanner">Саканирование</string>
+    <string name="scanner_beep">Звуки</string>
+    <string name="scanner_beep_summary">Проигрывать звук в случае успешного сканирования</string>
+    <string name="scanner_enter">Additional enter key</string>
+    <string name="scanner_enter_summary">Additional enter key after the scan results</string>
+    <string name="scanner_hint">Для скарирования кода нажмите соответствующую клавишу на устройстве, либо кнопку ниже</string>
+    <string name="scanner_keyboard_mode">Режим клавиатуры</string>
+    <string name="scanner_keyboard_output">Вывод в режиме клавиатуры</string>
+    <string name="scanner_keyboard_output_summary">Выводи результата в выделенное поле ввода</string>
+    <string name="scanner_lock">Клавиша сканирования</string>
+    <string name="scanner_lock_off">Клавиша отключения сканирования</string>
+    <string name="scanner_lock_on">Клавиша запуска сканирование</string>
+    <string name="scanner_off">Клавиша включение сканера</string>
+    <string name="scanner_on">Клавиша выключения сканера</string>
+    <string name="scanner_reset_def">Перезагрузка сканера</string>
+    <string name="scanner_reset_def_summary">Перезагрузка устройства сканирования</string>
+    <string name="scanner_toast">Перезагрузка выполнена!</string>
+    <string name="scanner_vibrate">Вибрация</string>
+    <string name="scanner_vibrate_summary">Вибрация при успешном сканировании</string>
+    <string name="se4500">Se4500</string>
+    <string name="set_scanner_manager">Настройки сканера</string>
+    <string name="start">Начать сканировать</string>
+    <string name="symbol">Symbol</string>
+    <string name="title_activity_main">Сканер</string>
+    <string name="close_zone">Закрыть зону</string>
+    <string name="zone">Зона</string>
+    <string name="title_activity_zone_select">Выбор зоны</string>
+</resources>
