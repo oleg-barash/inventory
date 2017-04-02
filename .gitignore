@@ -41,6 +41,11 @@ Inventarization.Android.Client/app/build/*
 Inventarization.Android.Client/build/*
 **/obj/*
 Inventarization.Admin/build/*
-Inventarization.Api/.vs/*
-Inventarization.Api/.vs/*
+Inventarization.Android.Client/local.properties
+Inventarization.Api/.vs/Inventory/v14/.suo
+Inventarization.Android.Client/*.iml
+Inventarization.Android.Client/app/app.iml
+Inventarization.Android.Client/app/app.iml
+Inventarization.Android.Client/Inventarization.Android.Client.iml
+Inventarization.Android.Client/local.properties
 Inventarization.Api/.vs/Inventory/v14/.suo

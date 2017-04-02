@@ -44,7 +44,7 @@ namespace Inventorization.Tests.Data
                 Type = ActionType.FirstScan,
                 UserId = user.Id,
                 Zone = inventarisation.Id,
-                BarCode = 1,
+                BarCode = "1",
                 Quantity = 1,
             };
 
@@ -55,7 +55,7 @@ namespace Inventorization.Tests.Data
                 Type = ActionType.FirstScan,
                 UserId = user.Id,
                 Zone = inventarisation.Id,
-                BarCode = 1,
+                BarCode = "1",
                 Quantity = 1,
             };
 
