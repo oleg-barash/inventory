@@ -14,7 +14,7 @@ namespace Inventorization.Api
             // register all your components with the container here
             // it is NOT necessary to register your controllers
             
-            string connectionString = "User ID=postgres;Password=anatole123;Host=localhost;Port=5432;Database=postgres;";
+            string connectionString = "Server=postgresql.oleg-baranow.myjino.ru;Port=5432;User ID=oleg-baranow_invent;Password=anatole123;Database=oleg-baranow_invent";
 
             container.RegisterInstance<ActionRepository>(new ActionRepository(connectionString));
             container.RegisterInstance<CompanyRepository>(new CompanyRepository(connectionString));
