@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
+using Inventorization.Api.Formatters;
 
 namespace Inventorization
 {
@@ -14,6 +15,7 @@ namespace Inventorization
         {
             // Web API configuration and services
             // Configure Web API to use only bearer token authentication.
+            config.Formatters.Add(new CsvMediaTypeFormatter());
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
             config.EnableCors();
