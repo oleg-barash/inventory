@@ -14,11 +14,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ProgressBar;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -50,9 +52,10 @@ public class ZoneSelectActivity extends Activity {
     private EditText showScanResult;
     private TextView resultTextView;
     private Zone zone;
-    private ProgressBar progressBar;
     private static final String TAG = "ZoneSelectActivity";
-    private String baseUrl = "http://192.168.0.103/api/zone";
+    private String inventorizationId = "81d51f07-9ff3-46c0-961c-c8ebfb7b47e3";
+    private String baseUrl = "http://192.168.0.106/api/zone";
+    private String baseInventorizationUrl = "http://192.168.0.106/api/inventorization/" + inventorizationId + "/";
     private ZoneActivityStates currentState = ZoneActivityStates.Initial;
 
     private void initScan() {
@@ -74,13 +77,10 @@ public class ZoneSelectActivity extends Activity {
 
     private void createZone(String code){
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("Code", code);
-        JsonObjectRequest stringRequest = new JsonObjectRequest(baseUrl, new JSONObject(params),
-                            new Response.Listener<JSONObject>()  {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, baseInventorizationUrl + "/zone/open?code=" + code,
+                            new Response.Listener<String>()  {
                                 @Override
-                    public void onResponse(JSONObject response) {
-//                        progressBar.setVisibility(View.INVISIBLE);
+                    public void onResponse(String response) {
                         try {
                             ObjectMapper mapper = new ObjectMapper();
                             zone = mapper.readValue(response.toString(), Zone.class);
@@ -97,13 +97,11 @@ public class ZoneSelectActivity extends Activity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                progressBar.setVisibility(View.INVISIBLE);
                 setState(ZoneActivityStates.ZoneNotFound);
                 showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
 
             }
         });
-//        progressBar.setVisibility(View.VISIBLE);
         queue.add(stringRequest);
     }
 
@@ -172,7 +170,7 @@ public class ZoneSelectActivity extends Activity {
                 }
             }
         });
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     private void setState(ZoneActivityStates state){
@@ -244,11 +242,10 @@ public class ZoneSelectActivity extends Activity {
     private void searchZone(String code){
         try {
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, baseUrl + "?code=" + code,
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, baseInventorizationUrl + "/zone?code=" + code,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-//                            progressBar.setVisibility(View.INVISIBLE);
                             try {
                                 ObjectMapper mapper = new ObjectMapper();
                                 zone = mapper.readValue(response.toString(), Zone.class);
@@ -265,10 +262,13 @@ public class ZoneSelectActivity extends Activity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-//                    progressBar.setVisibility(View.INVISIBLE);
                     if (error.networkResponse.statusCode == 404){
                         setState(ZoneActivityStates.ZoneNotFound);
-                        showToast("Зона не найдена. Вы можете создать её");
+                        showToast("Зона не найдена. Вы можете создать её.");
+                    }
+                    else if (error.networkResponse.statusCode == 403) {
+                        setState(ZoneActivityStates.Initial);
+                        showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
                     }
                     else {
                         setState(ZoneActivityStates.Error);
@@ -276,7 +276,7 @@ public class ZoneSelectActivity extends Activity {
                     }
                 }
             });
-//            progressBar.setVisibility(View.VISIBLE);
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             queue.add(stringRequest);
         }
         catch (Exception ex){

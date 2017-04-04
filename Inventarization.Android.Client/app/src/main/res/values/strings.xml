@@ -36,4 +36,6 @@
     <string name="accept">Ok</string>
     <string name="create">Create</string>
     <string name="Search">Search</string>
+    <string name="OpenZone">Open zone</string>
+    <string name="Accept">Accept</string>
 </resources>

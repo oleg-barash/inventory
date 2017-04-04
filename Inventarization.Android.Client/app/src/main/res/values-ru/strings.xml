@@ -36,4 +36,6 @@
     <string name="accept">Принять</string>
     <string name="create">Создать</string>
     <string name="Search">Поиск</string>
+    <string name="OpenZone">Открыть зону</string>
+    <string name="Accept">Применить</string>
 </resources>

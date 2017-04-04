@@ -86,7 +86,31 @@ namespace Inventorization.Data
             };
         }
 
-        
+        public static ZoneState ToZoneState(this NpgsqlDataReader reader)
+        {
+            return new ZoneState()
+            {
+                ZoneId = reader.GetGuid(0),
+                InventorizationId = reader.GetGuid(1),
+                OpenedAt = reader.GetDateTime(2),
+                ClosedAt = reader.IsDBNull(3) ? DateTime.MaxValue : reader.GetDateTime(3),
+                OpenedBy = reader.GetGuid(4),
+                ClosedBy = reader.IsDBNull(5) ? new Guid() : reader.GetGuid(5),
+            };
+        }
+
+        public static Item ToItem(this NpgsqlDataReader reader)
+        {
+            return new Item()
+            {
+                //Id = reader.GetGuid(0),
+                ItemNumber = reader.GetString(0),
+                Code = reader.GetString(1),
+                CompanyId = reader.GetGuid(2),
+                Description = reader.GetString(3),
+            };
+        }
+
 
     }
 }

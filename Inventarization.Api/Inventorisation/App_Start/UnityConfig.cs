@@ -1,5 +1,6 @@
 using Inventorization.Data;
 using Microsoft.Practices.Unity;
+using NLog;
 using System.Configuration;
 using System.Web.Http;
 using Unity.WebApi;

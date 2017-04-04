@@ -22,18 +22,18 @@ namespace Inventorization.Api.Controllers
         private InventorizationRepository _inventorizationRepository;
         private ZoneRepository _zoneRepository;
         private ActionRepository _actionRepository;
-        private ILogger _logger;
+        private CompanyRepository _companyRepository;
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public InventorizationController(InventorizationRepository inventorizationRepository, ZoneRepository zoneRepository, ActionRepository actionRepository, ILogger logger)
+        public InventorizationController(InventorizationRepository inventorizationRepository, ZoneRepository zoneRepository, ActionRepository actionRepository, CompanyRepository companyRepository)
         {
             _inventorizationRepository = inventorizationRepository;
             _zoneRepository = zoneRepository;
             _actionRepository = actionRepository;
-            _logger = logger;
+            _companyRepository = companyRepository;
+        }
 
-    }
-
-    [HttpGet]
+        [HttpGet]
         public HttpResponseMessage Get(string id)
         {
             Guid _id;
@@ -66,22 +66,106 @@ namespace Inventorization.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
+        [HttpGet]
+        [Route("{inventorization}/zone")]
+        public HttpResponseMessage SearchZone(Guid inventorization, [FromUri]string code)
+        {
+            try
+            {
+                Zone zone = _zoneRepository.GetZone(code);
+                return Request.CreateResponse(HttpStatusCode.OK, zone);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Error. Zone code:{Environment.NewLine} {JsonConvert.SerializeObject(code)}. InventorizationId: {inventorization}");
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [HttpGet]
+        [Route("{inventorization}/zone/open")]
+        public HttpResponseMessage OpenZone(Guid inventorization, [FromUri]string code)
+        {
+            try
+            {
+                Zone zone = _zoneRepository.GetZone(code);
+                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, code);
+                if (state == null)
+                {
+                    if (zone == null)
+                    {
+                        zone = new Zone();
+                        zone.Id = Guid.NewGuid();
+                        zone.Name = "Зона " + code;
+                        zone.Code = code;
+                        _zoneRepository.Create(zone);
+                    }
+
+                    _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
+                    state = _inventorizationRepository.GetZoneState(inventorization, code);
+                }
+                if (state.ClosedAt.HasValue && state.ClosedAt.Value < DateTime.UtcNow)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, zone);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Open zone error. Zone code:{Environment.NewLine} {JsonConvert.SerializeObject(code)}. InventorizationId: {inventorization}");
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        [Route("{inventorization}/zone/{zoneId}/close")]
+        public HttpResponseMessage CloseZone(Guid inventorization, Guid zoneId)
+        {
+            try
+            {
+                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, zoneId);
+                if (state.ClosedAt.HasValue)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
+                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Open zone error. Zone code:{Environment.NewLine} {JsonConvert.SerializeObject(zoneId)}. InventorizationId: {inventorization}");
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
 
         [HttpPost]
         [Route("{inventorization}/action")]
-        public HttpResponseMessage AddAction(Guid inventorization, [FromBody]Business.Model.Action[] actions)
+        public HttpResponseMessage AddAction(Guid inventorization, [FromBody]Business.Model.Action action)
         {
-            foreach (Business.Model.Action action in actions)
+            try
             {
-                try
+                ZoneState zoneState = _inventorizationRepository.GetZoneState(inventorization, action.Zone);
+                if (zoneState == null)
                 {
-                    action.Inventorization = inventorization;
-                    _actionRepository.CreateAction(action);
+                    _inventorizationRepository.OpenZone(inventorization, action.Zone, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
+                    zoneState = _inventorizationRepository.GetZoneState(inventorization, action.Zone);
                 }
-                catch(Exception ex)
+                if (zoneState.ClosedAt.HasValue && zoneState.ClosedAt < DateTime.UtcNow)
                 {
-                    _logger.Error(ex, $"Create action error. Action:{Environment.NewLine} {JsonConvert.SerializeObject(action)}");
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, $"Зона закрыта. Выберите другую зону.");
                 }
+                action.Inventorization = inventorization;
+                _actionRepository.CreateAction(action);
+                var inventarization = _inventorizationRepository.GetInventorization(inventorization);
+                List<Item> items = _companyRepository.GetItems(inventarization.Company);
+                Item foundItem = items.FirstOrDefault(x => x.Code == action.BarCode);
+                if (foundItem != null) {
+                    return Request.CreateResponse(HttpStatusCode.OK, foundItem);
+                }
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex, $"Create action error. Action:{Environment.NewLine} {JsonConvert.SerializeObject(action)}");
             }
             return Request.CreateResponse(HttpStatusCode.OK);
         }

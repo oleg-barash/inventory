@@ -104,5 +104,31 @@ namespace Inventorization.Data
                 }
             }
         }
+
+        public List<Item> GetItems(Guid id)
+        {
+            List<Item> items = new List<Item>();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"SELECT items.* FROM public.""Companies"" AS companies
+                        JOIN public.""Item"" AS items ON items.""CompanyId"" = companies.""Id""
+                        WHERE companies.""Id"" = @Id;";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", id));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            items.Add(reader.ToItem());
+                        }
+                    }
+                }
+            }
+            return items;
+        }
+
     }
 }

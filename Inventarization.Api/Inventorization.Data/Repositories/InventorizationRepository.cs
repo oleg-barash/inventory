@@ -113,8 +113,6 @@ namespace Inventorization.Data
             }
         }
 
-        
-
         public void DeleteInventorization(Guid id)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -129,5 +127,67 @@ namespace Inventorization.Data
                 }
             }
         }
+
+        public ZoneState GetZoneState(Guid id, string zone)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"SELECT * FROM public.""ZoneStates"" AS state
+                        JOIN public.""Zones"" AS zone ON zone.""Code"" = @zone
+                        WHERE ""InventorizationId"" = @id";
+                    cmd.Parameters.Add(new NpgsqlParameter("id", id));
+                    cmd.Parameters.Add(new NpgsqlParameter("zone", zone));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        return reader.Read() ? reader.ToZoneState() : null;
+                    }
+                }
+            }
+        }
+
+        public ZoneState GetZoneState(Guid id, Guid zoneId)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"SELECT * FROM public.""ZoneStates"" AS state
+                        WHERE ""InventorizationId"" = @id AND ""ZoneId"" = @zoneId";
+                    cmd.Parameters.Add(new NpgsqlParameter("zoneId", zoneId));
+                    cmd.Parameters.Add(new NpgsqlParameter("id", id));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        return reader.Read() ? reader.ToZoneState() : null;
+                    }
+                }
+            }
+        }
+
+        public void OpenZone(Guid id, Guid zoneId, Guid userId)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    Guid newId = Guid.NewGuid();
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"INSERT INTO public.""ZoneStates""(""ZoneId"", ""InventorizationId"", ""OpenedAt"", ""OpenedBy"") VALUES(:ZoneId, :InventorizationId, :OpenedAt, :OpenedBy)";
+                    cmd.Parameters.Add(new NpgsqlParameter("OpenedAt", DateTime.UtcNow));
+                    cmd.Parameters.Add(new NpgsqlParameter("OpenedBy", userId));
+                    cmd.Parameters.Add(new NpgsqlParameter("ZoneId", zoneId));
+                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", id));
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
+        }
+
     }
 }

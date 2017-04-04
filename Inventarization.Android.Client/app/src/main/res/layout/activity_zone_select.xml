@@ -26,7 +26,7 @@
                 android:layout_weight="1"
                 android:elevation="10dp"
                 android:enabled="false"
-                android:text="@string/accept"
+                android:text="@string/OpenZone"
                 android:visibility="visible" />
 
             <Button
@@ -51,15 +51,6 @@
                 android:visibility="visible" />
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            tools:visibility="invisible"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true" />
-
         <TextView
             android:id="@+id/resultTextView"
             android:layout_width="match_parent"
@@ -73,11 +64,14 @@
             android:id="@+id/scan_result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/progressBar"
             android:layout_weight="0.04"
             android:gravity="center"
-            android:hint="@string/scanner_hint" />
+            android:hint="@string/scanner_hint"
+            android:layout_marginTop="19dp"
+            android:layout_below="@+id/zoneText"
+            android:maxLines="1"
+            android:inputType="none"
+            android:layout_alignParentLeft="true" />
 
         <TextView
             android:id="@+id/zoneText"

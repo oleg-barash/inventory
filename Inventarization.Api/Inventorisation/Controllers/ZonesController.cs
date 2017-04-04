@@ -100,10 +100,12 @@ namespace Inventorization.Controllers
         }
 
         [HttpGet]
+        [Route("{id}")]
         public HttpResponseMessage Get(Guid id)
         {
-            return Request.CreateResponse(HttpStatusCode.OK, _zoneRepository.GetZones(new Guid[] { id }));
+            return Request.CreateResponse(HttpStatusCode.OK, _zoneRepository.GetZone(id));
         }
+
 
         [HttpGet]
         public HttpResponseMessage Get(string code)

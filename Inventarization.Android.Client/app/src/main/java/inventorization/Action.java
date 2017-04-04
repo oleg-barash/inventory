@@ -16,4 +16,5 @@ public class Action {
     public String Zone;
     public String Inventorization;
     public Integer Quantity;
+    public ActionStatus Status;
 }
