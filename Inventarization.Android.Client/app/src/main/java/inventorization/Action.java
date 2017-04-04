@@ -15,5 +15,5 @@ public class Action {
     public String BarCode;
     public String Zone;
     public String Inventorization;
-    public int Quantity;
+    public Integer Quantity;
 }

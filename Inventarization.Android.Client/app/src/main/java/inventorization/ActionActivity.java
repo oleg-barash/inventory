@@ -67,7 +67,10 @@ public class ActionActivity extends Activity {
     private String barcodeStr;
     private boolean isScaning = false;
     private String currentZone;
-    Action action;
+    Action newAction;
+    ActionType newActionType = ActionType.FirstScan;
+    List actionList = new ArrayList();
+
     private static final String TAG = "ActionActivity";
     private String baseUrl = "http://192.168.0.103/api/zone/";
     private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
@@ -79,24 +82,26 @@ public class ActionActivity extends Activity {
             soundpool.play(soundid, 1, 1, 0, 0, 1);
             showScanResult.setText("");
             mVibrator.vibrate(100);
-            action = new Action();
+            newAction = new Action();
             byte[] barcode = intent.getByteArrayExtra("barocode");
             int barocodelen = intent.getIntExtra("length", 0);
-            byte temp = intent.getByteExtra("barcodeType", (byte) 0);
-            android.util.Log.i("debug", "----codetype--" + temp);
-            action.BarCode = new String(barcode, 0, barocodelen);
-            showScanResult.setText(barcodeStr);
-
+            newAction.BarCode = new String(barcode, 0, barocodelen);
+            showScanResult.setText(newAction.BarCode);
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-            String uuid = UUID.randomUUID().toString();
+            newAction.Id = UUID.randomUUID().toString();
+            newAction.Quantity = 1;
+            newAction.Type = newActionType;
+            newAction.Zone = currentZone;
+            newAction.BarCode = UUID.randomUUID().toString();
             HashMap<String, String> params = new HashMap<String, String>();
-            params.put("id", uuid);
-            params.put("quantity", "1");
-            params.put("type", "1");
-            params.put("barCode", showScanResult.getText().toString());
+            params.put("id", newAction.Id);
+            params.put("quantity", newAction.Quantity.toString());
+            params.put("type", newAction.Type.toString());
+            params.put("barCode", newAction.BarCode);
             SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
             formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
             params.put("dateTime", formatUTC.format(new Date()));
+            actionList.add(newAction);
 
             JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + currentZone + "/action", new JSONObject(params),
                     new Response.Listener<JSONObject>() {
