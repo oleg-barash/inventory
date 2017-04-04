@@ -43,7 +43,7 @@ namespace Inventorization.Tests.Data
                 DateTime = DateTime.UtcNow,
                 Type = ActionType.FirstScan,
                 UserId = user.Id,
-                Zone = inventarisation.Id,
+                Inventorization = inventarisation.Id,
                 BarCode = "1",
                 Quantity = 1,
             };
@@ -84,7 +84,6 @@ namespace Inventorization.Tests.Data
             Zone firstZone = new Zone()
             {
                 Id = firstZoneId,
-                Inventorization = inventarisation.Id,
                 Name = "тестовая зона 1"
             };
             zoneRepository.Create(firstZone);
@@ -135,7 +134,6 @@ namespace Inventorization.Tests.Data
             Zone firstZone = new Zone()
             {
                 Id = firstZoneId,
-                Inventorization = inventarisation.Id,
                 Name = "тестовая зона 1"
             };
             zoneRepository.Create(firstZone);

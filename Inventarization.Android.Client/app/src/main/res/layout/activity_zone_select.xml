@@ -1,33 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:gravity="center">
 
-    <TextView
-        android:id="@+id/zoneText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Просканируйте зону для начала сканирования товаров"/>
-    <EditText
-        android:id="@+id/scan_result"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:hint="@string/scanner_hint"
-        android:layout_weight="0.04" />
-    <TextView
-        android:id="@+id/resultTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Название зоны" />
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/okButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/accept" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/linearLayout">
 
+            <Button
+                android:id="@+id/okButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_weight="1"
+                android:elevation="10dp"
+                android:enabled="false"
+                android:text="@string/accept"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/createButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:text="@string/create"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/findButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_weight="1"
+                android:text="@string/Search"
+                android:visibility="visible" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            tools:visibility="invisible"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true" />
+
+        <TextView
+            android:id="@+id/resultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.00"
+            android:text="Название зоны"
+            android:layout_above="@+id/linearLayout"
+            android:layout_alignParentLeft="true" />
+
+        <EditText
+            android:id="@+id/scan_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/progressBar"
+            android:layout_weight="0.04"
+            android:gravity="center"
+            android:hint="@string/scanner_hint" />
+
+        <TextView
+            android:id="@+id/zoneText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Просканируйте зону для начала сканирования товаров" />
+
+    </RelativeLayout>
 </LinearLayout>

@@ -11,7 +11,7 @@
     <string name="scanner_beep_summary">Проигрывать звук в случае успешного сканирования</string>
     <string name="scanner_enter">Additional enter key</string>
     <string name="scanner_enter_summary">Additional enter key after the scan results</string>
-    <string name="scanner_hint">Для скарирования кода нажмите соответствующую клавишу на устройстве, либо кнопку ниже</string>
+    <string name="scanner_hint">Для сканирования кода нажмите соответствующую клавишу на устройстве</string>
     <string name="scanner_keyboard_mode">Режим клавиатуры</string>
     <string name="scanner_keyboard_output">Вывод в режиме клавиатуры</string>
     <string name="scanner_keyboard_output_summary">Выводи результата в выделенное поле ввода</string>
@@ -33,4 +33,7 @@
     <string name="close_zone">Закрыть зону</string>
     <string name="zone">Зона</string>
     <string name="title_activity_zone_select">Выбор зоны</string>
+    <string name="accept">Принять</string>
+    <string name="create">Создать</string>
+    <string name="Search">Поиск</string>
 </resources>

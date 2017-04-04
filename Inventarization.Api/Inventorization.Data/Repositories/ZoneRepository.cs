@@ -24,9 +24,8 @@ namespace Inventorization.Data
                 using (var cmd = new NpgsqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = @"INSERT INTO public.""Zones""(""Id"", ""Inventorization"", ""Name"", ""Code"") VALUES(:Id, :Inventorization, :Name, :Code)";
+                    cmd.CommandText = @"INSERT INTO public.""Zones""(""Id"", ""Name"", ""Code"") VALUES(:Id, :Name, :Code)";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", zone.Id));
-                    cmd.Parameters.Add(new NpgsqlParameter("Inventorization", zone.Inventorization));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", zone.Name));
                     cmd.Parameters.Add(new NpgsqlParameter("Code", zone.Code));
                     
@@ -44,18 +43,17 @@ namespace Inventorization.Data
                 {
                     cmd.Connection = conn;
                     cmd.CommandText = @"UPDATE public.""Zones""
-                        SET ""Inventorization"" = @Inventorization,
-                            ""Name"" = @Name 
+                        SET ""Name"" = @Name 
                         WHERE ""Id"" == @Id";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", zone.Id));
-                    cmd.Parameters.Add(new NpgsqlParameter("Inventorization", zone.Inventorization));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", zone.Name));
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        public List<Zone> GetZonesByInventorization(Guid inventorization)
+
+        public List<Zone> GetZones()
         {
             List<Zone> result = new List<Zone>();
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -64,9 +62,7 @@ namespace Inventorization.Data
                 using (var cmd = new NpgsqlCommand())
                 {
                     cmd.Connection = conn;
-
-                    cmd.CommandText = "SELECT * FROM public.\"Zones\" WHERE \"Inventorization\" = @Id";
-                    cmd.Parameters.Add(new NpgsqlParameter("Id", inventorization));
+                    cmd.CommandText = "SELECT * FROM public.\"Zones\"";
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())

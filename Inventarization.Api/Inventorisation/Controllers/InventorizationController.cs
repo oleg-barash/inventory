@@ -1,6 +1,8 @@
 ﻿using Inventorization.Api.Formatters;
 using Inventorization.Business.Model;
 using Inventorization.Data;
+using Newtonsoft.Json;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +22,18 @@ namespace Inventorization.Api.Controllers
         private InventorizationRepository _inventorizationRepository;
         private ZoneRepository _zoneRepository;
         private ActionRepository _actionRepository;
+        private ILogger _logger;
 
-        public InventorizationController(InventorizationRepository inventorizationRepository, ZoneRepository zoneRepository, ActionRepository actionRepository)
+        public InventorizationController(InventorizationRepository inventorizationRepository, ZoneRepository zoneRepository, ActionRepository actionRepository, ILogger logger)
         {
             _inventorizationRepository = inventorizationRepository;
             _zoneRepository = zoneRepository;
             _actionRepository = actionRepository;
-        }
+            _logger = logger;
 
-        [HttpGet]
+    }
+
+    [HttpGet]
         public HttpResponseMessage Get(string id)
         {
             Guid _id;
@@ -63,86 +68,23 @@ namespace Inventorization.Api.Controllers
 
 
         [HttpPost]
-        [Route("{inventorization}/zone")]
-        public HttpResponseMessage CreateZone(Guid inventorization, [FromBody]Zone zone)
+        [Route("{inventorization}/action")]
+        public HttpResponseMessage AddAction(Guid inventorization, [FromBody]Business.Model.Action[] actions)
         {
-            zone.Inventorization = inventorization;
-            _zoneRepository.Create(zone);
+            foreach (Business.Model.Action action in actions)
+            {
+                try
+                {
+                    action.Inventorization = inventorization;
+                    _actionRepository.CreateAction(action);
+                }
+                catch(Exception ex)
+                {
+                    _logger.Error(ex, $"Create action error. Action:{Environment.NewLine} {JsonConvert.SerializeObject(action)}");
+                }
+            }
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
-        [HttpGet]
-        [Route("{inventorization}/zone/generate")]
-        public HttpResponseMessage CreateZoneList(Guid inventorization, [FromUri]int count)
-        {
-            List<Zone> zones = new List<Zone>();
-            Zone[] currentZones = _zoneRepository.GetZonesByInventorization(inventorization).ToArray();
-            for (int i = 1; i <= count; i++)
-            {
-                string code = i.ToString("0000");
-                Zone zone = currentZones.FirstOrDefault(x => x.Code == code);
-                if (zone == null)
-                {
-                    zone = new Zone();
-                    zone.Id = Guid.NewGuid();
-                    zone.Inventorization = inventorization;
-                    zone.Name = "Зона " + i;
-                    zone.Code = code;
-                    _zoneRepository.Create(zone);
-                }
-                zones.Add(zone);
-            }
-
-            var negotiator = this.Configuration.Services.GetContentNegotiator();
-
-            var result = negotiator.Negotiate(typeof(List<Zone>),
-                           this.Request,
-                           this.Configuration.Formatters);
-
-            // no formatter found
-            if (result == null)
-            {
-                throw new HttpResponseException(
-                      new HttpResponseMessage(HttpStatusCode.NotAcceptable));
-            }
-
-            var response = new HttpResponseMessage
-            {
-                Content = new ObjectContent<List<Zone>>(
-                    zones,  // data
-                    result.Formatter, // media formatter
-                    result.MediaType.MediaType // MIME type
-                )
-            };
-
-            // add the `content-disposition` response header
-            // to display the "File Download" dialog box 
-            response.Content.Headers.ContentDisposition =
-                new ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = "cars-download." + GetFileExt(result.Formatter)
-                };
-
-            return response;
-
-        }
-
-        private string GetFileExt(MediaTypeFormatter formatter)
-        {
-            if (formatter is JsonMediaTypeFormatter)
-            {
-                return "json";
-            }
-
-            if (formatter is CsvMediaTypeFormatter)
-            {
-                return "csv";
-            }
-
-            // default to text
-            return "txt";
-        }
-
 
         [HttpGet]
         [Route("{inventorization}/action")]

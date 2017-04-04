@@ -25,13 +25,14 @@ namespace Inventorization.Data
                 using (var cmd = new NpgsqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = "INSERT INTO public.\"Actions\"(\"Id\", \"DateTime\", \"Action\", \"UserId\", \"BarCode\", \"Zone\", \"Quantity\") VALUES(:Id, :DateTime, :Action, :UserId, :BarCode, :Zone, :Quantity)";
+                    cmd.CommandText = "INSERT INTO public.\"Actions\"(\"Id\", \"DateTime\", \"Action\", \"UserId\", \"BarCode\", \"Zone\", \"Inventorization\", \"Quantity\") VALUES(:Id, :DateTime, :Action, :UserId, :BarCode, :Zone, :Inventorization, :Quantity)";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", action.Id));
                     cmd.Parameters.Add(new NpgsqlParameter("DateTime", action.DateTime));
                     cmd.Parameters.Add(new NpgsqlParameter("Action", (int)action.Type));
                     cmd.Parameters.Add(new NpgsqlParameter("UserId", action.UserId));
                     cmd.Parameters.Add(new NpgsqlParameter("BarCode", action.BarCode));
                     cmd.Parameters.Add(new NpgsqlParameter("Zone", action.Zone));
+                    cmd.Parameters.Add(new NpgsqlParameter("Inventorization", action.Inventorization));
                     cmd.Parameters.Add(new NpgsqlParameter("Quantity", action.Quantity));
                     cmd.ExecuteNonQuery();
 

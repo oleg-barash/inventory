@@ -33,4 +33,7 @@
     <string name="close_zone">Close zone</string>
     <string name="zone">Zone</string>
     <string name="title_activity_zone_select">ZoneSelectActivity</string>
+    <string name="accept">Ok</string>
+    <string name="create">Create</string>
+    <string name="Search">Search</string>
 </resources>

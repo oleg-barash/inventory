@@ -10,6 +10,7 @@ namespace Inventorization.Business.Model
         public Guid UserId { get; set; }
         public string BarCode { get; set; }
         public Guid Zone { get; set; }
+        public Guid Inventorization { get; set; }
         public int Quantity { get; set; }
     }
 }

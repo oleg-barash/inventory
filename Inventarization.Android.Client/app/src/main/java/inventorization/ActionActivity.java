@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.device.ScanManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,23 +24,34 @@ import android.widget.TextView;
 
 import android.os.AsyncTask;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.text.SimpleDateFormat;
 
 
-public class MainActivity extends Activity {
+public class ActionActivity extends Activity {
 
     private final static String SCAN_ACTION = "urovo.rcv.message";
     public static final String ZONE_MESSAGE = "com.inventorization.ZONE";
@@ -47,9 +59,7 @@ public class MainActivity extends Activity {
     private Button mScan;
     private Button mClose;
     private TextView textView;
-    private int type;
-    private int outPut;
-    
+
     private Vibrator mVibrator;
     private ScanManager mScanManager;
     private SoundPool soundpool = null;
@@ -57,6 +67,9 @@ public class MainActivity extends Activity {
     private String barcodeStr;
     private boolean isScaning = false;
     private String currentZone;
+    Action action;
+    private static final String TAG = "ActionActivity";
+    private String baseUrl = "http://192.168.0.103/api/zone/";
     private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
 
         @Override
@@ -66,23 +79,50 @@ public class MainActivity extends Activity {
             soundpool.play(soundid, 1, 1, 0, 0, 1);
             showScanResult.setText("");
             mVibrator.vibrate(100);
-
+            action = new Action();
             byte[] barcode = intent.getByteArrayExtra("barocode");
-            //byte[] barcode = intent.getByteArrayExtra("barcode");
             int barocodelen = intent.getIntExtra("length", 0);
             byte temp = intent.getByteExtra("barcodeType", (byte) 0);
             android.util.Log.i("debug", "----codetype--" + temp);
-            barcodeStr = new String(barcode, 0, barocodelen);
-
+            action.BarCode = new String(barcode, 0, barocodelen);
             showScanResult.setText(barcodeStr);
 
-            try {
-                String result = new ActionUploader().execute(barcodeStr).get();
-                textView.setText(result);
-            }
-            catch (Exception ex){
-                textView.setText(ex.getMessage());
-            }
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            String uuid = UUID.randomUUID().toString();
+            HashMap<String, String> params = new HashMap<String, String>();
+            params.put("id", uuid);
+            params.put("quantity", "1");
+            params.put("type", "1");
+            params.put("barCode", showScanResult.getText().toString());
+            SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+            formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+            params.put("dateTime", formatUTC.format(new Date()));
+
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + currentZone + "/action", new JSONObject(params),
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                String name = response.toString();
+                                resultTextView.setText(name);
+                                showToast("Зона создана");
+                                setState(ZoneActivityStates.ZoneCreated);
+                            }
+                            catch (IOException exception){
+                                Log.e(TAG, "Error parsing zone: " + response.toString());
+                                setState(ZoneActivityStates.Error);
+                            }
+
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    setState(ZoneActivityStates.ZoneNotFound);
+                    showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
+
+                }
+            });
+            queue.add(jsonRequest);
         }
 
     };
@@ -98,42 +138,8 @@ public class MainActivity extends Activity {
         setupView();
 
         Intent intent = getIntent();
-        currentZone = intent.getStringExtra(MainActivity.ZONE_MESSAGE);
+        currentZone = intent.getStringExtra(ActionActivity.ZONE_MESSAGE);
     }
-
-    private class ActionUploader extends AsyncTask<String, Void, String> {
-
-        protected String doInBackground(String... barcodeStr) {
-            HttpClient httpclient = new DefaultHttpClient();
-            String address = "http://192.168.0.106/api/zone/" + currentZone + "/action";
-            HttpPost http = new HttpPost(address);
-            List nameValuePairs = new ArrayList(5);
-            String uuid = UUID.randomUUID().toString();
-            nameValuePairs.add(new BasicNameValuePair("id", uuid));
-            nameValuePairs.add(new BasicNameValuePair("quantity", "1"));
-            nameValuePairs.add(new BasicNameValuePair("type", "1"));
-            nameValuePairs.add(new BasicNameValuePair("barCode", barcodeStr[0]));
-            SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
-            formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
-            nameValuePairs.add(new BasicNameValuePair("dateTime", formatUTC.format(new Date())));
-            String response;
-            try {
-                http.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            }
-            catch (Exception ex){
-                response = address + " -> " + ex.getMessage();
-                return  response;
-            }
-            try {
-                response = httpclient.execute(http, new BasicResponseHandler());
-            }
-            catch (Exception ex){
-                response = address + " -> " + ex.getMessage();
-            }
-            return response;
-        }
-    }
-
 
     private void initScan() {
         // TODO Auto-generated method stub

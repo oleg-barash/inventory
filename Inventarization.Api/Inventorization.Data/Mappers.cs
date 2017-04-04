@@ -16,10 +16,11 @@ namespace Inventorization.Data
                 Id = reader.GetGuid(0),
                 DateTime = reader.GetDateTime(1),
                 UserId = reader.GetGuid(2),
-                Zone = reader.GetGuid(3),
+                Inventorization = reader.GetGuid(3),
                 Quantity= reader.GetInt32(4),
                 Type = (ActionType)reader.GetInt32(5),
-                BarCode = reader.GetString(6)
+                BarCode = reader.GetString(6),
+                Zone = reader.GetGuid(7),
             };
         }
 
@@ -81,8 +82,7 @@ namespace Inventorization.Data
             {
                 Id = reader.GetGuid(0),
                 Name = reader.GetString(1),
-                Inventorization = reader.GetGuid(2),
-                Code = reader.GetString(3)
+                Code = reader.GetString(2)
             };
         }
 
