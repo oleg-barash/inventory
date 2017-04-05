@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { Provider } from 'react-redux'
 import {
@@ -11,6 +11,7 @@ import {
   Link
 } from 'react-router-dom'
 import { actionList } from './reducers/actionReducers'
+import { itemList } from './reducers/itemReducers'
 
 import Main from './Main.js';
 import Login from './Login.js';
@@ -21,7 +22,7 @@ injectTapEventPlugin();
 const loggerMiddleware = createLogger()
 
 let store = createStore(
-    actionList,
+    combineReducers({ actions: actionList, items: itemList }),
     applyMiddleware(
         thunkMiddleware, // lets us dispatch() functions
         loggerMiddleware // neat middleware that logs actions

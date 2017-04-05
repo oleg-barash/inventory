@@ -14,22 +14,19 @@ function getTypeName(type){
     }
 }
 
-const ActionRow = ({ action }) => (
+const ItemRow = ({ item }) => (
     <TableRow>
-        <TableRowColumn>{moment(action.DateTime).format("DD MMMM hh:mm")}</TableRowColumn>
-        <TableRowColumn>{getTypeName(action.Type)}</TableRowColumn>
-        <TableRowColumn>{action.User}</TableRowColumn>
-        <TableRowColumn>{action.BarCode}</TableRowColumn>
-        <TableRowColumn>{action.Zone}</TableRowColumn>
-        <TableRowColumn>{action.Quantity}</TableRowColumn>
+        <TableRowColumn>{item.BarCode}</TableRowColumn>
+        <TableRowColumn>{item.QuantityPlan}</TableRowColumn>
+        <TableRowColumn>{item.QuantityFact}</TableRowColumn>
     </TableRow>
 )
 
-ActionRow.propTypes = {
-    action: PropTypes.shape({
-        Id: PropTypes.string.isRequired,
+ItemRow.propTypes = {
+    item: PropTypes.shape({
+        BarCode: PropTypes.string.isRequired,
     }).isRequired
 }
 
 
-export default ActionRow
+export default ItemRow

@@ -108,6 +108,7 @@ namespace Inventorization.Data
                 Code = reader.GetString(1),
                 CompanyId = reader.GetGuid(2),
                 Description = reader.GetString(3),
+                Quantity = reader.IsDBNull(4) ? default(int) : reader.GetInt32(4)
             };
         }
 

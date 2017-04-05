@@ -50,9 +50,8 @@ namespace Inventorization.Data
                 {
                     cmd.Connection = conn;
 
-                    cmd.CommandText = @"SELECT a.* FROM public.""Actions"" AS a
-                                    JOIN public.""Zones"" AS z ON z.""Id"" = a.""Zone""
-                                    WHERE z.""Inventorization"" =  @Id";
+                    cmd.CommandText = @"SELECT * FROM public.""Actions""
+                                    WHERE ""Inventorization"" =  @Id";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", inventarisation));
                     using (var reader = cmd.ExecuteReader())
                     {
