@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.device.ScanManager;
 import android.provider.CalendarContract;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -90,6 +92,7 @@ public class ActionActivity extends Activity {
     private static final String TAG = "ActionActivity";
     private String baseUrl = Configuration.BaseUrl + "inventorization/" + inventorizationId + "/";
     private String baseZoneUrl = Configuration.BaseUrl + "zone/";
+    private String baseActionUrl = Configuration.BaseUrl + "action/";
     private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
 
         @Override
@@ -99,68 +102,83 @@ public class ActionActivity extends Activity {
             soundpool.play(soundid, 1, 1, 0, 0, 1);
             showScanResult.setText("");
             mVibrator.vibrate(100);
-            if (newAction != null){
-                actionList.addFirst(newAction.BarCode);
-                adapter.notifyDataSetChanged();
-            }
-            newAction = new Action();
             byte[] barcode = intent.getByteArrayExtra("barocode");
             int barcodeLen = intent.getIntExtra("length", 0);
-            newAction.BarCode = new String(barcode, 0, barcodeLen);
-            showScanResult.setText(newAction.BarCode);
-            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-            newAction.Id = UUID.randomUUID().toString();
-            newAction.Quantity = 1;
-            newAction.Type = newActionType;
-            newAction.Zone = currentZone;
-            newAction.Inventorization = inventorizationId;
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put("id", newAction.Id);
-            params.put("quantity", newAction.Quantity.toString());
-            params.put("type", newAction.Type.toString());
-            params.put("barCode", newAction.BarCode);
-            params.put("inventorization", newAction.Inventorization);
-            params.put("zone", newAction.Zone);
-            SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
-            formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
-            params.put("dateTime", formatUTC.format(new Date()));
 
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + "/action", new JSONObject(params),
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try{
-                                ObjectMapper mapper = new ObjectMapper();
-                                Item item = mapper.readValue(response.toString(), Item.class);
-                                description.setText(item.Description);
-                                description.setBackgroundColor(Color.GREEN);
-                                newAction.Status = ActionStatus.Sent;
-                            }
-                            catch (IOException exception){
-                                Log.e(TAG, "Error parsing item: " + response.toString());
-                            }
+            addAction(new String(barcode, 0, barcodeLen));
 
+        }
+
+    };
+
+    private void addAction(String code){
+
+        if (newAction != null){
+            actionList.addFirst(newAction.BarCode);
+            adapter.notifyDataSetChanged();
+        }
+        newAction = new Action();
+        newAction.BarCode = code;
+        showScanResult.setText(newAction.BarCode);
+        newAction.Id = UUID.randomUUID().toString();
+        newAction.Quantity = 1;
+        newAction.Type = newActionType;
+        newAction.Zone = currentZone;
+        newAction.Inventorization = inventorizationId;
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", newAction.Id);
+        params.put("quantity", newAction.Quantity.toString());
+        params.put("type", newAction.Type.toString());
+        params.put("barCode", newAction.BarCode);
+        params.put("inventorization", newAction.Inventorization);
+        params.put("zone", newAction.Zone);
+        SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+        formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+        params.put("dateTime", formatUTC.format(new Date()));
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + "/action", new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                            ObjectMapper mapper = new ObjectMapper();
+                            Item item = mapper.readValue(response.toString(), Item.class);
+                            description.setText(item.Description);
+                            description.setBackgroundColor(Color.GREEN);
+                            newAction.Status = ActionStatus.Sent;
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    newAction.Status = ActionStatus.Error;
-                    if (error.networkResponse != null && error.networkResponse.statusCode == 404){
-                        soundpool.play(errorSoundid, 1, 1, 0, 0, 1);
-                        description.setText("Товар не найден.");
-                        description.setBackgroundColor(Color.RED);
+                        catch (IOException exception){
+                            Log.e(TAG, "Error parsing item: " + response.toString());
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                newAction.Status = ActionStatus.Error;
+                if (error.networkResponse != null && error.networkResponse.statusCode == 404){
+                    soundpool.play(errorSoundid, 1, 1, 0, 0, 1);
+                    description.setText("Товар не найден.");
+                    description.setBackgroundColor(Color.RED);
+                }
+                else {
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 403){
+                        showToast("Зона уже закрыта. Выберите другую зону.");
+                        Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
+                        startActivity(intent);
                     }
                     else {
                         showToast("Ошибка при регистрации штрих-кода: " + error.toString());
                     }
                 }
-            });
-            jsonRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            queue.add(jsonRequest);
-        }
+            }
+        });
+        jsonRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(jsonRequest);
+    }
 
-    };
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
@@ -215,7 +233,26 @@ public class ActionActivity extends Activity {
     private void setupView() {
         // TODO Auto-generated method stub
         showScanResult = (EditText) findViewById(R.id.scan_result);
+
         quantity = (EditText) findViewById(R.id.quantity);
+
+        TextWatcher fieldValidatorTextWatcher = new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                okButton.setEnabled(!quantity.getText().toString().isEmpty());
+            }
+        };
+
+        quantity.addTextChangedListener(fieldValidatorTextWatcher);
+
         okButton = (Button) findViewById(R.id.okButton);
         okButton.setOnClickListener(new OnClickListener() {
                                         @Override
@@ -228,26 +265,46 @@ public class ActionActivity extends Activity {
         closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, baseUrl + "/zone/" + currentZone + "/close",
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                showToast("Зона закрыта");
+                try {
+                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, baseUrl + "zone/" + currentZone + "/close",
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    showToast("Зона закрыта");
+                                    Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
+                                    startActivity(intent);
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            if (error.networkResponse.statusCode == 403) {
+                                showToast("Зона уже закрыта");
                                 Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
                                 startActivity(intent);
                             }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        showToast("Ошибка при закрытии зоны. Код " + error.networkResponse.statusCode);
-                    }
-                });
-                queue.add(stringRequest);
+                            else {
+                                showToast("Ошибка при закрытии зоны. Код " + error.networkResponse.statusCode);
+                            }
+
+                        }
+                    });
+                    queue.add(stringRequest);
+                }
+                catch (Exception ex){
+                    showToast("Ошибка при закрытии зоны.");
+                    Log.e(TAG, ex.getMessage());
+                }
             }
         });
 
         findButton = (Button) findViewById(R.id.findButton);
+        findButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                addAction(showScanResult.getText().toString());
+            }
+        });
 
         description = (TextView) findViewById(R.id.description);
         zone_title =  (TextView) findViewById(R.id.zone_title);
@@ -299,20 +356,26 @@ public class ActionActivity extends Activity {
 
     public void updateQuantity(){
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        newAction.Quantity = Integer.getInteger(quantity.getText().toString());
+        newAction.Quantity = Integer.parseInt(quantity.getText().toString());
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("quantity", newAction.Quantity.toString());
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + currentZone + "/action/" + newAction.Id, new JSONObject(params),
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseActionUrl + newAction.Id, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         newAction.Status = ActionStatus.Sent;
+                        showToast("Изменение количества товара успешно зафиксировано.");
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 newAction.Status = ActionStatus.Error;
-                showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
+                if (error.networkResponse != null) {
+                    showToast("Ошибка изменении количества товара. Код " + error.networkResponse.statusCode);
+                }
+                else{
+                    showToast("Ошибка изменении количества товара.");
+                }
 
             }
         });

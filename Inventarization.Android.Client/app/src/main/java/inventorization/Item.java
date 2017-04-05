@@ -9,4 +9,5 @@ public class Item {
     public String Code;
     public String CompanyId;
     public String Description;
+    public Integer Quantity;
 }

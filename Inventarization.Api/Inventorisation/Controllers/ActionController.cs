@@ -22,5 +22,13 @@ namespace Inventorization.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, _actionRepository.GetActionsByInventorization(id));
         }
 
+        [HttpPost]
+        [Route("{id}")]
+        public HttpResponseMessage Update(Guid id, [FromBody]Business.Model.Action action)
+        {
+            _actionRepository.UpdateAction(id, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"), action.Quantity);
+            return Request.CreateResponse(HttpStatusCode.OK, action);
+        }
+
     }
 }

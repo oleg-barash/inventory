@@ -75,7 +75,7 @@ public class ZoneSelectActivity extends Activity {
         toast.show();
     }
 
-    private void createZone(String code){
+    private void openZone(String code){
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         StringRequest stringRequest = new StringRequest(Request.Method.GET, baseInventorizationUrl + "/zone/open?code=" + code,
                             new Response.Listener<String>()  {
@@ -84,9 +84,9 @@ public class ZoneSelectActivity extends Activity {
                         try {
                             ObjectMapper mapper = new ObjectMapper();
                             zone = mapper.readValue(response.toString(), Zone.class);
-                            resultTextView.setText(zone.Name);
-                            showToast("Зона создана");
-                            setState(ZoneActivityStates.ZoneCreated);
+                            Intent intent = new Intent(ZoneSelectActivity.this, ActionActivity.class);
+                            intent.putExtra(ActionActivity.ZONE_MESSAGE, zone.Id);
+                            startActivity(intent);
                         }
                         catch (IOException exception){
                             Log.e(TAG, "Error parsing zone: " + response.toString());
@@ -97,13 +97,20 @@ public class ZoneSelectActivity extends Activity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                setState(ZoneActivityStates.ZoneNotFound);
-                showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
+                setState(ZoneActivityStates.Initial);
+                if (error.networkResponse.statusCode == 403) {
+                    showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
+                }
+                else {
+                    showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
+                }
 
             }
         });
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
     }
+
 
     private void setupView() {
         // TODO Auto-generated method stub
@@ -133,7 +140,7 @@ public class ZoneSelectActivity extends Activity {
                                             @Override
                                             public void onClick(View arg0) {
                                                 if (showScanResult.getText() != null && !showScanResult.getText().toString().isEmpty()) {
-                                                    createZone(showScanResult.getText().toString());
+                                                    openZone(showScanResult.getText().toString());
                                                 }
                                                 else{
                                                     showToast("Просканируйте зону, либо укажите номер зоны при помощи клавиатуры");
@@ -145,14 +152,11 @@ public class ZoneSelectActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                String barcodeStr = showScanResult.getText().toString();
-                if(barcodeStr != null && !barcodeStr.isEmpty()) {
-                    Intent intent = new Intent(ZoneSelectActivity.this, ActionActivity.class);
-                    intent.putExtra(ActionActivity.ZONE_MESSAGE, zone.Id);
-                    startActivity(intent);
+                if (showScanResult.getText() != null && !showScanResult.getText().toString().isEmpty()) {
+                    openZone(showScanResult.getText().toString());
                 }
                 else{
-                    showToast("Укажите зону");
+                    showToast("Просканируйте зону, либо укажите номер зоны при помощи клавиатуры");
                 }
             }
         });
@@ -253,7 +257,7 @@ public class ZoneSelectActivity extends Activity {
                                 showToast("Зона найдена");
                                 setState(ZoneActivityStates.ZoneFound);
                             }
-                            catch (IOException exception){
+                            catch (Exception exception){
                                 Log.e(TAG, "Error parsing zone: " + response.toString());
                                 setState(ZoneActivityStates.Error);
                             }

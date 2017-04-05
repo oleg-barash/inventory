@@ -79,5 +79,26 @@ namespace Inventorization.Data
                 }
             }
         }
+
+        public void UpdateAction(Guid actionId, Guid userId, int quantity)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"UPDATE public.""Actions""
+                            SET ""DateTime""=@dateTime, ""UserId""=@userId, ""Quantity""=@quantity
+                        WHERE ""Id"" = @id";
+                    cmd.Parameters.Add(new NpgsqlParameter("id", actionId));
+                    cmd.Parameters.Add(new NpgsqlParameter("dateTime", DateTime.UtcNow));
+                    cmd.Parameters.Add(new NpgsqlParameter("userId", userId));
+                    cmd.Parameters.Add(new NpgsqlParameter("quantity", quantity));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
     }
 }

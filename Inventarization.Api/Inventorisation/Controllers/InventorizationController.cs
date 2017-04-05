@@ -73,6 +73,10 @@ namespace Inventorization.Api.Controllers
             try
             {
                 Zone zone = _zoneRepository.GetZone(code);
+                if (zone == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
                 return Request.CreateResponse(HttpStatusCode.OK, zone);
             }
             catch (Exception ex)
@@ -124,10 +128,11 @@ namespace Inventorization.Api.Controllers
             try
             {
                 ZoneState state = _inventorizationRepository.GetZoneState(inventorization, zoneId);
-                if (state.ClosedAt.HasValue)
+                if (state.ClosedAt.HasValue && state.ClosedAt < DateTime.UtcNow)
                 {
                     return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
                 }
+                _inventorizationRepository.CloseZone(state, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -187,7 +192,7 @@ namespace Inventorization.Api.Controllers
                 Zone = zones.FirstOrDefault(z => z.Id == x.Zone).Name,
                 BarCode = x.BarCode
             });
-            return Request.CreateResponse(HttpStatusCode.OK, result);
+            return Request.CreateResponse(HttpStatusCode.OK, result.OrderByDescending(x => x.DateTime));
         }
 
         [HttpGet]

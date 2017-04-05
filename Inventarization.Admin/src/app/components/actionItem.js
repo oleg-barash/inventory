@@ -7,9 +7,9 @@ import moment from 'moment';
 moment.locale("ru-RU")
 function getTypeName(type){
     switch(type){
-        case 1: return "первое сканирование";
-        case 2: return "второе сканирование";
-        case 3: return "третье сканирование";
+        case 0: return "первое сканирование";
+        case 1: return "второе сканирование";
+        case 2: return "третье сканирование";
         default: "неизвестно"
     }
 }

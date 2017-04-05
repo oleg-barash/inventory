@@ -138,7 +138,7 @@ namespace Inventorization.Data
                     cmd.Connection = conn;
                     cmd.CommandText = @"SELECT * FROM public.""ZoneStates"" AS state
                         JOIN public.""Zones"" AS zone ON zone.""Code"" = @zone
-                        WHERE ""InventorizationId"" = @id";
+                        WHERE state.""InventorizationId"" = @id AND state.""ZoneId"" = zone.""Id""" ;
                     cmd.Parameters.Add(new NpgsqlParameter("id", id));
                     cmd.Parameters.Add(new NpgsqlParameter("zone", zone));
                     using (var reader = cmd.ExecuteReader())
@@ -168,6 +168,27 @@ namespace Inventorization.Data
                 }
             }
         }
+
+        public void CloseZone(ZoneState state, Guid userId)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"UPDATE public.""ZoneStates"" 
+                        SET ""ClosedAt"" = @date, ""ClosedBy"" = @user
+                        WHERE ""InventorizationId"" = @id AND ""ZoneId"" = @zoneId";
+                    cmd.Parameters.Add(new NpgsqlParameter("zoneId", state.ZoneId));
+                    cmd.Parameters.Add(new NpgsqlParameter("id", state.InventorizationId));
+                    cmd.Parameters.Add(new NpgsqlParameter("date", DateTime.UtcNow));
+                    cmd.Parameters.Add(new NpgsqlParameter("user", userId));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
 
         public void OpenZone(Guid id, Guid zoneId, Guid userId)
         {
