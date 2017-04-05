@@ -3,13 +3,13 @@
  */
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import ActionList from '../components/actionList'
-import { fetchActions } from '../actions/MainActions'
+import ItemList from '../components/itemList'
+import { fetchItems } from '../actions/MainActions'
 
-const getActions = (actions, filter) => {
+const getItems = (items, filter) => {
     // switch (filter) {
     //     case 'SHOW_ALL':
-            return actions;
+            return items;
         // case 'SHOW_COMPLETED':
         //     return actions.filter(t => t.completed)
         // case 'SHOW_ACTIVE':
@@ -19,11 +19,11 @@ const getActions = (actions, filter) => {
 
 const mapStateToProps = (state) => {
     return {
-        actions: getActions(state.actions.items, state.visibilityFilter)
+        items: getItems(state.items.items, state.visibilityFilter)
     }
 }
 
-class AllActionList extends Component {
+class Items extends Component {
     constructor(props) {
         super(props)
         // this.handleChange = this.handleChange.bind(this)
@@ -31,7 +31,7 @@ class AllActionList extends Component {
     }
     componentDidMount() {
         const { dispatch } = this.props
-        dispatch(fetchActions('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+        dispatch(fetchItems('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
     }
     // componentDidUpdate() {
     //     const { dispatch } = this.props
@@ -40,13 +40,13 @@ class AllActionList extends Component {
     render() {
         return (
         <div>
-            <ActionList actions={this.props.actions}/>
+            <ItemList items={this.props.items}/>
         </div>)
     }
 }
 
-AllActionList.propTypes = {
-    actions: PropTypes.array.isRequired
+Items.propTypes = {
+    items: PropTypes.array.isRequired
 }
 
-export default connect(mapStateToProps)(AllActionList)
+export default connect(mapStateToProps)(Items)

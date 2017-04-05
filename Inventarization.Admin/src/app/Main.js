@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
-import AllActionList from './containers/allActions'
+import Items from './containers/items'
+import AllActions from './containers/allActions'
 
 
 const styles = {
@@ -15,15 +16,16 @@ const styles = {
 const Main = () => {
     return (
   <Tabs>
-      <Tab label="Позиции" >
+      <Tab label="Товары" >
           <div>
-              <h2 style={styles.headline}>Позиции</h2>
-              <AllActionList/>
+              <h2 style={styles.headline}>Товары</h2>
+              <Items/>
           </div>
       </Tab>
-    <Tab label="Зоны" >
+    <Tab label="События" >
       <div>
-        <h2 style={styles.headline}>Зоны</h2>
+        <h2 style={styles.headline}>События</h2>
+        <AllActions/>
       </div>
     </Tab>
     <Tab label="Отчёты">

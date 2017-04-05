@@ -171,7 +171,7 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{inventorization}/action")]
+        [Route("{inventorization}/actions")]
         public HttpResponseMessage GetActions(Guid inventorization)
         {
             var actions = _actionRepository.GetActionsByInventorization(inventorization);
@@ -186,6 +186,37 @@ namespace Inventorization.Api.Controllers
                 User = "тестовый",
                 Zone = zones.FirstOrDefault(z => z.Id == x.Zone).Name,
                 BarCode = x.BarCode
+            });
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+        [HttpGet]
+        [Route("{inventorizationId}/items")]
+        public HttpResponseMessage GetItems(Guid inventorizationId, [FromUri]ActionType type = ActionType.FirstScan)
+        {
+            var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
+            var items = _companyRepository.GetItems(inventorization.Company);
+            var actions = _actionRepository.GetActionsByInventorization(inventorizationId);
+            var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
+
+            var result = items.Select(x =>
+            {
+                Models.Item res = new Models.Item();
+                res.QuantityPlan = x.Quantity;
+                res.Type = type;
+                res.BarCode = x.Code;
+                
+                var itemActions = actions.Where(a => a.BarCode == x.Code && a.Type == type).GroupBy(a => a.Zone);
+                res.Actions = new List<Models.ItemDetails>(); 
+                foreach (var zone in itemActions)
+                {
+                    res.Actions.Add(new Models.ItemDetails()
+                    {
+                        Quantity = zone.Sum(z => z.Quantity),
+                        Zone = zones.FirstOrDefault(z => z.Id == zone.Key).Name
+                    });
+                }
+                return res;
             });
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }

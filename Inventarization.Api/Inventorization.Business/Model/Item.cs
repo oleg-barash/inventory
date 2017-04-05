@@ -13,5 +13,6 @@ namespace Inventorization.Business.Model
         public string Code{ get; set; }
         public Guid CompanyId { get; set; }
         public string Description { get; set; }
+        public int? Quantity { get; set; }
     }
 }
