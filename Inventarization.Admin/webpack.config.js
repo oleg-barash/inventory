@@ -4,17 +4,17 @@ const path = require('path');
 const buildPath = path.resolve(__dirname, 'build');
 const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const TransferWebpackPlugin = require('transfer-webpack-plugin');
-
+var publicPath         = 'http://localhost:8050/public'
 const config = {
   // Entry points to the project
   entry: [
     'webpack/hot/only-dev-server',
-    path.join(__dirname, '/src/app/app.js')
+    path.join(__dirname, '/src/app/client.js')
   ],
-
   output: {
-    path: buildPath, // Path of output file
-    filename: 'app.js'
+      path: `${__dirname}/build/`,
+      filename: 'app.js',
+      publicPath
   },
   plugins: [
     // Enables Hot Modules Replacement

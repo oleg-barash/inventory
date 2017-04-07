@@ -13,27 +13,12 @@ const styles = {
   }
 };
 
-const Main = () => {
+const ItemsPage = () => {
     return (
-  <Tabs>
-      <Tab label="Товары" >
           <div>
               <h2 style={styles.headline}>Товары</h2>
               <Items/>
           </div>
-      </Tab>
-    <Tab label="События" >
-      <div>
-        <h2 style={styles.headline}>События</h2>
-        <AllActions/>
-      </div>
-    </Tab>
-    <Tab label="Отчёты">
-      <div>
-        <h2 style={styles.headline}>Отчёты</h2>
-      </div>
-    </Tab>
-  </Tabs>
-)};
+    )};
 
-export default Main
+export default ItemsPage

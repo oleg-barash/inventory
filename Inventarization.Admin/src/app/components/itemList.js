@@ -6,7 +6,7 @@ import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'mater
 import ItemRow from '../components/itemRow';
 const ItemList = ({ items }) => (
     <Table>
-        <TableHeader>
+        <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
                 <TableHeaderColumn>Код</TableHeaderColumn>
                 <TableHeaderColumn>Количество план</TableHeaderColumn>

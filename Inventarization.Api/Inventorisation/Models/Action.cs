@@ -16,4 +16,10 @@ namespace Inventorization.Api.Models
         public string Zone { get; set; }
         public int Quantity { get; set; }
     }
+
+    public class DeleteModel
+    {
+        public Guid Id { get; set; }
+    }
+
 }

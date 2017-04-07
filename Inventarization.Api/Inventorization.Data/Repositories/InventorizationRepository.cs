@@ -149,6 +149,30 @@ namespace Inventorization.Data
             }
         }
 
+        public List<ZoneState> GetZoneStates(Guid id)
+        {
+            List<ZoneState> result = new List<ZoneState>();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"SELECT * FROM public.""ZoneStates"" AS state
+                        WHERE state.""InventorizationId"" = @id";
+                    cmd.Parameters.Add(new NpgsqlParameter("id", id));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.ToZoneState());
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         public ZoneState GetZoneState(Guid id, Guid zoneId)
         {
             using (var conn = new NpgsqlConnection(_connectionString))

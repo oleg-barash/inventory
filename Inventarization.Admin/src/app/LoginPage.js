@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const Login = () => (
+const LoginPage = () => (
   <div>
     <h2>Авторизация</h2>
   </div>
 )
 
-export default Login
+export default LoginPage

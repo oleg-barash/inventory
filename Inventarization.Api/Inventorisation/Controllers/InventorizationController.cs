@@ -1,4 +1,5 @@
 ﻿using Inventorization.Api.Formatters;
+using Inventorization.Api.Models;
 using Inventorization.Business.Model;
 using Inventorization.Data;
 using Newtonsoft.Json;
@@ -87,6 +88,31 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpGet]
+        [Route("{inventorization}/zones")]
+        public HttpResponseMessage Zones(Guid inventorization)
+        {
+            try
+            {
+                List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorization);
+                List<Zone> zones = _zoneRepository.GetZones(states.Select(x => x.ZoneId).ToArray());
+                return Request.CreateResponse(HttpStatusCode.OK, states.Select(x => new ZoneViewModel()
+                {
+                    ZoneStatusId = x.ZoneId,
+                    ClosedAt = x.ClosedAt,
+                    ClosedBy = x.ClosedBy,
+                    OpenedAt = x.OpenedAt,
+                    OpenedBy = x.OpenedBy,
+                    ZoneName = zones.First(z => z.Id == x.ZoneId).Name
+                }));
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Error getting zones. InventorizationId: {inventorization}");
+            }
+            return Request.CreateResponse(HttpStatusCode.NoContent);
+        }
+
+        [HttpGet]
         [Route("{inventorization}/zone/open")]
         public HttpResponseMessage OpenZone(Guid inventorization, [FromUri]string code)
         {
@@ -161,8 +187,8 @@ namespace Inventorization.Api.Controllers
                 action.Inventorization = inventorization;
                 _actionRepository.CreateAction(action);
                 var inventarization = _inventorizationRepository.GetInventorization(inventorization);
-                List<Item> items = _companyRepository.GetItems(inventarization.Company);
-                Item foundItem = items.FirstOrDefault(x => x.Code == action.BarCode);
+                List<Business.Model.Item> items = _companyRepository.GetItems(inventarization.Company);
+                Business.Model.Item foundItem = items.FirstOrDefault(x => x.Code == action.BarCode);
                 if (foundItem != null) {
                     return Request.CreateResponse(HttpStatusCode.OK, foundItem);
                 }

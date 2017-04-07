@@ -46,7 +46,7 @@ class AllActionList extends Component {
 }
 
 AllActionList.propTypes = {
-    actions: PropTypes.array.isRequired
+    dispatch: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps)(AllActionList)
