@@ -21,4 +21,11 @@ const ItemList = ({ items }) => (
     </Table>
 )
 
+
+ItemList.propTypes = {
+    items: PropTypes.arrayOf(PropTypes.shape({
+        BarCode: PropTypes.string.isRequired
+    }).isRequired).isRequired
+}
+
 export default ItemList

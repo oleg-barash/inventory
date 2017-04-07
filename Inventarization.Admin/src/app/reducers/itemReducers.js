@@ -10,11 +10,11 @@ export function itemList(state = { isFetching: false, items: [] }, action)
                 return item.Code === action.Code;
             })
         case REQUEST_ITEMS:
-            return Object.assign({}, state.items, {
+            return Object.assign({}, state, {
                 isFetching: true
             })
         case RECEIVE_ITEMS:
-            return Object.assign({}, state.items, {
+            return Object.assign({}, state, {
                 isFetching: false,
                 items: action.items.map(x => {
                     x.key = x.Id;

@@ -14,7 +14,7 @@ export function actionList(state = { isFetching: false, items: [] }, action)
                 isFetching: true
             })
         case RECEIVE_ACTION:
-            return Object.assign({}, state.items, {
+            return Object.assign({}, state, {
                     isFetching: false,
                     items: action.items.map(x => {
                         x.key = x.Id;
