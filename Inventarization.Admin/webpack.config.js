@@ -12,8 +12,8 @@ const config = {
     path.join(__dirname, '/src/app/client.js')
   ],
   output: {
-      path: `${__dirname}/build/`,
-      filename: 'app.js',
+      path: buildPath,
+      filename: 'client.js',
       publicPath
   },
   plugins: [

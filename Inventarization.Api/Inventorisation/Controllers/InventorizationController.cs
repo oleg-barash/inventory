@@ -95,14 +95,18 @@ namespace Inventorization.Api.Controllers
             {
                 List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorization);
                 List<Zone> zones = _zoneRepository.GetZones(states.Select(x => x.ZoneId).ToArray());
-                return Request.CreateResponse(HttpStatusCode.OK, states.Select(x => new ZoneViewModel()
-                {
-                    ZoneStatusId = x.ZoneId,
-                    ClosedAt = x.ClosedAt,
-                    ClosedBy = x.ClosedBy,
-                    OpenedAt = x.OpenedAt,
-                    OpenedBy = x.OpenedBy,
-                    ZoneName = zones.First(z => z.Id == x.ZoneId).Name
+                return Request.CreateResponse(HttpStatusCode.OK, states.Select(x => {
+                    var zone = zones.First(z => z.Id == x.ZoneId);
+                    return new ZoneViewModel()
+                    {
+                        ZoneStatusId = x.ZoneId,
+                        Code = zone.Code,
+                        ClosedAt = x.ClosedAt < DateTime.MaxValue ? x.ClosedAt : null,
+                        ClosedBy = x.ClosedBy,
+                        OpenedAt = x.OpenedAt,
+                        OpenedBy = x.OpenedBy,
+                        ZoneName = zone.Name
+                    };
                 }));
             }
             catch (Exception ex)
@@ -139,6 +143,30 @@ namespace Inventorization.Api.Controllers
                     return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
                 }
                 return Request.CreateResponse(HttpStatusCode.OK, zone);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, $"Open zone error. Zone code:{Environment.NewLine} {JsonConvert.SerializeObject(code)}. InventorizationId: {inventorization}");
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [HttpGet]
+        [Route("{inventorization}/zone/reopen")]
+        public HttpResponseMessage ReopenZone(Guid inventorization, [FromUri]string code)
+        {
+            try
+            {
+                Zone zone = _zoneRepository.GetZone(code);
+                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, code);
+                if (state != null)
+                {
+
+                    _inventorizationRepository.ReopenZone(inventorization, zone.Id);
+                    state = _inventorizationRepository.GetZoneState(inventorization, code);
+                    return Request.CreateResponse(HttpStatusCode.OK, zone);
+                }
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Зона не была открыта");
             }
             catch (Exception ex)
             {

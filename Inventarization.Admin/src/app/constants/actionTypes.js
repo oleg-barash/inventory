@@ -21,3 +21,4 @@ export const RECEIVE_ITEMS = 'RECEIVE_ITEMS';
 export const CREATE_ZONE = 'CREATE_ZONE';
 export const OPEN_ZONE = 'OPEN_ZONE';
 export const EDIT_ZONE = 'EDIT_ZONE';
+export const ZONE_OPENED = 'ZONE_OPENED';

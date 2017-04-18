@@ -11,6 +11,7 @@ const ZoneList = ({ zones }) => (
                 <TableHeaderColumn>Зона</TableHeaderColumn>
                 <TableHeaderColumn>Время открытия</TableHeaderColumn>
                 <TableHeaderColumn>Время закрытия</TableHeaderColumn>
+                <TableHeaderColumn>Действия</TableHeaderColumn>
             </TableRow>
         </TableHeader>
         <TableBody>

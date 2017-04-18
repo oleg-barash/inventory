@@ -10,7 +10,8 @@ import { FILTER_ACTION,
     ACTION_DELETED,
     DELETING_ACTION,
     REQUEST_ZONES,
-    RECEIVE_ZONES} from '../constants/actionTypes'
+    RECEIVE_ZONES,
+    ZONE_OPENED} from '../constants/actionTypes'
 import { BASE_URL } from '../constants/configuration'
 export function applyFilter(filter){
     return { type: FILTER_ACTION, filter }
@@ -59,6 +60,13 @@ function actionDeleted(action){
     }
 }
 
+function zoneOpened(zone){
+    return {
+        type: ZONE_OPENED,
+        action: zone
+    }
+}
+
 function deletingAction(action){
     return {
         type: DELETING_ACTION,
@@ -81,6 +89,17 @@ export function deleteAction(action){
             })
     }
 }
+
+export function openZone(zone){
+    return function (dispatch){
+        return fetch(BASE_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/reopen?code=' + zone.Code)
+            .then(response => {
+                dispatch(zoneOpened(zone))
+                dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+            })
+    }
+}
+
 
 
 

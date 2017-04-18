@@ -29,7 +29,7 @@ app.use((req, res) => {
          });
 });
 
-const assetUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:8050' : '/';
+const assetUrl = 'http://localhost:8050/public/';//'http://193.124.113.47:82/';
 
 function renderHTML(componentHTML) {
     return `
@@ -47,7 +47,7 @@ function renderHTML(componentHTML) {
     content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1, minimum-scale=1"
   >
 <link href="http://diegoddox.github.io/react-redux-toastr/4.4/react-redux-toastr.min.css" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" type="text/css" href="${assetUrl}/public/main.css">
+  <link rel="stylesheet" type="text/css" href="${assetUrl}main.css">
 </head>
 
 <body>
@@ -67,13 +67,13 @@ function renderHTML(componentHTML) {
       s.parentNode.insertBefore(wf, s);
     })();
   </script>
-  <script src="${assetUrl}/public/app.js">${componentHTML}</script>
+  <script src="${assetUrl}client.js">${componentHTML}</script>
 </body>
 
   `;
 }
 
-const PORT = process.env.PORT || 3001;
+const PORT = 81;
 
 app.listen(PORT, () => {
     console.log(`Server listening on: ${PORT}`);

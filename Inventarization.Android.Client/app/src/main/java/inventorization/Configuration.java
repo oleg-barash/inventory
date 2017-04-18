@@ -5,5 +5,5 @@ package inventorization;
  */
 
 public class Configuration {
-    public static String BaseUrl = "http://192.168.0.106/api/";
+    public static String BaseUrl = "http://192.124.113.47/api/";
 }

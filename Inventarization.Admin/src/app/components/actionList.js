@@ -22,7 +22,7 @@ class ActionList extends Component {
                             <TableHeaderColumn >Код</TableHeaderColumn>
                             <TableHeaderColumn >Зона</TableHeaderColumn>
                             <TableHeaderColumn >Количество</TableHeaderColumn>
-                            <TableHeaderColumn style={{width: '30px'}}></TableHeaderColumn>
+                            <TableHeaderColumn >Действия</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>

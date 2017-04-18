@@ -8,7 +8,7 @@ export function actionList(state = { isFetching: false, items: [] }, action)
 {
     switch (action.type){
         case ACTION_DELETED:
-            toastr.success('The title', 'The message')
+            //toastr.success('The title', 'The message')
             return Object.assign({}, state, {
                 isFetching: false,
                 items: state.items.filter((actionItem) => actionItem.Id !== action.id)

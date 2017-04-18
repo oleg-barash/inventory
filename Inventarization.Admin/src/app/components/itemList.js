@@ -15,7 +15,7 @@ const ItemList = ({ items }) => (
         </TableHeader>
         <TableBody>
             {items.map(item =>
-                <ItemRow item={item} key={item.BarCode + item.Zone}/>
+                <ItemRow item={item} key={item.BarCode}/>
             )}
         </TableBody>
     </Table>

@@ -18,7 +18,6 @@ const getZones = (items, filter) => {
 }
 
 const mapStateToProps = (state) => {
-    debugger;
     return {
         zones: getZones(state.zones.items, state.visibilityFilter)
     }
