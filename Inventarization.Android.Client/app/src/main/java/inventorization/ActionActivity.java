@@ -278,15 +278,18 @@ public class ActionActivity extends Activity {
                             }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            if (error.networkResponse.statusCode == 403) {
-                                showToast("Зона уже закрыта");
-                                Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
-                                startActivity(intent);
+                            if (error.networkResponse != null) {
+                                if (error.networkResponse.statusCode == 403) {
+                                    showToast("Зона уже закрыта");
+                                    Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
+                                    startActivity(intent);
+                                } else {
+                                    showToast("Ошибка при закрытии зоны. Код " + error.networkResponse.statusCode);
+                                }
                             }
                             else {
-                                showToast("Ошибка при закрытии зоны. Код " + error.networkResponse.statusCode);
+                                showToast("Ошибка при закрытии зоны. Текст ошибки " + error.getMessage());
                             }
-
                         }
                     });
                     queue.add(stringRequest);
