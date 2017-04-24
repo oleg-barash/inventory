@@ -7,14 +7,14 @@ import ActionList from '../components/actionList'
 import { fetchActions } from '../actions/MainActions'
 
 const getActions = (actions, filter) => {
-    // switch (filter) {
-    //     case 'SHOW_ALL':
+     switch (filter) {
+         case 'SHOW_ALL':
             return actions;
-        // case 'SHOW_COMPLETED':
-        //     return actions.filter(t => t.completed)
-        // case 'SHOW_ACTIVE':
-        //     return actions.filter(t => !t.completed)
-    //}
+         case 'SHOW_COMPLETED':
+             return actions.filter(t => t.completed)
+         case 'SHOW_ACTIVE':
+             return actions.filter(t => !t.completed)
+    }
 }
 
 const mapStateToProps = (state) => {

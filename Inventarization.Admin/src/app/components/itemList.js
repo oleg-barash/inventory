@@ -4,6 +4,8 @@
 import React, { PropTypes } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
 import ItemRow from '../components/itemRow';
+import { fetchItems } from '../actions/MainActions'
+
 const ItemList = ({ items }) => (
     <Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
@@ -25,7 +27,8 @@ const ItemList = ({ items }) => (
 ItemList.propTypes = {
     items: PropTypes.arrayOf(PropTypes.shape({
         BarCode: PropTypes.string.isRequired
-    }).isRequired).isRequired
+    }).isRequired).isRequired,
+    filter: PropTypes.object,
 }
 
 export default ItemList

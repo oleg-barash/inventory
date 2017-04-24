@@ -13,6 +13,7 @@ class ActionList extends Component {
         var {actions, dispatch} = this.props;
         return (
             <div>
+
                 <Table>
                     <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
                         <TableRow>

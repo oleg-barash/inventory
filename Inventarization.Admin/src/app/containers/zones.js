@@ -6,20 +6,9 @@ import { connect } from 'react-redux'
 import ZoneList from '../components/zoneList'
 import { fetchZones } from '../actions/MainActions'
 
-const getZones = (items, filter) => {
-    // switch (filter) {
-    //     case 'SHOW_ALL':
-            return items;
-        // case 'SHOW_COMPLETED':
-        //     return actions.filter(t => t.completed)
-        // case 'SHOW_ACTIVE':
-        //     return actions.filter(t => !t.completed)
-    //}
-}
-
 const mapStateToProps = (state) => {
     return {
-        zones: getZones(state.zones.items, state.visibilityFilter)
+        zones: state.zones.items
     }
 }
 

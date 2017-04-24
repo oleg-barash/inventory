@@ -4,49 +4,47 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import ItemList from '../components/itemList'
-import { fetchItems } from '../actions/MainActions'
-
-const getItems = (items, filter) => {
-    // switch (filter) {
-    //     case 'SHOW_ALL':
-            return items;
-        // case 'SHOW_COMPLETED':
-        //     return actions.filter(t => t.completed)
-        // case 'SHOW_ACTIVE':
-        //     return actions.filter(t => !t.completed)
-    //}
-}
+import { fetchItems, applyItemsFilter } from '../actions/MainActions'
+import TextField from 'material-ui/TextField';
 
 const mapStateToProps = (state) => {
     return {
-        items: getItems(state.items.items, state.visibilityFilter)
+        items: state.items.items,
+        filter: state.items.filter,
+        dispatch: state.dispatch
     }
 }
 
 class Items extends Component {
     constructor(props) {
         super(props)
-        // this.handleChange = this.handleChange.bind(this)
-        // this.handleRefreshClick = this.handleRefreshClick.bind(this)
     }
+    
     componentDidMount() {
-        const { dispatch } = this.props
-        dispatch(fetchItems('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+        this.props.dispatch(fetchItems('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
     }
-    // componentDidUpdate() {
-    //     const { dispatch } = this.props
-    //     dispatch(fetchActions('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
-    // }
+
     render() {
+        var objectClosure = this;
+        function handleCodeChange(event) {
+            objectClosure.props.dispatch(fetchItems('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3', { Code: event.target.value}))
+        };
         return (
-        <div>
-            <ItemList items={this.props.items}/>
+        <div>    
+            <TextField 
+                id="code-filter"
+                value={this.props.filter.code}
+                onChange={handleCodeChange}
+                hintText="Код товара"/>
+            <ItemList items={this.props.items} filter={this.props.filter}/>
         </div>)
     }
 }
 
 Items.propTypes = {
-    items: PropTypes.array.isRequired
+    items: PropTypes.array.isRequired,
+    filter: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired
 }
 
 export default connect(mapStateToProps)(Items)

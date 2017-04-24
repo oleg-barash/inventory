@@ -38,7 +38,7 @@ class ZoneRow extends Component {
                     />
                     {/*<LinearProgress mode="indeterminate"/>*/}
                 </TableRowColumn>
-            </TableRow>
+            </TableRow>       
         )
     }
 }
