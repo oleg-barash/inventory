@@ -7,6 +7,9 @@ import ZoneList from '../components/zoneList'
 import { fetchZones } from '../actions/MainActions'
 
 const mapStateToProps = (state) => {
+    if (state.zones.items == undefined){
+        return [];
+    }
     return {
         zones: state.zones.items
     }

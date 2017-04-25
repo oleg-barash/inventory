@@ -4,6 +4,7 @@
 import React, { PropTypes } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
 import ZoneRow from '../components/zoneRow';
+
 const ZoneList = ({ zones }) => (
     <Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>

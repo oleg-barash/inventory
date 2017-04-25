@@ -1,4 +1,4 @@
-import React, { Component, PropTypes }  from 'react';
+import React, { Component }  from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import { createStore, combineReducers, applyMiddleware } from 'redux'
@@ -14,6 +14,7 @@ import { createLogger } from 'redux-logger'
 import {reducer as toastrReducer} from 'react-redux-toastr'
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import ReduxToastr from 'react-redux-toastr'
+import PropTypes from 'prop-types';
 injectTapEventPlugin();
 const loggerMiddleware = createLogger()
 
@@ -43,7 +44,7 @@ class App extends Component {
                         <ul>
                             <li><Link to="/login">Авторизация</Link></li>
                             <li><Link to="/items">Товары</Link></li>
-                            <li><Link to="/events">События</Link></li>
+                            <li><Link to="/actions">События</Link></li>
                             <li><Link to="/zones">Зоны</Link></li>
                             <li><Link to="/report">Отчёты</Link></li>
                         </ul>

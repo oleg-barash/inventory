@@ -7,13 +7,13 @@ import App from './app';
 import ItemsPage from './ItemsPage.js';
 import ReportPage from './ReportPage.js';
 import ZonesPage from './ZonesPage.js';
-import EventsPage from './EventsPage.js';
+import ActionsPage from './ActionsPage.js';
 import LoginPage from './LoginPage.js';
 export default (<Route path="/" component={App}>
     <div>
         <IndexRoute  component={ItemsPage}/>
         <Route path="items" component={ItemsPage}/>
-        <Route path="events" component={EventsPage}/>
+        <Route path="actions" component={ActionsPage}/>
         <Route path="zones" component={ZonesPage}/>
         <Route path="report" component={ReportPage}/>
         <Route path="login" component={LoginPage}/>

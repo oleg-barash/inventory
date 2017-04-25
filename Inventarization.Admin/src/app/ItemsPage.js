@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Items from './containers/items'
 import AllActions from './containers/allActions'
+import AuthorizedComponent from './components/authorizedComponent'
 
 
 const styles = {
@@ -13,12 +14,15 @@ const styles = {
   }
 };
 
-const ItemsPage = () => {
+
+class ItemsPage extends AuthorizedComponent {
+  render() {
     return (
           <div>
               <h2 style={styles.headline}>Товары</h2>
               <Items/>
           </div>
     )};
+}
 
 export default ItemsPage

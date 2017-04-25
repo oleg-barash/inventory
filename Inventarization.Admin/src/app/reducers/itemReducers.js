@@ -12,9 +12,11 @@ export function itemList(state = { isFetching: false, items: [], filter: {} }, a
         case RECEIVE_ITEMS:
                 var items = action.items
                 if (action.filter !== undefined){
-                    items = items.filter((item) => {
-                        return item.BarCode.startsWith(action.filter.Code);
-                    })
+                    if (action.filter.Code !== undefined){
+                        items = items.filter((item) => {
+                            return item.BarCode.startsWith(action.filter.Code);
+                        })
+                    }
                 }
             return Object.assign({}, state, {
                 isFetching: false,
