@@ -233,21 +233,28 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{inventorization}/actions")]
-        public HttpResponseMessage GetActions(Guid inventorization)
+        [Route("{inventorizationId}/actions")]
+        public HttpResponseMessage GetActions(Guid inventorizationId)
         {
-            var actions = _actionRepository.GetActionsByInventorization(inventorization);
+            var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
+            var actions = _actionRepository.GetActionsByInventorization(inventorizationId);
             var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
-
-            var result = actions.Select(x => new Models.Action()
-            {
-                Id = x.Id,
-                DateTime = x.DateTime,
-                Quantity = x.Quantity,
-                Type = x.Type,
-                User = "тестовый",
-                Zone = zones.FirstOrDefault(z => z.Id == x.Zone).Name,
-                BarCode = x.BarCode
+            var items = _companyRepository.GetItems(inventorization.Company, actions.Select(x => x.BarCode).ToArray());
+            var result = actions.Select(x => {
+                var foundItem = items.FirstOrDefault(i => i.Code == x.BarCode);
+                var res = new Models.Action()
+                {
+                    Id = x.Id,
+                    DateTime = x.DateTime,
+                    Quantity = x.Quantity,
+                    Type = x.Type,
+                    //User = "тестовый",
+                    Zone = zones.FirstOrDefault(z => z.Id == x.Zone).Name,
+                    BarCode = x.BarCode,
+                    FoundInItems = foundItem != null,
+                    Description = foundItem != null ? foundItem.Description : "Не найдена в номенклатуре"
+                };
+                return res;
             });
             return Request.CreateResponse(HttpStatusCode.OK, result.OrderByDescending(x => x.DateTime));
         }

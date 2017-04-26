@@ -105,7 +105,33 @@ namespace Inventorization.Data
             }
         }
 
-        public List<Item> GetItems(Guid id)
+        public List<Item> GetItems(Guid company, string[] codes)
+        {
+            List<Item> items = new List<Item>();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"SELECT items.* FROM public.""Companies"" AS companies
+                        JOIN public.""Item"" AS items ON items.""CompanyId"" = companies.""Id""
+                        WHERE companies.""Id"" = @Id AND items.""Code"" = ANY (:Codes)";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", company));
+                    cmd.Parameters.Add(new NpgsqlParameter("Codes", codes));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            items.Add(reader.ToItem());
+                        }
+                    }
+                }
+            }
+            return items;
+        }
+
+        public List<Item> GetItems(Guid companyId)
         {
             List<Item> items = new List<Item>();
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -117,7 +143,7 @@ namespace Inventorization.Data
                     cmd.CommandText = @"SELECT items.* FROM public.""Companies"" AS companies
                         JOIN public.""Item"" AS items ON items.""CompanyId"" = companies.""Id""
                         WHERE companies.""Id"" = @Id;";
-                    cmd.Parameters.Add(new NpgsqlParameter("Id", id));
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", companyId));
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())

@@ -14,7 +14,7 @@ import { FILTER_ACTION,
     ZONE_OPENED,
     FILTER_ITEMS} from '../constants/actionTypes'
 import { BASE_URL } from '../constants/configuration'
-export function applyFilter(filter){
+export function filterActions(filter){
     return { type: FILTER_ACTION, filter }
 }
 

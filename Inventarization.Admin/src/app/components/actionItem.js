@@ -7,8 +7,10 @@ import moment from 'moment';
 import { connect } from 'react-redux'
 import FlatButton from 'material-ui/FlatButton';
 import DeleteAndroid from 'material-ui/svg-icons/action/delete';
-import {red700 as red}  from 'material-ui/styles/colors';
-import {fullWhite as white}  from 'material-ui/styles/colors';
+import { green100 as green}  from 'material-ui/styles/colors';
+import { yellow100 as yellow}  from 'material-ui/styles/colors';
+import { red100 as red}  from 'material-ui/styles/colors';
+import { fullWhite as white}  from 'material-ui/styles/colors';
 import { deleteAction } from '../actions/MainActions';
 moment.locale("ru-RU")
 function getTypeName(type){
@@ -27,16 +29,18 @@ class ActionRow extends Component {
 
     render() {
         var {action, dispatch} = this.props;
-        var style = {backgroundColor: action.IsDeleting ? red : white}
+        var buttonStyle = {backgroundColor: action.IsDeleting ? red : white}
+        var rowStyle = {backgroundColor: action.FoundInItems ? green : white}
 
         var deleteFunc = function(){
             dispatch(deleteAction(action))
         }
         return (
-            <TableRow>
+            <TableRow style={rowStyle}>
+                <TableRowColumn >{action.Description}</TableRowColumn>
                 <TableRowColumn >{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
                 <TableRowColumn >{getTypeName(action.Type)}</TableRowColumn>
-                <TableRowColumn >{action.User}</TableRowColumn>
+                {/*<TableRowColumn >{action.User}</TableRowColumn>*/}
                 <TableRowColumn >{action.BarCode}</TableRowColumn>
                 <TableRowColumn >{action.Zone}</TableRowColumn>
                 <TableRowColumn >{action.Quantity}</TableRowColumn>
@@ -46,7 +50,7 @@ class ActionRow extends Component {
                         backgroundColor={white}
                         hoverColor={red}
                         icon={<DeleteAndroid/>}
-                        style={style}
+                        style={buttonStyle}
                         onClick={deleteFunc}
                     />
                     {/*<LinearProgress mode="indeterminate"/>*/}

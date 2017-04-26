@@ -27,9 +27,8 @@ export function actionList(state = { isFetching: false, items: [], filter: {} },
             })
 
         case FILTER_ACTION:
-            return state.items.filter((actionItem) => {
-                return actionItem.Id === action.Id;
-            })
+            var filter = Object.assign(state.filter, action.filter)
+            return Object.assign({filter}, state)
         case REQUEST_ACTION:
             return Object.assign({}, state, {
                 isFetching: true

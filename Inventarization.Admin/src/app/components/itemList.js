@@ -13,6 +13,7 @@ const ItemList = ({ items }) => (
                 <TableHeaderColumn>Наименование</TableHeaderColumn>
                 <TableHeaderColumn>Номер</TableHeaderColumn>
                 <TableHeaderColumn>Код</TableHeaderColumn>
+                <TableHeaderColumn>Зоны</TableHeaderColumn>
                 <TableHeaderColumn>Количество план</TableHeaderColumn>
                 <TableHeaderColumn>Количество факт</TableHeaderColumn>
             </TableRow>

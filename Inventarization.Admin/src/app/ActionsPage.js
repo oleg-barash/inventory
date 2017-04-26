@@ -5,6 +5,9 @@ import React, { PropTypes } from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Items from './containers/items'
 import AllActions from './containers/allActions'
+import { filterActions } from './actions/MainActions'
+import { connect } from 'react-redux'
+
 import AuthorizedComponent from './components/authorizedComponent'
 
 
@@ -18,6 +21,10 @@ const styles = {
 };
 
 class ActionsPage extends AuthorizedComponent {
+    componentDidMount() {
+        const { ZoneName, Code } = this.props.location.query
+        this.props.dispatch(filterActions({ZoneName, Code}))
+    }
       render() {
     return (
         <div>
@@ -26,5 +33,14 @@ class ActionsPage extends AuthorizedComponent {
         </div>
     )}};
 
-export default ActionsPage
+
+const mapStateToProps = (state) => {
+    return {}
+}
+
+ActionsPage.propTypes = {
+    dispatch: PropTypes.func.isRequired
+}
+
+export default connect(mapStateToProps)(ActionsPage)
 

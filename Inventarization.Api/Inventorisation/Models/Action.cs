@@ -15,6 +15,8 @@ namespace Inventorization.Api.Models
         public string BarCode { get; set; }
         public string Zone { get; set; }
         public int Quantity { get; set; }
+        public bool FoundInItems { get; set; }
+        public string Description { get; set; }
     }
 
     public class DeleteModel

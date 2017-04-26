@@ -6,24 +6,8 @@ import { connect } from 'react-redux'
 import ActionList from '../components/actionList'
 import { fetchActions } from '../actions/MainActions'
 
-const getActions = (actions, filter) => {
-    if (actions == undefined){
-        return [];
-    }
-    var result = actions;
-    if (filter !== undefined){
-        if (filter.Code !== undefined){
-            result = result.filter((item) => {
-                return item.BarCode.startsWith(filter.Code);
-            })
-        }
-    }
-    return result;
-}
-
 const mapStateToProps = (state) => {
     return {
-        actions: getActions(state.actions.items, state.actions.filter)
     }
 }
 
@@ -38,7 +22,7 @@ class AllActionList extends Component {
     render() {
         return (
         <div>
-            <ActionList actions={this.props.actions}/>
+            <ActionList/>
         </div>)
     }
 }
