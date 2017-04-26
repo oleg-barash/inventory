@@ -7,6 +7,8 @@ import moment from 'moment';
 moment.locale("ru-RU")
 const ItemRow = ({ item }) => (
         <TableRow>
+            <TableRowColumn>{item.Description}</TableRowColumn>
+            <TableRowColumn>{item.Number}</TableRowColumn>
             <TableRowColumn>{item.BarCode}</TableRowColumn>
             <TableRowColumn>{item.QuantityPlan}</TableRowColumn>
             <TableRowColumn>{item.QuantityFact}</TableRowColumn>

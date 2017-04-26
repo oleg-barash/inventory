@@ -10,6 +10,8 @@ const ItemList = ({ items }) => (
     <Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
+                <TableHeaderColumn>Наименование</TableHeaderColumn>
+                <TableHeaderColumn>Номер</TableHeaderColumn>
                 <TableHeaderColumn>Код</TableHeaderColumn>
                 <TableHeaderColumn>Количество план</TableHeaderColumn>
                 <TableHeaderColumn>Количество факт</TableHeaderColumn>

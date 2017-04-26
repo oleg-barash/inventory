@@ -18,7 +18,7 @@ export function applyFilter(filter){
     return { type: FILTER_ACTION, filter }
 }
 
-export function applyItemsFilter(filter){
+export function filterItems(filter){
     return { type: FILTER_ITEMS, filter }
 }
 

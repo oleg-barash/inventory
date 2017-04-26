@@ -91,6 +91,9 @@ namespace Inventorization.Api.Controllers
         [Route("{inventorization}/zones")]
         public HttpResponseMessage Zones(Guid inventorization)
         {
+            //var response = Request.CreateResponse(HttpStatusCode.Redirect);
+            //response.Headers.Location = new Uri("http://www.google.com");
+            //return response;
             try
             {
                 List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorization);
@@ -264,6 +267,8 @@ namespace Inventorization.Api.Controllers
                 res.QuantityPlan = x.Quantity;
                 res.Type = type;
                 res.BarCode = x.Code;
+                res.Description = x.Description;
+                res.Number = x.ItemNumber;
                 
                 var itemActions = actions.Where(a => a.BarCode == x.Code && a.Type == type).GroupBy(a => a.Zone);
                 res.Actions = new List<Models.ItemDetails>(); 

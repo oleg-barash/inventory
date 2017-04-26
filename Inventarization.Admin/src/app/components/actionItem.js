@@ -34,7 +34,7 @@ class ActionRow extends Component {
         }
         return (
             <TableRow>
-                <TableRowColumn >{moment(action.DateTime).format("DD MMMM hh:mm")}</TableRowColumn>
+                <TableRowColumn >{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
                 <TableRowColumn >{getTypeName(action.Type)}</TableRowColumn>
                 <TableRowColumn >{action.User}</TableRowColumn>
                 <TableRowColumn >{action.BarCode}</TableRowColumn>

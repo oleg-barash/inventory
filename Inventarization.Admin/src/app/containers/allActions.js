@@ -10,21 +10,20 @@ const getActions = (actions, filter) => {
     if (actions == undefined){
         return [];
     }
-     switch (filter) {
-         case 'SHOW_ALL':
-            return actions;
-         case 'SHOW_COMPLETED':
-             return actions.filter(t => t.completed)
-         case 'SHOW_ACTIVE':
-             return actions.filter(t => !t.completed)
-         default:
-             return actions;
+    var result = actions;
+    if (filter !== undefined){
+        if (filter.Code !== undefined){
+            result = result.filter((item) => {
+                return item.BarCode.startsWith(filter.Code);
+            })
+        }
     }
+    return result;
 }
 
 const mapStateToProps = (state) => {
     return {
-        actions: getActions(state.actions.items, state.visibilityFilter)
+        actions: getActions(state.actions.items, state.actions.filter)
     }
 }
 

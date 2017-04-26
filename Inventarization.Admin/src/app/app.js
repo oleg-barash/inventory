@@ -44,7 +44,7 @@ class App extends Component {
                         <ul>
                             <li><Link to="/login">Авторизация</Link></li>
                             <li><Link to="/items">Товары</Link></li>
-                            <li><Link to="/actions">События</Link></li>
+                            <li><Link to="/actions">Действия</Link></li>
                             <li><Link to="/zones">Зоны</Link></li>
                             <li><Link to="/report">Отчёты</Link></li>
                         </ul>

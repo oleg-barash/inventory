@@ -71,8 +71,6 @@ namespace Inventorization.Controllers
                 )
             };
 
-            // add the `content-disposition` response header
-            // to display the "File Download" dialog box 
             response.Content.Headers.ContentDisposition =
                 new ContentDispositionHeaderValue("attachment")
                 {
@@ -95,7 +93,6 @@ namespace Inventorization.Controllers
                 return "csv";
             }
 
-            // default to text
             return "txt";
         }
 

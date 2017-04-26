@@ -4,7 +4,7 @@
 import { FILTER_ACTION, REQUEST_ACTION, RECEIVE_ACTION, DELETING_ACTION, ACTION_DELETED } from '../constants/actionTypes'
 import {toastr} from 'react-redux-toastr'
 
-export function actionList(state = { isFetching: false, items: [] }, action)
+export function actionList(state = { isFetching: false, items: [], filter: {} }, action)
 {
     switch (action.type){
         case ACTION_DELETED:
@@ -35,6 +35,14 @@ export function actionList(state = { isFetching: false, items: [] }, action)
                 isFetching: true
             })
         case RECEIVE_ACTION:
+            var items = action.items
+            if (action.filter !== undefined){
+                if (action.filter.Code !== undefined){
+                    items = items.filter((item) => {
+                        return item.BarCode.startsWith(action.filter.Code);
+                    })
+                }
+            }
             return Object.assign({}, state, {
                     isFetching: false,
                     items: action.items.map(x => {
