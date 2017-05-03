@@ -38,4 +38,6 @@
     <string name="Search">Search</string>
     <string name="OpenZone">Open zone</string>
     <string name="Accept">Accept</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_activity_workflow_selection">WorkflowSelection</string>
 </resources>

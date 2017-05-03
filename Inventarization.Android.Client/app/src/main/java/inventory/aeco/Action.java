@@ -1,4 +1,4 @@
-package inventorization;
+package inventory.aeco;
 
 import java.util.Date;
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="inventorization"
+    package="inventory"
     android:versionCode="1"
     android:versionName="1.0">
 
@@ -20,22 +20,24 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:windowSoftInputMode="stateAlwaysHidden"
-            android:name="inventorization.ZoneSelectActivity"
+            android:name="inventory.aeco.ZoneSelectActivity"
             android:label="@string/title_activity_zone_select">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:windowSoftInputMode="stateAlwaysHidden"
-            android:name=".ActionActivity"
+            android:name="inventory.aeco.ActionActivity"
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="inventory.aeco.WorkflowSelection"
+            android:label="@string/title_activity_workflow_selection">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

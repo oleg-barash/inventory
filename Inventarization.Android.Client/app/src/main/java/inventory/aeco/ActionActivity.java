@@ -1,4 +1,4 @@
-package inventorization;
+package inventory.aeco;
 
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -11,13 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.device.ScanManager;
-import android.provider.CalendarContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -28,7 +25,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -44,14 +40,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
+
+import inventory.R;
 
 
 public class ActionActivity extends Activity {
@@ -366,7 +362,9 @@ public class ActionActivity extends Activity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        newAction.Status = ActionStatus.Sent;
+                        //newAction.Status = ActionStatus.Sent;
+                        newAction = new Action();
+                        showScanResult.setText("");
                         showToast("Изменение количества товара успешно зафиксировано.");
                     }
                 }, new Response.ErrorListener() {

@@ -1,4 +1,4 @@
-package inventorization;
+package inventory.aeco;
 
 /**
  * Created by Барашики on 26.03.2017.
