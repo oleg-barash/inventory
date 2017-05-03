@@ -8,7 +8,8 @@ import {
   Link
 } from 'react-router'
 import { actionList } from './reducers/actionReducers'
-import { itemList } from './reducers/itemReducers'
+import { itemList } from './reducers/itemListReducers'
+import { item } from './reducers/itemReducers'
 import { zoneList } from './reducers/zoneReducers'
 import { createLogger } from 'redux-logger'
 import {reducer as toastrReducer} from 'react-redux-toastr'
@@ -19,7 +20,7 @@ injectTapEventPlugin();
 const loggerMiddleware = createLogger()
 
 let store = createStore(
-    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer }),
+    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item  }),
     applyMiddleware(
         thunkMiddleware,
         loggerMiddleware

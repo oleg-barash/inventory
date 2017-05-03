@@ -3,7 +3,7 @@
  */
 import React, { PropTypes, Component } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
-import ActionRow from '../components/actionItem';
+import ActionRow from '../components/actionRow';
 import { connect } from 'react-redux'
 import TextField from 'material-ui/TextField';
 import { filterActions } from '../actions/MainActions'

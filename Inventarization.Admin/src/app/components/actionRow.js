@@ -7,11 +7,17 @@ import moment from 'moment';
 import { connect } from 'react-redux'
 import FlatButton from 'material-ui/FlatButton';
 import DeleteAndroid from 'material-ui/svg-icons/action/delete';
-import { green100 as green}  from 'material-ui/styles/colors';
-import { yellow100 as yellow}  from 'material-ui/styles/colors';
-import { red100 as red}  from 'material-ui/styles/colors';
+import Add from 'material-ui/svg-icons/Content/add';
+import { green200 as green}  from 'material-ui/styles/colors';
+import { yellow200 as yellow}  from 'material-ui/styles/colors';
+import { blue200 as blue}  from 'material-ui/styles/colors';
+import { red200 as red}  from 'material-ui/styles/colors';
 import { fullWhite as white}  from 'material-ui/styles/colors';
-import { deleteAction } from '../actions/MainActions';
+import { setCurrentItem, deleteAction } from '../actions/MainActions';
+import { browserHistory } from 'react-router';
+import {
+  Link
+} from 'react-router'
 moment.locale("ru-RU")
 function getTypeName(type){
     switch(type){
@@ -29,12 +35,18 @@ class ActionRow extends Component {
 
     render() {
         var {action, dispatch} = this.props;
-        var buttonStyle = {backgroundColor: action.IsDeleting ? red : white}
         var rowStyle = {backgroundColor: action.FoundInItems ? green : white}
 
         var deleteFunc = function(){
             dispatch(deleteAction(action))
         }
+
+
+        var newItem = function() {
+            dispatch(setCurrentItem({BarCode: action.BarCode}))
+            browserHistory.push('/newItem');
+        }
+
         return (
             <TableRow style={rowStyle}>
                 <TableRowColumn >{action.Description}</TableRowColumn>
@@ -46,13 +58,17 @@ class ActionRow extends Component {
                 <TableRowColumn >{action.Quantity}</TableRowColumn>
                 <TableRowColumn >
 
-                    <FlatButton
-                        backgroundColor={white}
+                    <FlatButton disabled={action.IsDeleting}
                         hoverColor={red}
                         icon={<DeleteAndroid/>}
-                        style={buttonStyle}
                         onClick={deleteFunc}
                     />
+                    <FlatButton disabled={action.FoundInItems || action.IsDeleting}
+                        hoverColor={blue}
+                        icon={<Add/>}
+                        onClick={newItem}
+                    />
+                    
                     {/*<LinearProgress mode="indeterminate"/>*/}
                 </TableRowColumn>
             </TableRow>)

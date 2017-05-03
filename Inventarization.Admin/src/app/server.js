@@ -29,7 +29,7 @@ app.use((req, res) => {
          });
 });
 
-const assetUrl = 'http://localhost:8050/public/';//'http://193.124.113.47:82/';
+const assetUrl = process.env.NODE_ENV === 'production' ? 'http://193.124.113.47:82/' : 'http://localhost:8050/public/';
 
 function renderHTML(componentHTML) {
     return `
@@ -73,8 +73,8 @@ function renderHTML(componentHTML) {
   `;
 }
 
-const PORT = 90;
+console.log(`Port: ${process.env.PORT}`);
 
-app.listen(PORT, () => {
-    console.log(`Server listening on: ${PORT}`);
+app.listen(process.env.PORT, '0.0.0.0', () => {
+    console.log(`Server listening on: ${process.env.PORT}`);
 });

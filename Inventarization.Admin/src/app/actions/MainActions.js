@@ -12,6 +12,10 @@ import { FILTER_ACTION,
     REQUEST_ZONES,
     RECEIVE_ZONES,
     ZONE_OPENED,
+    ZONE_CLOSED,
+    CREATE_ITEM,
+    VALIDATE_ITEM,
+    SET_CURRENT_ITEM,
     FILTER_ITEMS} from '../constants/actionTypes'
 import { BASE_URL } from '../constants/configuration'
 export function filterActions(filter){
@@ -74,6 +78,22 @@ function zoneOpened(zone){
     }
 }
 
+function zoneClosed(zone){
+    return {
+        type: ZONE_CLOSED,
+        action: zone
+    }
+}
+
+
+export function validateItem(itemData){
+    return {
+        type: VALIDATE_ITEM,
+        data: itemData
+    }
+}
+
+
 function deletingAction(action){
     return {
         type: DELETING_ACTION,
@@ -97,6 +117,26 @@ export function deleteAction(action){
     }
 }
 
+export function addItemFromAction(action){
+    return {
+        type: CREATE_ITEM,
+        item: {
+            BarCode: action.BarCode
+        }
+    }
+}
+
+
+export function setCurrentItem(item){
+    return {
+        type: SET_CURRENT_ITEM,
+        item
+    }
+}
+
+
+
+
 export function openZone(zone){
     return function (dispatch){
         return fetch(BASE_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/reopen?code=' + zone.Code)
@@ -106,6 +146,23 @@ export function openZone(zone){
             })
     }
 }
+
+export function closeZone(zone){
+    return function (dispatch){
+        return fetch(BASE_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/close',
+            {method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: zone.Code})
+            .then(response => {
+                dispatch(zoneClosed(zone))
+                dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+            })
+    }
+}
+
 
 
 

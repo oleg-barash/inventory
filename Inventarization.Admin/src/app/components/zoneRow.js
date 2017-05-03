@@ -5,10 +5,12 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux'
 import { TableRow, TableRowColumn} from 'material-ui/Table';
 import FlatButton from 'material-ui/FlatButton';
-import DeleteAndroid from 'material-ui/svg-icons/action/delete';
-import {red700 as red}  from 'material-ui/styles/colors';
+import Replay from 'material-ui/svg-icons/av/replay';
+import Done from 'material-ui/svg-icons/action/done';
+import {green200 as green}  from 'material-ui/styles/colors';
+import {red200 as red}  from 'material-ui/styles/colors';
 import {fullWhite as white}  from 'material-ui/styles/colors';
-import { openZone } from '../actions/MainActions';
+import { openZone, closeZone } from '../actions/MainActions';
 import moment from 'moment';
 moment.locale("ru-RU")
 
@@ -23,18 +25,27 @@ class ZoneRow extends Component {
         var openFunc = function () {
             dispatch(openZone(zone))
         }
+        var closeFunc = function () {
+            dispatch(closeZone(zone))
+        }
         return (
             <TableRow>
                 <TableRowColumn>{zone.ZoneName}</TableRowColumn>
                 <TableRowColumn>{moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
-                <TableRowColumn>{moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
+                <TableRowColumn>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
                 <TableRowColumn >
 
-                    <FlatButton
+                    <FlatButton disabled={zone.ClosedAt == undefined}
                         backgroundColor={white}
                         hoverColor={red}
-                        icon={<DeleteAndroid/>}
+                        icon={<Replay/>}
                         onClick={openFunc}
+                    />
+                    <FlatButton disabled={zone.ClosedAt != undefined}
+                        backgroundColor={white}
+                        hoverColor={green}
+                        icon={<Done/>}
+                        onClick={closeFunc}
                     />
                     {/*<LinearProgress mode="indeterminate"/>*/}
                 </TableRowColumn>

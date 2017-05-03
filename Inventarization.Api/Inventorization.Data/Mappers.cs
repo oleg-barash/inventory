@@ -82,7 +82,8 @@ namespace Inventorization.Data
             {
                 Id = reader.GetGuid(0),
                 Name = reader.GetString(1),
-                Code = reader.GetString(2)
+                Code = reader.GetString(2),
+                
             };
         }
 
@@ -93,9 +94,9 @@ namespace Inventorization.Data
                 ZoneId = reader.GetGuid(0),
                 InventorizationId = reader.GetGuid(1),
                 OpenedAt = reader.GetDateTime(2),
-                ClosedAt = reader.IsDBNull(3) ? DateTime.MaxValue : reader.GetDateTime(3),
-                OpenedBy = reader.GetGuid(4),
-                ClosedBy = reader.IsDBNull(5) ? new Guid() : reader.GetGuid(5),
+                OpenedBy = reader.GetGuid(3),
+                ClosedBy = reader.IsDBNull(4) ? new Guid() : reader.GetGuid(4),
+                ClosedAt = reader.IsDBNull(5) ? DateTime.MaxValue : reader.GetDateTime(5),
             };
         }
 

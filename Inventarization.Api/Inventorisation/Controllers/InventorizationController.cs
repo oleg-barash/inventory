@@ -179,12 +179,12 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpPost]
-        [Route("{inventorization}/zone/{zoneId}/close")]
-        public HttpResponseMessage CloseZone(Guid inventorization, Guid zoneId)
+        [Route("{inventorization}/zone/close")]
+        public HttpResponseMessage CloseZone(Guid inventorization, [FromBody]string zoneCode)
         {
             try
             {
-                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, zoneId);
+                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, zoneCode);
                 if (state.ClosedAt.HasValue && state.ClosedAt < DateTime.UtcNow)
                 {
                     return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
@@ -194,7 +194,7 @@ namespace Inventorization.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Open zone error. Zone code:{Environment.NewLine} {JsonConvert.SerializeObject(zoneId)}. InventorizationId: {inventorization}");
+                _logger.Error(ex, $"Open zone error. Zone code: {zoneCode}. InventorizationId: {inventorization}");
             }
             return Request.CreateResponse(HttpStatusCode.OK);
         }

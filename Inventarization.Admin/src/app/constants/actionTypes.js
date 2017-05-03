@@ -13,12 +13,16 @@ export const RECEIVE_ZONES = 'RECEIVE_ZONES';
 export const REQUEST_ZONES = 'REQUEST_ZONES';
 
 
+export const CREATE_ITEM = 'CREATE_ITEM';
 export const EDIT_ITEMS = 'EDIT_ITEMS';
 export const FILTER_ITEMS = 'FILTER_ITEMS';
 export const REQUEST_ITEMS = 'REQUEST_ITEMS';
 export const RECEIVE_ITEMS = 'RECEIVE_ITEMS';
+export const VALIDATE_ITEM = 'VALIDATE_ITEM';
+export const SET_CURRENT_ITEM = 'SET_CURRENT_ITEM';
 
 export const CREATE_ZONE = 'CREATE_ZONE';
 export const OPEN_ZONE = 'OPEN_ZONE';
 export const EDIT_ZONE = 'EDIT_ZONE';
 export const ZONE_OPENED = 'ZONE_OPENED';
+export const ZONE_CLOSED = 'ZONE_CLOSED';
