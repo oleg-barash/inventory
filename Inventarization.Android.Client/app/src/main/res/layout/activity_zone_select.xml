@@ -38,7 +38,7 @@
                 android:layout_weight="1"
                 android:enabled="false"
                 android:text="@string/create"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/findButton"
