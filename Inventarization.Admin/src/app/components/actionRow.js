@@ -14,10 +14,7 @@ import { blue200 as blue}  from 'material-ui/styles/colors';
 import { red200 as red}  from 'material-ui/styles/colors';
 import { fullWhite as white}  from 'material-ui/styles/colors';
 import { setCurrentItem, deleteAction } from '../actions/MainActions';
-import { browserHistory } from 'react-router';
-import {
-  Link
-} from 'react-router'
+import { Link, browserHistory } from 'react-router'
 moment.locale("ru-RU")
 function getTypeName(type){
     switch(type){
@@ -43,7 +40,7 @@ class ActionRow extends Component {
 
 
         var newItem = function() {
-            dispatch(setCurrentItem({BarCode: action.BarCode}))
+            dispatch(setCurrentItem({BarCode: action.BarCode, Quantity: action.Quantity}))
             browserHistory.push('/newItem');
         }
 

@@ -156,5 +156,28 @@ namespace Inventorization.Data
             return items;
         }
 
+
+        public void CreateItem(Guid companyId, Item item)
+        {
+            Business.Model.Inventorization result = new Business.Model.Inventorization();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    Guid id = Guid.NewGuid();
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""Quantity"") VALUES(:Company, :Code, :Description, :Quantity)";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", id));
+                    cmd.Parameters.Add(new NpgsqlParameter("Code", item.Code));
+                    cmd.Parameters.Add(new NpgsqlParameter("Company", companyId));
+                    cmd.Parameters.Add(new NpgsqlParameter("Description", item.Description));
+                    cmd.Parameters.Add(new NpgsqlParameter("Quantity", item.Quantity));
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
+        }
+
     }
 }

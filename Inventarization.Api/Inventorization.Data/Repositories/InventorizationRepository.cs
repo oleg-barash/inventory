@@ -46,7 +46,7 @@ namespace Inventorization.Data
             }
             return result;
         }
-
+        
         public Business.Model.Inventorization GetInventorization(Guid id)
         {
             Business.Model.Inventorization result = new Business.Model.Inventorization();

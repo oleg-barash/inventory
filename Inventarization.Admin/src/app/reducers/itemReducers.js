@@ -7,7 +7,7 @@ export function item(state = { }, action)
 {
     switch (action.type){
         case VALIDATE_ITEM:
-            let item = Object.assign(state, action.data)
+            let item = Object.assign({}, state, action.data)
             item.BarCodeError = item.BarCode !== '' ? '' : 'Код товара нужно обязательно указать'
             item.DescriptionError = item.Description !== '' ? '' : 'Наименование товара нужно обязательно указать'
             return item;

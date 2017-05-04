@@ -15,6 +15,7 @@ import { FILTER_ACTION,
     ZONE_CLOSED,
     CREATE_ITEM,
     VALIDATE_ITEM,
+    SAVE_ITEM,
     SET_CURRENT_ITEM,
     FILTER_ITEMS} from '../constants/actionTypes'
 import { BASE_URL } from '../constants/configuration'
@@ -93,7 +94,6 @@ export function validateItem(itemData){
     }
 }
 
-
 function deletingAction(action){
     return {
         type: DELETING_ACTION,
@@ -126,6 +126,14 @@ export function addItemFromAction(action){
     }
 }
 
+export function itemSaved(item){
+    return {
+        type: ITEM_SAVED,
+        item
+    }
+}
+
+
 
 export function setCurrentItem(item){
     return {
@@ -143,6 +151,22 @@ export function openZone(zone){
             .then(response => {
                 dispatch(zoneOpened(zone))
                 dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+            })
+    }
+}
+
+
+export function saveItem(item){
+        return function (dispatch){
+        return fetch(BASE_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/reopen?code=', {
+            method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: item})
+            .then(response => {
+                dispatch(itemSaved(item))
             })
     }
 }

@@ -9,6 +9,7 @@ export const REQUEST_ACTION = 'REQUEST_ACTIONS';
 export const RECEIVE_ACTION = 'RECEIVE_ACTION';
 export const DELETING_ACTION = 'DELETING_ACTION';
 export const ACTION_DELETED = 'ACTION_DELETED';
+
 export const RECEIVE_ZONES = 'RECEIVE_ZONES';
 export const REQUEST_ZONES = 'REQUEST_ZONES';
 
@@ -20,6 +21,8 @@ export const REQUEST_ITEMS = 'REQUEST_ITEMS';
 export const RECEIVE_ITEMS = 'RECEIVE_ITEMS';
 export const VALIDATE_ITEM = 'VALIDATE_ITEM';
 export const SET_CURRENT_ITEM = 'SET_CURRENT_ITEM';
+export const SAVE_ITEM = 'SAVE_ITEM';
+
 
 export const CREATE_ZONE = 'CREATE_ZONE';
 export const OPEN_ZONE = 'OPEN_ZONE';

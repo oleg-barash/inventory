@@ -89,17 +89,20 @@ namespace Inventorization.Api.Controllers
         [HttpPost]
         [Route("{id}/inventorization")]
 
-        public HttpResponseMessage CreateInventorization(string id, [FromBody]DateTime? date)
+        public HttpResponseMessage CreateInventorization(Guid id, [FromBody]DateTime? date)
         {
-            Guid _companyId;
-            if (!Guid.TryParse(id, out _companyId))
-            {
-                var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-                response.ReasonPhrase = $"GUID '{id}' is not valid!";
-                return response;
-            }
-            return Request.CreateResponse(HttpStatusCode.Created, _inventorizationRepository.CreateInventorization(_companyId, date ?? DateTime.UtcNow));
+            return Request.CreateResponse(HttpStatusCode.Created, _inventorizationRepository.CreateInventorization(id, date ?? DateTime.UtcNow));
         }
+
+        [HttpPost]
+        [Route("{id}/item")]
+
+        public HttpResponseMessage CreateItem(Guid id, [FromBody]Item item)
+        {
+            _companyRepository.CreateItem(id, item);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
 
     }
 }
