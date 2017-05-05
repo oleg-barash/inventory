@@ -1,8 +1,8 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { FILTER_ITEMS, REQUEST_ITEMS, RECEIVE_ITEMS } from '../constants/actionTypes'
-export function itemList(state = { isFetching: false, items: [], filter: {} }, action)
+import { FILTER_ITEMS, REQUEST_ITEMS, RECEIVE_ITEMS, OPEN_IMPORT_DIALOG, CLOSE_IMPORT_DIALOG } from '../constants/actionTypes'
+export function itemList(state = { isFetching: false, items: [], filter: {}, isImportDialogOpened: false }, action)
 {
     switch (action.type){
         case FILTER_ITEMS:
@@ -21,6 +21,10 @@ export function itemList(state = { isFetching: false, items: [], filter: {} }, a
                 }),
                 lastUpdated: action.receivedAt
             })
+        case OPEN_IMPORT_DIALOG:
+            return Object.assign({}, state, { isImportDialogOpened: true })
+        case CLOSE_IMPORT_DIALOG:
+            return Object.assign({}, state, { isImportDialogOpened: false })
         default:
             return state
     }

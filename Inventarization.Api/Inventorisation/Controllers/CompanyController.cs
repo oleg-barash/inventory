@@ -1,4 +1,5 @@
-﻿using Inventorization.Business.Model;
+﻿using Inventorization.Api.Models;
+using Inventorization.Business.Model;
 using Inventorization.Data;
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace Inventorization.Api.Controllers
 {
+    [EnableCors("*", "*", "*")]
     [RoutePrefix("api/company")]
     public class CompanyController : ApiController
     {
@@ -97,8 +100,14 @@ namespace Inventorization.Api.Controllers
         [HttpPost]
         [Route("{id}/item")]
 
-        public HttpResponseMessage CreateItem(Guid id, [FromBody]Item item)
+        public HttpResponseMessage CreateItem(Guid id, [FromBody]CreateItemViewModel itemVM)
         {
+            Business.Model.Item item = new Business.Model.Item();
+            item.Code = itemVM.Code;
+            item.Description = itemVM.Description;
+            item.Quantity = itemVM.Quantity ?? default(int);
+            item.CompanyId = id;
+            item.Source = ItemSource.Manual;
             _companyRepository.CreateItem(id, item);
             return Request.CreateResponse(HttpStatusCode.OK);
         }

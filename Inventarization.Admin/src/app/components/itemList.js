@@ -10,12 +10,12 @@ const ItemList = ({ items }) => (
     <Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
-                <TableHeaderColumn>Наименование</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '280px'}}>Наименование</TableHeaderColumn>
                 <TableHeaderColumn>Номер</TableHeaderColumn>
                 <TableHeaderColumn>Код</TableHeaderColumn>
                 <TableHeaderColumn>Зоны</TableHeaderColumn>
-                <TableHeaderColumn>Количество план</TableHeaderColumn>
-                <TableHeaderColumn>Количество факт</TableHeaderColumn>
+                <TableHeaderColumn>План</TableHeaderColumn>
+                <TableHeaderColumn>Факт</TableHeaderColumn>
             </TableRow>
         </TableHeader>
         <TableBody>

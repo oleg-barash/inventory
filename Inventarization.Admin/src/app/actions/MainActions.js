@@ -16,7 +16,10 @@ import { FILTER_ACTION,
     CREATE_ITEM,
     VALIDATE_ITEM,
     SAVE_ITEM,
+    ITEM_SAVED,
     SET_CURRENT_ITEM,
+    OPEN_IMPORT_DIALOG,
+    CLOSE_IMPORT_DIALOG,
     FILTER_ITEMS} from '../constants/actionTypes'
 import { BASE_URL } from '../constants/configuration'
 export function filterActions(filter){
@@ -69,6 +72,18 @@ function actionDeleted(action){
     return {
         type: ACTION_DELETED,
         action: action
+    }
+}
+
+export function openImportDialog(){
+    return {
+        type: OPEN_IMPORT_DIALOG
+    }
+}
+
+export function closeImportDialog(){
+    return {
+        type: CLOSE_IMPORT_DIALOG
     }
 }
 
@@ -158,16 +173,16 @@ export function openZone(zone){
 
 export function saveItem(item){
         return function (dispatch){
-        return fetch(BASE_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/reopen?code=', {
-            method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: item})
-            .then(response => {
-                dispatch(itemSaved(item))
-            })
+            return fetch(BASE_URL + 'company/' + '9e0e8591-293d-4603-898d-59334e4c53dc' + '/item', {
+                method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(item)})
+                .then(response => {
+                    dispatch(itemSaved(item))
+                })
     }
 }
 

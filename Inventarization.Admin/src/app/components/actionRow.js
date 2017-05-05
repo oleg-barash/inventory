@@ -40,17 +40,17 @@ class ActionRow extends Component {
 
 
         var newItem = function() {
-            dispatch(setCurrentItem({BarCode: action.BarCode, Quantity: action.Quantity}))
+            dispatch(setCurrentItem({Code: action.BarCode, Quantity: action.Quantity}))
             browserHistory.push('/newItem');
         }
 
         return (
             <TableRow style={rowStyle}>
-                <TableRowColumn >{action.Description}</TableRowColumn>
-                <TableRowColumn >{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
+                <TableRowColumn style={{width: '270px'}}>{action.Description}</TableRowColumn>
+                <TableRowColumn style={{width: '120px'}}>{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
                 <TableRowColumn >{getTypeName(action.Type)}</TableRowColumn>
                 {/*<TableRowColumn >{action.User}</TableRowColumn>*/}
-                <TableRowColumn >{action.BarCode}</TableRowColumn>
+                <TableRowColumn style={{width: '120px'}}>{action.BarCode}</TableRowColumn>
                 <TableRowColumn >{action.Zone}</TableRowColumn>
                 <TableRowColumn >{action.Quantity}</TableRowColumn>
                 <TableRowColumn >

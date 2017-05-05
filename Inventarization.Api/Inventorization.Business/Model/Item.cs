@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace Inventorization.Business.Model
 {
+
+    public enum ItemSource
+    {
+        Undefined,
+        Import,
+        Manual
+    }
+
     public class Item
     {
         //public Guid Id { get; set; }
@@ -14,5 +22,6 @@ namespace Inventorization.Business.Model
         public Guid CompanyId { get; set; }
         public string Description { get; set; }
         public int? Quantity { get; set; }
+        public ItemSource Source { get; set; }
     }
 }

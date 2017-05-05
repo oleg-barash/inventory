@@ -23,6 +23,9 @@ export const VALIDATE_ITEM = 'VALIDATE_ITEM';
 export const SET_CURRENT_ITEM = 'SET_CURRENT_ITEM';
 export const SAVE_ITEM = 'SAVE_ITEM';
 
+export const OPEN_IMPORT_DIALOG = 'OPEN_IMPORT_DIALOG';
+export const CLOSE_IMPORT_DIALOG = 'CLOSE_IMPORT_DIALOG';
+
 
 export const CREATE_ZONE = 'CREATE_ZONE';
 export const OPEN_ZONE = 'OPEN_ZONE';

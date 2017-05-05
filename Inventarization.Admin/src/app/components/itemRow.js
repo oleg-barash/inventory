@@ -24,7 +24,7 @@ class ItemRow extends Component {
         
         return (
             <TableRow style={rowStyle}>
-                <TableRowColumn>{item.Description}</TableRowColumn>
+                <TableRowColumn style={{width: '280px'}}>{item.Description}</TableRowColumn>
                 <TableRowColumn>{item.Number}</TableRowColumn>
                 <TableRowColumn>{item.BarCode}</TableRowColumn>
                 <TableRowColumn>{item.Actions.map((action) => <Link key={action.Zone} to={{pathname: "/actions", query: { ZoneName: action.Zone, Code: item.BarCode} }}>{action.Zone}<br/></Link>)}</TableRowColumn>

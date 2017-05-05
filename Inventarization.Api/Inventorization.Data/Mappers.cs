@@ -105,11 +105,12 @@ namespace Inventorization.Data
             return new Item()
             {
                 //Id = reader.GetGuid(0),
-                ItemNumber = reader.GetString(0),
+                ItemNumber = reader.IsDBNull(0) ? default(string) : reader.GetString(0),
                 Code = reader.GetString(1),
                 CompanyId = reader.GetGuid(2),
                 Description = reader.GetString(3),
-                Quantity = reader.IsDBNull(4) ? default(int) : reader.GetInt32(4)
+                Quantity = reader.IsDBNull(4) ? default(int) : reader.GetInt32(4),
+                Source = (ItemSource)reader.GetInt32(5)
             };
         }
 
