@@ -20,5 +20,7 @@ namespace Inventorization.Api.Models
         public int? QuantityPlan { get; set; }
         public List<ItemDetails> Actions { get; set; }
         public ActionType Type { get; set; }
+        public string Name { get; set; }
+        public int Id { get; set; }
     }
 }

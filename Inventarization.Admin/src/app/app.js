@@ -7,24 +7,32 @@ import { Provider } from 'react-redux'
 import {
   Link
 } from 'react-router'
-import { actionList } from './reducers/actionReducers'
+import { actionList } from './reducers/actionListReducers'
 import { itemList } from './reducers/itemListReducers'
 import { item } from './reducers/itemReducers'
+import { action } from './reducers/actionReducers'
 import { zoneList } from './reducers/zoneReducers'
 import { createLogger } from 'redux-logger'
 import {reducer as toastrReducer} from 'react-redux-toastr'
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import ReduxToastr from 'react-redux-toastr'
 import PropTypes from 'prop-types';
+import throttle from "redux-throttle";
+
+const defaultWait = 30000
+const defaultThrottleOption = {
+  leading: true,
+  trailing: true
+}
+
+const throttleMiddleware = throttle(defaultWait, defaultThrottleOption);
+
 injectTapEventPlugin();
 const loggerMiddleware = createLogger()
-
+const middleware = [thunkMiddleware,loggerMiddleware,throttleMiddleware];
 let store = createStore(
-    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item  }),
-    applyMiddleware(
-        thunkMiddleware,
-        loggerMiddleware
-));
+    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action  }),
+    applyMiddleware(...middleware));
 
 
 const propTypes = {

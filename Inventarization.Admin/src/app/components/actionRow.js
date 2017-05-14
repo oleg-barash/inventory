@@ -13,7 +13,8 @@ import { yellow200 as yellow}  from 'material-ui/styles/colors';
 import { blue200 as blue}  from 'material-ui/styles/colors';
 import { red200 as red}  from 'material-ui/styles/colors';
 import { fullWhite as white}  from 'material-ui/styles/colors';
-import { setCurrentItem, deleteAction } from '../actions/MainActions';
+import { deleteAction } from '../actions/actionActions';
+import { setCurrentItem } from '../actions/itemActions';
 import { Link, browserHistory } from 'react-router'
 moment.locale("ru-RU")
 function getTypeName(type){
@@ -46,7 +47,7 @@ class ActionRow extends Component {
 
         return (
             <TableRow style={rowStyle}>
-                <TableRowColumn style={{width: '270px'}}>{action.Description}</TableRowColumn>
+                <TableRowColumn style={{width: '270px'}}>{action.Name}</TableRowColumn>
                 <TableRowColumn style={{width: '120px'}}>{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
                 <TableRowColumn >{getTypeName(action.Type)}</TableRowColumn>
                 {/*<TableRowColumn >{action.User}</TableRowColumn>*/}

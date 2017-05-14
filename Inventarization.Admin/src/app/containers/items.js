@@ -4,45 +4,27 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import ItemList from '../components/itemList'
-import { fetchItems, applyItemsFilter, filterItems, openImportDialog, closeImportDialog } from '../actions/MainActions'
+import { 
+    fetchItems, 
+    applyItemsFilter, 
+    filterItems, 
+    openImportDialog, 
+    closeImportDialog,
+    loadMoreItems,
+    updateItemsFilter,
+    requestItems
+} from '../actions/itemActions'
 import TextField from 'material-ui/TextField';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import { green100 as green}  from 'material-ui/styles/colors';
 import Dialog from 'material-ui/Dialog';
-const filterItemsData = (items, filter) => {
-    if (items == undefined){
-        return [];
-    }
-    var result = items;
-    if (filter !== undefined){
-        if (filter.Text !== undefined){
-            result = result.filter((item) => {
-                return item.BarCode.startsWith(filter.Text) 
-                    || item.Number.startsWith(filter.Text) 
-                    || item.Description.startsWith(filter.Text);
-            })
-        }
-        if (filter.Type !== undefined){
-            switch(filter.Type){
-                case '1': 
-                    result = result.filter((item) => item.QuantityFact < item.QuantityPlan)
-                    break
-                case '2': result = result.filter((item) => item.QuantityFact > item.QuantityPlan)
-                    break
-                default:
-                    break
-            }
-
-        }
-    }
-    return result;
-}
 
 const mapStateToProps = (state) => {
     return {
-        items: filterItemsData(state.items.items, state.items.filter),
+        items: state.items.displayItems,
+        isFetching: state.items.isFetching,
         isDialogOpened: state.items.isImportDialogOpened,
         filter: state.items.filter,
         dispatch: state.dispatch
@@ -78,10 +60,12 @@ class Items extends Component {
         var objectClosure = this;
 
         function handleFilterChange(event, value) {
-            objectClosure.props.dispatch(filterItems({ Text: event.target.value }))
+            objectClosure.props.dispatch(updateItemsFilter({ text: value }))
+            objectClosure.props.dispatch(filterItems({ text: value }))
         };
         function handleStateChange(event, value) {
-            objectClosure.props.dispatch(filterItems({ Type: value }))
+            objectClosure.props.dispatch(updateItemsFilter({ type: value }))
+            objectClosure.props.dispatch(filterItems({ type: value }))
         };
         function importFunc(){
 
@@ -89,6 +73,11 @@ class Items extends Component {
 
         function handleOpen () {
             objectClosure.props.dispatch(openImportDialog())
+        };
+
+        function handleLoadMore () {
+            objectClosure.props.dispatch(requestItems())
+            objectClosure.props.dispatch(filterItems({currentPage: objectClosure.props.filter.currentPage + 1}))
         };
 
         function handleClose () {
@@ -147,7 +136,14 @@ class Items extends Component {
                     The actions in this window were passed in as an array of React objects.
                     </Dialog>
             </Paper>
+            <h2 style={{display: this.props.isFetching ? "block" : "none"}}>
+                Загрузка...
+            </h2>
             <ItemList items={this.props.items} filter={this.props.filter}/>
+            <FlatButton style={{display: this.props.isFetching ? "none" : "block"}} label="Загрузить ещё" hoverColor={green} onClick={handleLoadMore}/>
+            <h2 style={{display: this.props.isFetching && this.props.items.length > 0 ? "block" : "none"}}>
+                Загрузка...
+            </h2>
         </div>)
     }
 }

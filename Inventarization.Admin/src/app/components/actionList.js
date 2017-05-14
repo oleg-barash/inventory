@@ -6,7 +6,7 @@ import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'mater
 import ActionRow from '../components/actionRow';
 import { connect } from 'react-redux'
 import TextField from 'material-ui/TextField';
-import { filterActions } from '../actions/MainActions'
+import { filterActions } from '../actions/actionActions'
 const getActions = (items, filter) => {
     if (items == undefined){
         return [];
@@ -15,12 +15,12 @@ const getActions = (items, filter) => {
     if (filter !== undefined){
         if (filter.ZoneName !== undefined){
             result = result.filter((item) => {
-                return item.Zone.startsWith(filter.ZoneName);
+                return item.Zone.toUpperCase().startsWith(filter.ZoneName.toUpperCase());
             })
         }
         if (filter.Code !== undefined){
             result = result.filter((item) => {
-                return item.BarCode.startsWith(filter.Code);
+                return item.BarCode.toUpperCase().startsWith(filter.Code.toUpperCase());
             })
         }
     }

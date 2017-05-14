@@ -104,6 +104,7 @@ namespace Inventorization.Api.Controllers
         {
             Business.Model.Item item = new Business.Model.Item();
             item.Code = itemVM.Code;
+            item.Name = itemVM.Name;
             item.Description = itemVM.Description;
             item.Quantity = itemVM.Quantity ?? default(int);
             item.CompanyId = id;

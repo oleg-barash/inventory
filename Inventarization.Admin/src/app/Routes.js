@@ -10,11 +10,13 @@ import ReportPage from './ReportPage.js';
 import ZonesPage from './ZonesPage.js';
 import ActionsPage from './ActionsPage.js';
 import LoginPage from './LoginPage.js';
+import NewActionPage from './NewActionPage.js';
 export default (<Route path="/" component={App}>
     <div>
         <IndexRoute  component={ItemsPage}/>
         <Route path="items" component={ItemsPage}/>
         <Route path="newItem" component={NewItemPage}/>
+        <Route path="newAction" component={NewActionPage}/>
         <Route path="actions" component={ActionsPage}/>
         <Route path="zones" component={ZonesPage}/>
         <Route path="report" component={ReportPage}/>

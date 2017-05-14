@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import ItemForm from './components/itemForm'
+import ActionForm from './components/actionForm'
 import AuthorizedComponent from './components/authorizedComponent'
 import { connect } from 'react-redux'
 
@@ -14,15 +14,15 @@ const styles = {
 };
 
 
-class NewItemPage extends AuthorizedComponent {
+class NewActionPage extends AuthorizedComponent {
   componentDidMount() {
         const { dispatch } = this.props
   }
   render() {
     return (
           <div>
-              <h2 style={styles.headline}>Добавление товара</h2>
-              <ItemForm/>
+              <h2 style={styles.headline}>Добавление действия</h2>
+              <ActionForm/>
           </div>
     )};
 }
@@ -30,8 +30,8 @@ class NewItemPage extends AuthorizedComponent {
 
 const mapStateToProps = (state) => {
     return {
-        item : state.item
+        action : state.action
     }
 }
 
-export default connect(mapStateToProps)(NewItemPage)
+export default connect(mapStateToProps)(NewActionPage)

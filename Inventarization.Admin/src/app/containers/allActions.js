@@ -4,7 +4,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import ActionList from '../components/actionList'
-import { fetchActions } from '../actions/MainActions'
+import { fetchActions } from '../actions/actionActions'
 
 const mapStateToProps = (state) => {
     return {

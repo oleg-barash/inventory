@@ -7,10 +7,14 @@ import { TableRow, TableRowColumn} from 'material-ui/Table';
 import FlatButton from 'material-ui/FlatButton';
 import Replay from 'material-ui/svg-icons/av/replay';
 import Done from 'material-ui/svg-icons/action/done';
+import {blue200 as blue}  from 'material-ui/styles/colors';
 import {green200 as green}  from 'material-ui/styles/colors';
 import {red200 as red}  from 'material-ui/styles/colors';
 import {fullWhite as white}  from 'material-ui/styles/colors';
-import { openZone, closeZone } from '../actions/MainActions';
+import { openZone, closeZone } from '../actions/zoneActions';
+import { setCurrentAction } from '../actions/actionActions';
+import Add from 'material-ui/svg-icons/Content/add';
+import { browserHistory } from 'react-router'
 import moment from 'moment';
 moment.locale("ru-RU")
 
@@ -20,21 +24,32 @@ class ZoneRow extends Component {
     }
 
     render() {
-        var {zone, dispatch} = this.props;
+        let {zone, dispatch} = this.props;
 
-        var openFunc = function () {
+        let openFunc = function () {
             dispatch(openZone(zone))
         }
-        var closeFunc = function () {
+
+        let closeFunc = function () {
             dispatch(closeZone(zone))
         }
+
+        let newAction = function() {
+            dispatch(setCurrentAction({Zone: zone, Type: 0}))
+            browserHistory.push('/newAction');
+        }
+
         return (
             <TableRow>
                 <TableRowColumn>{zone.ZoneName}</TableRowColumn>
                 <TableRowColumn>{moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
                 <TableRowColumn>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
                 <TableRowColumn >
-
+                    <FlatButton disabled={zone.ClosedAt != undefined}
+                        hoverColor={blue}
+                        icon={<Add/>}
+                        onClick={newAction}
+                    />
                     <FlatButton disabled={zone.ClosedAt == undefined}
                         backgroundColor={white}
                         hoverColor={red}
@@ -47,6 +62,7 @@ class ZoneRow extends Component {
                         icon={<Done/>}
                         onClick={closeFunc}
                     />
+
                     {/*<LinearProgress mode="indeterminate"/>*/}
                 </TableRowColumn>
             </TableRow>       

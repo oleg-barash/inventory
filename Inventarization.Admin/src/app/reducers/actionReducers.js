@@ -1,55 +1,26 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { FILTER_ACTION, REQUEST_ACTION, RECEIVE_ACTION, DELETING_ACTION, ACTION_DELETED } from '../constants/actionTypes'
-import {toastr} from 'react-redux-toastr'
+import { VALIDATE_ACTION, SET_CURRENT_ACTION } from '../constants/actionTypes'
 
-export function actionList(state = { isFetching: false, items: [], filter: {} }, action)
+export function action(state = { Type: 0 }, action)
 {
     switch (action.type){
-        case ACTION_DELETED:
-            //toastr.success('The title', 'The message')
-            return Object.assign({}, state, {
-                isFetching: false,
-                items: state.items.filter((actionItem) => actionItem.Id !== action.id)
-            })
-        case DELETING_ACTION:
-            return Object.assign({}, state, {
-                isFetching: false,
-                items: state.items.map((actionItem) => {
-                    if (actionItem.Id === action.id)
-                    {
-                        actionItem.IsDeleting = true;
-                    }
-                    return actionItem;
-                }),
-                lastUpdated: action.receivedAt
-            })
-
-        case FILTER_ACTION:
-            var filter = Object.assign(state.filter, action.filter)
-            return Object.assign({filter}, state)
-        case REQUEST_ACTION:
-            return Object.assign({}, state, {
-                isFetching: true
-            })
-        case RECEIVE_ACTION:
-            var items = action.items
-            if (action.filter !== undefined){
-                if (action.filter.Code !== undefined){
-                    items = items.filter((item) => {
-                        return item.BarCode.startsWith(action.filter.Code);
-                    })
-                }
+        case VALIDATE_ACTION:
+        debugger
+            let actionItem = Object.assign({}, state, action.data)
+            actionItem.NameError = actionItem.Name !== '' ? '' : 'Наименование товара нужно выбрать из списка'
+            actionItem.CodeError = actionItem.Code !== '' ? '' : 'Код товара нужно выбрать из списка'
+            actionItem.QuantityError = actionItem.Quantity !== '' ? '' : 'Количество нужно обязательно указать'
+            actionItem.ZoneError = actionItem.Zone !== undefined ? '' : 'Зону нужно обязательно указать'
+            debugger;
+            if (actionItem.Zone && !!actionItem.Zone.ClosedAt){
+                actionItem.ZoneError = 'Зона закрыта. Для добавления действия в эту зону её нужно открыть'
             }
-            return Object.assign({}, state, {
-                    isFetching: false,
-                    items: action.items.map(x => {
-                        x.key = x.Id;
-                        return x;
-                    }),
-                    lastUpdated: action.receivedAt
-            })
+            return actionItem;
+        case SET_CURRENT_ACTION:
+            return action.action;
+            
         default:
             return state
     }

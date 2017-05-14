@@ -108,9 +108,11 @@ namespace Inventorization.Data
                 ItemNumber = reader.IsDBNull(0) ? default(string) : reader.GetString(0),
                 Code = reader.GetString(1),
                 CompanyId = reader.GetGuid(2),
-                Description = reader.GetString(3),
+                Description = reader.IsDBNull(3) ? default(string) : reader.GetString(3),
                 Quantity = reader.IsDBNull(4) ? default(int) : reader.GetInt32(4),
-                Source = (ItemSource)reader.GetInt32(5)
+                Id = reader.IsDBNull(5) ? default(int) : reader.GetInt32(5),
+                Source = reader.IsDBNull(6) ? ItemSource.Undefined : (ItemSource)reader.GetInt32(6),
+                Name = reader.GetString(7)
             };
         }
 

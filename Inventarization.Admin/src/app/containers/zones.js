@@ -4,7 +4,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import ZoneList from '../components/zoneList'
-import { fetchZones } from '../actions/MainActions'
+import { fetchZones } from '../actions/zoneActions'
 
 const mapStateToProps = (state) => {
     if (state.zones.items == undefined){

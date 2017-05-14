@@ -4,7 +4,6 @@
 import React, { PropTypes } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
 import ItemRow from '../components/itemRow';
-import { fetchItems } from '../actions/MainActions'
 
 const ItemList = ({ items }) => (
     <Table>
