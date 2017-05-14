@@ -64,13 +64,13 @@ class ActionList extends Component {
                 <Table>
                     <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
                         <TableRow>
-                            <TableHeaderColumn style={{width: '270px'}}>Описание</TableHeaderColumn>
-                            <TableHeaderColumn style={{width: '120px'}}>Время</TableHeaderColumn>
-                            <TableHeaderColumn >Тип</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '200px'}}>Описание</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '100px'}}>Время</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '100px'}}>Тип</TableHeaderColumn>
                             {/*<TableHeaderColumn >Пользователь</TableHeaderColumn>*/}
-                            <TableHeaderColumn style={{width: '120px'}}>Код</TableHeaderColumn>
-                            <TableHeaderColumn >Зона</TableHeaderColumn>
-                            <TableHeaderColumn >Количество</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '100px'}}>Код</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '50px'}}>Зона</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '50px'}}>Кол-во</TableHeaderColumn>
                             <TableHeaderColumn >Действия</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>

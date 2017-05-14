@@ -194,7 +194,7 @@ export function closeZone(zone){
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: zone.Code})
+                body: JSON.stringify({zoneCode: zone.Code})})
             .then(response => {
                 dispatch(zoneClosed(zone))
                 dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))

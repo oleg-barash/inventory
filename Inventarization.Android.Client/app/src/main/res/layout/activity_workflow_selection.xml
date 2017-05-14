@@ -1,36 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <RadioGroup
+        android:id="@+id/radioGroup"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="349dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
-            android:id="@+id/radioButton"
+            android:id="@+id/firstScan"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="66dp"
             android:checked="true"
-            android:text="RadioButton"
+            android:onClick="onRadioButtonClicked"
+            android:text="Первое сканирование"
             android:visibility="visible" />
 
         <RadioButton
-            android:id="@+id/radioButton2"
+            android:id="@+id/secondScan"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="RadioButton"
-            android:visibility="visible" />
-
-        <RadioButton
-            android:id="@+id/radioButton3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="RadioButton"
+            android:layout_height="70dp"
+            android:onClick="onRadioButtonClicked"
+            android:text="Повторное сканирование"
             android:visibility="visible" />
 
     </RadioGroup>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="74dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="10dp"
+        android:onClick="onOkButtonClicked"
+        android:text="ОК"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
 </LinearLayout>
