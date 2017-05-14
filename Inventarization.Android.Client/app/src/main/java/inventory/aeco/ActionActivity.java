@@ -71,9 +71,9 @@ public class ActionActivity extends Activity {
     private int errorSoundid;
     private boolean isScaning = false;
     private String currentZone;
+    private ActionType currentActionType;
     private String inventorizationId = "81d51f07-9ff3-46c0-961c-c8ebfb7b47e3";
     Action newAction;
-    ActionType newActionType = ActionType.FirstScan;
     LinkedList<String> actionList = new LinkedList<>();
 
     ArrayAdapter<String> adapter;
@@ -118,7 +118,7 @@ public class ActionActivity extends Activity {
         showScanResult.setText(newAction.BarCode);
         newAction.Id = UUID.randomUUID().toString();
         newAction.Quantity = 1;
-        newAction.Type = newActionType;
+        newAction.Type = currentActionType;
         newAction.Zone = currentZone;
         newAction.Inventorization = inventorizationId;
         HashMap<String, String> params = new HashMap<String, String>();
@@ -142,7 +142,7 @@ public class ActionActivity extends Activity {
                             ObjectMapper mapper = new ObjectMapper();
                             Item item = mapper.readValue(response.toString(), Item.class);
                             description.setText(item.Description);
-                            description.setBackgroundColor(Color.GREEN);
+                            description.setBackgroundColor(Color.argb(128,0,0,64));
                             newAction.Status = ActionStatus.Sent;
                         }
                         catch (IOException exception){
@@ -153,6 +153,7 @@ public class ActionActivity extends Activity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                showScanResult.setText("");
                 newAction.Status = ActionStatus.Error;
                 if (error.networkResponse != null && error.networkResponse.statusCode == 404){
                     soundpool.play(errorSoundid, 1, 1, 0, 0, 1);
@@ -187,7 +188,9 @@ public class ActionActivity extends Activity {
 
 
         Intent intent = getIntent();
-        currentZone = intent.getStringExtra(ActionActivity.ZONE_MESSAGE);
+        Bundle extras = intent.getExtras();
+        currentZone = extras.getString(ActionActivity.ZONE_MESSAGE);
+        currentActionType = ActionType.valueOf(extras.getString(ZoneSelectActivity.ACTION_TYPE_MESSAGE));
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         StringRequest stringRequest = new StringRequest(Request.Method.GET, baseZoneUrl + currentZone,
@@ -263,12 +266,18 @@ public class ActionActivity extends Activity {
             public void onClick(View arg0) {
                 try {
                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, baseUrl + "zone/" + currentZone + "/close",
-                            new Response.Listener<String>() {
+                    HashMap<String, String> params = new HashMap<String, String>();
+                    params.put("zoneId", currentZone);
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, baseUrl + "zone/close"
+                            , new JSONObject(params),
+                            new Response.Listener<JSONObject>() {
                                 @Override
-                                public void onResponse(String response) {
+                                public void onResponse(JSONObject response) {
                                     showToast("Зона закрыта");
                                     Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
+                                    Bundle extras = new Bundle();
+                                    extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());
+                                    intent.putExtras(extras);
                                     startActivity(intent);
                                 }
                             }, new Response.ErrorListener() {
@@ -288,7 +297,7 @@ public class ActionActivity extends Activity {
                             }
                         }
                     });
-                    queue.add(stringRequest);
+                    queue.add(request);
                 }
                 catch (Exception ex){
                     showToast("Ошибка при закрытии зоны.");

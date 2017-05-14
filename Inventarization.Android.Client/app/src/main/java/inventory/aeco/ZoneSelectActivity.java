@@ -37,6 +37,7 @@ import inventory.R;
 public class ZoneSelectActivity extends Activity {
 
     private final static String SCAN_ACTION = "urovo.rcv.message";
+    public static final String ACTION_TYPE_MESSAGE = "com.inventorization.ACTION_TYPE";
     private boolean isScaning = false;
     private Vibrator mVibrator;
     private ScanManager mScanManager;
@@ -50,9 +51,9 @@ public class ZoneSelectActivity extends Activity {
     private Zone zone;
     private static final String TAG = "ZoneSelectActivity";
     private String inventorizationId = "81d51f07-9ff3-46c0-961c-c8ebfb7b47e3";
-    private String baseUrl = "http://192.168.0.106/api/zone";
-    private String baseInventorizationUrl = "http://192.168.0.106/api/inventorization/" + inventorizationId + "/";
+    private String baseInventorizationUrl = Configuration.BaseUrl + "inventorization/" + inventorizationId + "/";
     private ZoneActivityStates currentState = ZoneActivityStates.Initial;
+    private ActionType currentActionType;
 
     private void initScan() {
         // TODO Auto-generated method stub
@@ -63,6 +64,10 @@ public class ZoneSelectActivity extends Activity {
         soundid = soundpool.load("/etc/Scan_new.ogg", 1);
     }
 
+    public void goToActionTypeSelect(View view){
+        Intent intent = new Intent(ZoneSelectActivity.this, WorkflowSelection.class);
+        startActivity(intent);
+    }
 
     private void showToast(CharSequence text){
         Context appContext = getApplicationContext();
@@ -81,12 +86,16 @@ public class ZoneSelectActivity extends Activity {
                             ObjectMapper mapper = new ObjectMapper();
                             zone = mapper.readValue(response.toString(), Zone.class);
                             Intent intent = new Intent(ZoneSelectActivity.this, ActionActivity.class);
-                            intent.putExtra(ActionActivity.ZONE_MESSAGE, zone.Id);
+                            Bundle extras = new Bundle();
+                            extras.putString(ActionActivity.ZONE_MESSAGE, zone.Id);
+                            extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());
+                            intent.putExtras(extras);
                             startActivity(intent);
                         }
                         catch (IOException exception){
                             Log.e(TAG, "Error parsing zone: " + response.toString());
-                            setState(ZoneActivityStates.Error);
+                            setState(ZoneActivityStates.Initial);
+                            showToast("При открытии зоны произошла ошибка.");
                         }
 
                     }
@@ -255,7 +264,8 @@ public class ZoneSelectActivity extends Activity {
                             }
                             catch (Exception exception){
                                 Log.e(TAG, "Error parsing zone: " + response.toString());
-                                setState(ZoneActivityStates.Error);
+                                setState(ZoneActivityStates.Initial);
+                                showToast("При открытии зоны произошла ошибка.");
                             }
 
                         }
@@ -264,7 +274,7 @@ public class ZoneSelectActivity extends Activity {
                 public void onErrorResponse(VolleyError error) {
                     if (error.networkResponse.statusCode == 404){
                         setState(ZoneActivityStates.ZoneNotFound);
-                        showToast("Зона не найдена. Вы можете создать её.");
+                        showToast("Зона не найдена.");// Вы можете создать её.");
                     }
                     else if (error.networkResponse.statusCode == 403) {
                         setState(ZoneActivityStates.Initial);
@@ -330,6 +340,8 @@ public class ZoneSelectActivity extends Activity {
         setContentView(R.layout.activity_zone_select);
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         setupView();
+        Intent intent = getIntent();
+        currentActionType = ActionType.valueOf(intent.getStringExtra(ACTION_TYPE_MESSAGE));
     }
 
 }

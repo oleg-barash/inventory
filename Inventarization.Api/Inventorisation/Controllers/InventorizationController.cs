@@ -83,6 +83,7 @@ namespace Inventorization.Api.Controllers
             catch (Exception ex)
             {
                 _logger.Error(ex, $"Error. Zone code:{Environment.NewLine} {JsonConvert.SerializeObject(code)}. InventorizationId: {inventorization}");
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -141,7 +142,7 @@ namespace Inventorization.Api.Controllers
                     _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
                     state = _inventorizationRepository.GetZoneState(inventorization, code);
                 }
-                if (state.ClosedAt.HasValue && state.ClosedAt.Value < DateTime.UtcNow)
+                if (state.ClosedAt.HasValue && state.ClosedAt.Value.ToUniversalTime() < DateTime.UtcNow)
                 {
                     return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
                 }
@@ -180,23 +181,35 @@ namespace Inventorization.Api.Controllers
 
         [HttpPost]
         [Route("{inventorization}/zone/close")]
-        public HttpResponseMessage CloseZone(Guid inventorization, [FromBody]string zoneCode)
+        public HttpResponseMessage CloseZone(Guid inventorization, [FromBody]CloseZoneVM zoneInfo)
         {
             try
             {
-                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, zoneCode);
-                if (state.ClosedAt.HasValue && state.ClosedAt < DateTime.UtcNow)
+                ZoneState state;
+                if (zoneInfo.ZoneId != null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
+                    state = _inventorizationRepository.GetZoneState(inventorization, zoneInfo.ZoneId);
                 }
-                _inventorizationRepository.CloseZone(state, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
-                return Request.CreateResponse(HttpStatusCode.OK);
+                else
+                {
+                    state = _inventorizationRepository.GetZoneState(inventorization, zoneInfo.ZoneCode);
+                }
+                if (state != null)
+                {
+                    if (state.ClosedAt.HasValue && state.ClosedAt < DateTime.UtcNow)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Forbidden, new { Result = "Error", Reason = "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру." });
+                    }
+                    _inventorizationRepository.CloseZone(state, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
+                    return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
+                }
+                return Request.CreateResponse(HttpStatusCode.Forbidden, new { Result = "Error", Reason = "Зона не была открыта" });
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Open zone error. Zone code: {zoneCode}. InventorizationId: {inventorization}");
+                _logger.Error(ex, $"Open zone error. Zone code: {zoneInfo.ZoneCode}. InventorizationId: {inventorization}");
             }
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
         }
 
         [HttpPost]
@@ -223,7 +236,7 @@ namespace Inventorization.Api.Controllers
                     _inventorizationRepository.OpenZone(inventorization, action.Zone, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
                     zoneState = _inventorizationRepository.GetZoneState(inventorization, action.Zone);
                 }
-                if (zoneState.ClosedAt.HasValue && zoneState.ClosedAt < DateTime.UtcNow)
+                if (zoneState.ClosedAt.HasValue && zoneState.ClosedAt.Value.ToUniversalTime() < DateTime.Now)
                 {
                     return Request.CreateResponse(HttpStatusCode.Forbidden, $"Зона закрыта. Выберите другую зону.");
                 }

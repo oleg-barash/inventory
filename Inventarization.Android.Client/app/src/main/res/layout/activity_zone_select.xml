@@ -10,12 +10,22 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:id="@+id/linearLayout">
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/findButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_weight="1"
+                android:text="@string/Search"
+                android:visibility="visible" />
 
             <Button
                 android:id="@+id/okButton"
@@ -41,14 +51,12 @@
                 android:visibility="gone" />
 
             <Button
-                android:id="@+id/findButton"
+                android:id="@+id/goBack"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/Search"
-                android:visibility="visible" />
+                android:onClick="goToActionTypeSelect"
+                android:text="Назад" />
         </LinearLayout>
 
         <TextView

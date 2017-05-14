@@ -247,6 +247,7 @@
     </Compile>
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\CloseZoneVM.cs" />
     <Compile Include="Models\CreateItemViewModel.cs" />
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\Action.cs" />
@@ -319,6 +320,9 @@
       <Project>{2524d7a7-7d13-47ce-b3e9-674b3b1c3b78}</Project>
       <Name>Inventorization.Data</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

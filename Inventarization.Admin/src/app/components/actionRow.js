@@ -13,8 +13,7 @@ import { yellow200 as yellow}  from 'material-ui/styles/colors';
 import { blue200 as blue}  from 'material-ui/styles/colors';
 import { red200 as red}  from 'material-ui/styles/colors';
 import { fullWhite as white}  from 'material-ui/styles/colors';
-import { deleteAction } from '../actions/actionActions';
-import { setCurrentItem } from '../actions/itemActions';
+import { setCurrentItem, deleteAction } from '../actions/MainActions';
 import { Link, browserHistory } from 'react-router'
 moment.locale("ru-RU")
 function getTypeName(type){
@@ -47,13 +46,13 @@ class ActionRow extends Component {
 
         return (
             <TableRow style={rowStyle}>
-                <TableRowColumn style={{width: '270px'}}>{action.Name}</TableRowColumn>
-                <TableRowColumn style={{width: '120px'}}>{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
-                <TableRowColumn >{getTypeName(action.Type)}</TableRowColumn>
+                <TableRowColumn style={{width: '200px'}}>{action.Description}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}>{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}><small>{getTypeName(action.Type)}</small></TableRowColumn>
                 {/*<TableRowColumn >{action.User}</TableRowColumn>*/}
-                <TableRowColumn style={{width: '120px'}}>{action.BarCode}</TableRowColumn>
-                <TableRowColumn >{action.Zone}</TableRowColumn>
-                <TableRowColumn >{action.Quantity}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}>{action.BarCode}</TableRowColumn>
+                <TableRowColumn style={{width: '50px'}}>{action.Zone}</TableRowColumn>
+                <TableRowColumn style={{width: '50px'}}>{action.Quantity}</TableRowColumn>
                 <TableRowColumn >
 
                     <FlatButton disabled={action.IsDeleting}

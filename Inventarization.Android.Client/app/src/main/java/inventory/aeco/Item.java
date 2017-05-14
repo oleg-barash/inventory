@@ -10,4 +10,5 @@ public class Item {
     public String CompanyId;
     public String Description;
     public Integer Quantity;
+    public int Source;
 }
