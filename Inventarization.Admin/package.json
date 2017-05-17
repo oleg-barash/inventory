@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --debug --hot --devtool eval-source-map --output-pathinfo --watch --colors --inline --content-base public --port 8050 --host 0.0.0.0",
-    "build": "set NODE_ENV=production && webpack --config webpack.production.config.js --progress --colors",
-    "nodemon": "set PORT=90 && nodemon --exec npm run babel-node -- src/app/server.js",
-    "babel-node": "babel-node --presets=es2015 src/app/server.js"
+    "build": "set NODE_ENV=production && webpack --config webpack.production.config.js --progress --colors"
   },
   "keywords": [
     "inventory"
@@ -42,6 +40,8 @@
     "prop-types": "^15.5.9",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "react-dropzone": "^3.13.1",
+    "react-file-input": "^0.2.5",
     "react-moment": "^0.2.2",
     "react-redux": "^5.0.3",
     "react-redux-toastr": "^5.0.0",

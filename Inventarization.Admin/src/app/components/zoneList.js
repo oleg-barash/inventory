@@ -9,9 +9,9 @@ const ZoneList = ({ zones }) => (
     <Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
-                <TableHeaderColumn>Зона</TableHeaderColumn>
-                <TableHeaderColumn>Время открытия</TableHeaderColumn>
-                <TableHeaderColumn>Время закрытия</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '100px'}}>Зона</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '100px'}}>Время открытия</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '100px'}}>Время закрытия</TableHeaderColumn>
                 <TableHeaderColumn>Действия</TableHeaderColumn>
             </TableRow>
         </TableHeader>

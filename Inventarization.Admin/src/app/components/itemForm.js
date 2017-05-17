@@ -30,46 +30,54 @@ class ItemForm extends Component {
     render() {
         let {item, dispatch} = this.props;
         let onCodeChange = function(event) {
-            dispatch(validateItem({Code: event.target.value}));
+            dispatch(validateItem({BarCode: event.target.value}));
         }
         let onNameChange = function(event) {
             dispatch(validateItem({Name: event.target.value}));
         }
-        let onQuantityChange = function(event) {
-            dispatch(validateItem({Quantity: event.target.value}));
+        let onDescriptionChange = function(event) {
+            dispatch(validateItem({Description: event.target.value}));
         }
+        let onQuantityChange = function(event) {
+            dispatch(validateItem({QuantityPlan: event.target.value}));
+        }
+        let onNumberChange = function(event) {
+            dispatch(validateItem({Number: event.target.value}));
+        }
+
         let goBack = function() {
             browserHistory.goBack();
         }
         let save = function() {
-            if (!!item.Name && !!item.Code && !!item.Quantity){
+            if (!!item.Name && !!item.BarCode && !!item.QuantityPlan){
                 dispatch(saveItem(item));
             }
             else{
-                dispatch(validateItem({Code: item.Code || '', Name: item.Name || '', Quantity: item.Quantity || ''}));
+                dispatch(validateItem({BarCode: item.BarCode || '', Name: item.Name || '', QuantityPlan: item.QuantityPlan || ''}));
             }
         }
         return (
             <Paper>
-                <TextField id="BarCode" hintText="1234567890" floatingLabelText="Укажите код товара" value={item.Code} onChange={onCodeChange} errorText={item != null ? item.CodeError || '' : ''}/>
+                <TextField disabled={item.Readonly} id="BarCode" hintText="1234567890" floatingLabelText="Укажите код товара" value={item.BarCode} onChange={onCodeChange} errorText={item != null ? item.CodeError || '' : ''}/>
                 <Divider />
-                <TextField id="Name" hintText="Наименование" floatingLabelText="Наименование товара" value={item.Name} onChange={onNameChange} errorText={item != null ? item.NameError || '' : '' }/>
+                <TextField disabled={item.Readonly} id="Name" hintText="Наименование" floatingLabelText="Наименование товара" value={item.Name} onChange={onNameChange} errorText={item != null ? item.NameError || '' : '' }/>
                 <Divider />
                 
-                <TextField id="Description" 
+                <TextField disabled={item.Readonly} id="Description" 
                         multiLine={true}
                         rows={2}
                         rowsMax={4}
                         hintText="Описание товара" 
                         floatingLabelText="Описание товара" 
+                        onChange={onDescriptionChange}
                         value={item.Description} />
                 <Divider />
-                <TextField id="Number" hintText="ИНВ-20141815052" floatingLabelText="Инвентарный номер товара"/>
+                <TextField disabled={item.Readonly} id="Number" value={item.Number} onChange={onNumberChange} hintText="ИНВ-20141815052" floatingLabelText="Инвентарный номер товара"/>
                 <Divider />
-                <TextField id="Quantity" hintText="0" value={item.Quantity} onChange={onQuantityChange} floatingLabelText="Количество единиц товара" errorText={item != null ? item.QuantityError || '' : '' }/>
+                <TextField disabled={item.Readonly} id="Quantity" hintText="0" value={item.QuantityPlan} onChange={onQuantityChange} floatingLabelText="Количество единиц товара" errorText={item != null ? item.QuantityError || '' : '' }/>
                 <Divider />
-                <FlatButton label="Отменить" onClick={goBack} />
-                <FlatButton label="Добавить" onClick={save} disabled={ !!item.CodeError || !!item.DescriptionError || !!item.QuantityError} />
+                <FlatButton label="Назад" onClick={goBack} />
+                <FlatButton disabled={item.Readonly} label="Сохранить" onClick={save} disabled={ !!item.CodeError || !!item.DescriptionError || !!item.QuantityError} />
             </Paper>)
     }
 }

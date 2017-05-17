@@ -15,7 +15,7 @@ const getActions = (items, filter) => {
     if (filter !== undefined){
         if (filter.ZoneName !== undefined){
             result = result.filter((item) => {
-                return item.Zone.toUpperCase().startsWith(filter.ZoneName.toUpperCase());
+                return item.Zone.ZoneName.toUpperCase().startsWith(filter.ZoneName.toUpperCase());
             })
         }
         if (filter.Code !== undefined){
@@ -61,7 +61,7 @@ class ActionList extends Component {
                     value={this.props.filter.Code}
                     onChange={handleCodeChange}
                     hintText="Поиск по коду"/>
-                <Table>
+                <Table selectable={true} fixedHeader={true}  height={'600px'}>
                     <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
                         <TableRow>
                             <TableHeaderColumn style={{width: '200px'}}>Описание</TableHeaderColumn>

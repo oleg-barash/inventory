@@ -38,4 +38,5 @@
     <string name="Search">Поиск</string>
     <string name="OpenZone">Открыть зону</string>
     <string name="Accept">Применить</string>
+    <string name="no">Нет</string>
 </resources>

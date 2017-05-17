@@ -5,12 +5,12 @@ import React, { PropTypes } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
 import ItemRow from '../components/itemRow';
 
-const ItemList = ({ items }) => (
+const ItemList = ({ items }) => {
+    return (
     <Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
                 <TableHeaderColumn style={{width: '280px'}}>Наименование</TableHeaderColumn>
-                <TableHeaderColumn>Номер</TableHeaderColumn>
                 <TableHeaderColumn>Код</TableHeaderColumn>
                 <TableHeaderColumn>Зоны</TableHeaderColumn>
                 <TableHeaderColumn>План</TableHeaderColumn>
@@ -18,12 +18,13 @@ const ItemList = ({ items }) => (
             </TableRow>
         </TableHeader>
         <TableBody>
-            {items.map(item =>
-                <ItemRow item={item} key={item.BarCode}/>
+            {items.map(item =>{
+                return <ItemRow item={item} key={item.BarCode}/>
+            }
             )}
         </TableBody>
     </Table>
-)
+)}
 
 
 ItemList.propTypes = {

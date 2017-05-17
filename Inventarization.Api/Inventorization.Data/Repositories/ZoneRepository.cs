@@ -102,6 +102,31 @@ namespace Inventorization.Data
             return result;
         }
 
+        public List<Zone> GetAllZones()
+        {
+            List<Zone> result = new List<Zone>();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+
+                    cmd.CommandText = "SELECT * FROM public.\"Zones\"";
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.ToZone());
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+
         public Zone GetZone(Guid id)
         {
             using (var conn = new NpgsqlConnection(_connectionString))

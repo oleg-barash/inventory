@@ -1,7 +1,7 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { FILTER_ITEMS, REQUEST_ITEMS, RECEIVE_ITEMS, OPEN_IMPORT_DIALOG, CLOSE_IMPORT_DIALOG, UPDATE_ITEMS_FILTER  } from '../constants/actionTypes'
+import { FILTER_ITEMS, REQUEST_ITEMS, RECEIVE_ITEMS, OPEN_IMPORT_DIALOG, CLOSE_IMPORT_DIALOG, UPDATE_ITEMS_FILTER, START_IMPORT, STOP_IMPORT  } from '../constants/actionTypes'
 import _ from 'lodash'
 
 function _applyFilter(items, filter){
@@ -22,9 +22,11 @@ function _applyFilter(items, filter){
             }
             if (filter.text !== undefined){
                 result = _.filter(result, (item) => {
-                    return item.BarCode && item.BarCode.toUpperCase().startsWith(filter.text.toUpperCase()) 
-                        || item.Number && item.Number.toUpperCase().startsWith(filter.text.toUpperCase()) 
-                        || item.Description && item.Description.toUpperCase().startsWith(filter.text.toUpperCase());
+                    let val = filter.text.toUpperCase();
+                    return item.BarCode && item.BarCode.toUpperCase().startsWith(val) 
+                        || item.Number && item.Number.toUpperCase().startsWith(val) 
+                        || item.Name && item.Name.toUpperCase().startsWith(val) 
+                        || item.Description && item.Description.toUpperCase().startsWith(val);
                 })
             }
 
@@ -45,6 +47,14 @@ export function itemList(state = { isFetching: false, items: [], displayItems:[]
         case REQUEST_ITEMS:
             return Object.assign({}, state, {
                 isFetching: true
+            })
+        case START_IMPORT:
+            return Object.assign({}, state, {
+                importInProgress: true
+            })
+        case STOP_IMPORT:
+            return Object.assign({}, state, {
+                importInProgress: false
             })
         case RECEIVE_ITEMS:
             var totalPages = Math.floor(action.items.length / state.filter.pageSize);

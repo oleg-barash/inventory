@@ -9,7 +9,7 @@ import { red100 as red}  from 'material-ui/styles/colors';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import { validateAction, saveAction } from '../actions/actionActions'
+import { validateAction, saveAction, loadCurrentAction } from '../actions/actionActions'
 import { fetchItems } from '../actions/itemActions'
 import { fetchZones } from '../actions/zoneActions'
 
@@ -64,13 +64,12 @@ class ActionForm extends Component {
         }
         
         let onZoneChange = function(value) {
-            dispatch(validateAction({Zone: value}));
+            dispatch(validateAction({Zone: value }));
         }
         let onQuantityChange = function(event) {
             dispatch(validateAction({Quantity: event.target.value}));
         }
         let onTypeChange = function(event, index, value) {
-            debugger
             dispatch(validateAction({Type: value}));
         }
         let goBack = function() {
@@ -81,7 +80,7 @@ class ActionForm extends Component {
                 dispatch(saveAction(action));
             }
             else{
-                dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone || '', Quantity: action.Quantity || ''}));
+                dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone, Quantity: action.Quantity || ''}));
             }
         }
         return (
@@ -120,7 +119,7 @@ class ActionForm extends Component {
                     hintText="Зона 1" 
                     floatingLabelText="Зона"
                     dataSource={this.props.availabledZones}
-                    searchText={action.Zone !== undefined ? action.Zone.ZoneName : ''} 
+                    searchText={action && action.Zone ? action.Zone.ZoneName : ''} 
                     onNewRequest={onZoneChange}  
                     dataSourceConfig={zoneDataSourceConfig}
                     errorText={action != null ? action.ZoneError || '' : '' }/>
@@ -135,7 +134,7 @@ class ActionForm extends Component {
                     </SelectField>
                 <Divider />
                 <FlatButton label="Назад" onClick={goBack} />
-                <FlatButton label="Добавить" onClick={save} disabled={ !!action.CodeError || !!action.ZoneError || !!action.QuantityError} />
+                <FlatButton label="Сохранить" onClick={save} disabled={ !!action.CodeError || !!action.ZoneError || !!action.QuantityError} />
             </Paper>)
     }
 }

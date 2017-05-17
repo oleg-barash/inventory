@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import ItemForm from './components/itemForm'
 import AuthorizedComponent from './components/authorizedComponent'
 import { connect } from 'react-redux'
-
+import { loadCurrentItem } from './actions/itemActions'
 
 const styles = {
   headline: {
@@ -15,13 +15,15 @@ const styles = {
 
 
 class NewItemPage extends AuthorizedComponent {
-  componentDidMount() {
+   componentDidMount() {
         const { dispatch } = this.props
+        const { id } = this.props.location.query
+        dispatch(loadCurrentItem(id));
   }
   render() {
     return (
           <div>
-              <h2 style={styles.headline}>Добавление товара</h2>
+              <h2 style={styles.headline}>Редактирование товара</h2>
               <ItemForm/>
           </div>
     )};

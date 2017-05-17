@@ -8,12 +8,14 @@ import { connect } from 'react-redux'
 import FlatButton from 'material-ui/FlatButton';
 import DeleteAndroid from 'material-ui/svg-icons/action/delete';
 import Add from 'material-ui/svg-icons/Content/add';
+import Edit from 'material-ui/svg-icons/Content/create';
 import { green200 as green}  from 'material-ui/styles/colors';
 import { yellow200 as yellow}  from 'material-ui/styles/colors';
 import { blue200 as blue}  from 'material-ui/styles/colors';
 import { red200 as red}  from 'material-ui/styles/colors';
 import { fullWhite as white}  from 'material-ui/styles/colors';
-import { setCurrentItem, deleteAction } from '../actions/MainActions';
+import { deleteAction, setCurrentAction } from '../actions/actionActions';
+import { setCurrentItem } from '../actions/itemActions';
 import { Link, browserHistory } from 'react-router'
 moment.locale("ru-RU")
 function getTypeName(type){
@@ -44,6 +46,9 @@ class ActionRow extends Component {
             browserHistory.push('/newItem');
         }
 
+        var editAction = function() {
+            browserHistory.push('/editAction?id=' + action.Id);
+        }
         return (
             <TableRow style={rowStyle}>
                 <TableRowColumn style={{width: '200px'}}>{action.Description}</TableRowColumn>
@@ -51,10 +56,14 @@ class ActionRow extends Component {
                 <TableRowColumn style={{width: '100px'}}><small>{getTypeName(action.Type)}</small></TableRowColumn>
                 {/*<TableRowColumn >{action.User}</TableRowColumn>*/}
                 <TableRowColumn style={{width: '100px'}}>{action.BarCode}</TableRowColumn>
-                <TableRowColumn style={{width: '50px'}}>{action.Zone}</TableRowColumn>
+                <TableRowColumn style={{width: '50px'}}>{action.Zone.ZoneName}</TableRowColumn>
                 <TableRowColumn style={{width: '50px'}}>{action.Quantity}</TableRowColumn>
                 <TableRowColumn >
-
+                    <FlatButton disabled={action.IsDeleting}
+                        hoverColor={green}
+                        icon={<Edit/>}
+                        onClick={editAction}
+                    />
                     <FlatButton disabled={action.IsDeleting}
                         hoverColor={red}
                         icon={<DeleteAndroid/>}

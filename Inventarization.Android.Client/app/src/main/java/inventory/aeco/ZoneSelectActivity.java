@@ -281,7 +281,7 @@ public class ZoneSelectActivity extends Activity {
                         showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
                     }
                     else {
-                        setState(ZoneActivityStates.Error);
+                        setState(ZoneActivityStates.Initial);
                         showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
                     }
                 }

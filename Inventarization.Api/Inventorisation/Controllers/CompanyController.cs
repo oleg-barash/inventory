@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -18,10 +20,13 @@ namespace Inventorization.Api.Controllers
     {
         private CompanyRepository _companyRepository;
         private InventorizationRepository _inventorizationRepository;
-        public CompanyController(CompanyRepository companyRepository, InventorizationRepository inventorizationRepository)
+        private ActionRepository _actionRepository;
+        
+        public CompanyController(CompanyRepository companyRepository, InventorizationRepository inventorizationRepository, ActionRepository actionRepository)
         {
             _companyRepository = companyRepository;
             _inventorizationRepository = inventorizationRepository;
+            _actionRepository = actionRepository;
         }
 
         [HttpGet]
@@ -97,22 +102,69 @@ namespace Inventorization.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.Created, _inventorizationRepository.CreateInventorization(id, date ?? DateTime.UtcNow));
         }
 
+
         [HttpPost]
         [Route("{id}/item")]
-
-        public HttpResponseMessage CreateItem(Guid id, [FromBody]CreateItemViewModel itemVM)
+        public HttpResponseMessage SaveItem(Guid id, [FromBody]ItemViewModel itemVM)
         {
             Business.Model.Item item = new Business.Model.Item();
-            item.Code = itemVM.Code;
+            bool isNew = itemVM.Id == default(int);
+            item.Code = itemVM.BarCode;
+            item.Id = itemVM.Id;
+            item.ItemNumber = itemVM.Number;
             item.Name = itemVM.Name;
             item.Description = itemVM.Description;
-            item.Quantity = itemVM.Quantity ?? default(int);
+            item.Quantity = itemVM.QuantityPlan ?? default(int);
             item.CompanyId = id;
             item.Source = ItemSource.Manual;
-            _companyRepository.CreateItem(id, item);
+            item.CreatedAt = DateTime.UtcNow;
+            if (isNew)
+            {
+                _companyRepository.CreateItem(id, item);
+            }
+            else
+            {
+                _companyRepository.UpdateItem(item);
+            }
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
+        [HttpPost]
+        [Route("{companyId}/import")]
+        public HttpResponseMessage Import(Guid companyId, [FromBody]List<ItemViewModel> items)
+        {
+            var foundItems =_companyRepository.GetItems(companyId, items.Select(x => x.BarCode).ToArray());
+            ImportItemsResult result = new ImportItemsResult();
+            foreach (var item in items)
+            {
+                try {
+                    Business.Model.Item itemModel = new Business.Model.Item();
+                    itemModel.Code = item.BarCode;
+                    itemModel.ItemNumber = item.Number;
+                    itemModel.Name = item.Name;
+                    itemModel.Description = item.Description;
+                    itemModel.Quantity = item.QuantityPlan ?? default(int);
+                    itemModel.CompanyId = companyId;
+                    var foundItem = foundItems.FirstOrDefault(x => x.Code == item.BarCode);
+                    if (foundItem == null)
+                    {
+                        itemModel.CreatedAt = DateTime.UtcNow;
+                        itemModel.Source = ItemSource.Import;
+                        _companyRepository.CreateItem(companyId, itemModel);
+                    }
+                    else
+                    {
+                        itemModel.Id = foundItem.Id;
+                        _companyRepository.UpdateItem(itemModel);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    result.AddFailed(item, ex.Message);
+                }
+            }
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
 
     }
 }

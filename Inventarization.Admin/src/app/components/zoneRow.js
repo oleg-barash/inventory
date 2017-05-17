@@ -7,15 +7,17 @@ import { TableRow, TableRowColumn} from 'material-ui/Table';
 import FlatButton from 'material-ui/FlatButton';
 import Replay from 'material-ui/svg-icons/av/replay';
 import Done from 'material-ui/svg-icons/action/done';
+import Clear from 'material-ui/svg-icons/action/cached';
 import {blue200 as blue}  from 'material-ui/styles/colors';
 import {green200 as green}  from 'material-ui/styles/colors';
 import {red200 as red}  from 'material-ui/styles/colors';
 import {fullWhite as white}  from 'material-ui/styles/colors';
-import { openZone, closeZone } from '../actions/zoneActions';
+import { openZone, closeZone, clearZone } from '../actions/zoneActions';
 import { setCurrentAction } from '../actions/actionActions';
 import Add from 'material-ui/svg-icons/Content/add';
 import { browserHistory } from 'react-router'
 import moment from 'moment';
+import { ZoneStatuses } from '../constants/zoneStatuses';
 moment.locale("ru-RU")
 
 class ZoneRow extends Component {
@@ -34,16 +36,31 @@ class ZoneRow extends Component {
             dispatch(closeZone(zone))
         }
 
+        let clearFunc = function () {
+            dispatch(clearZone(zone))
+        }
+
         let newAction = function() {
-            dispatch(setCurrentAction({Zone: zone, Type: 0}))
-            browserHistory.push('/newAction');
+            dispatch(setCurrentAction({Zone: zone.ZoneName, Type: 0}))
+            browserHistory.push('/editAction');
+        }
+
+        let getStyle = function(zone){
+            switch(zone.Status){
+                case ZoneStatuses.Opened:
+                    return { backgroundColor:  blue}
+                case ZoneStatuses.Closed:
+                    return { backgroundColor:  green}
+                default:
+                    return { backgroundColor:  white}
+            }
         }
 
         return (
-            <TableRow>
-                <TableRowColumn>{zone.ZoneName}</TableRowColumn>
-                <TableRowColumn>{moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
-                <TableRowColumn>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
+            <TableRow style={getStyle(zone)}>
+                <TableRowColumn style={{width: '100px'}}>{zone.ZoneName}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}>{zone.OpenedAt == undefined ? "не открыта" : moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
                 <TableRowColumn >
                     <FlatButton disabled={zone.ClosedAt != undefined}
                         hoverColor={blue}
@@ -51,16 +68,19 @@ class ZoneRow extends Component {
                         onClick={newAction}
                     />
                     <FlatButton disabled={zone.ClosedAt == undefined}
-                        backgroundColor={white}
                         hoverColor={red}
                         icon={<Replay/>}
                         onClick={openFunc}
                     />
                     <FlatButton disabled={zone.ClosedAt != undefined}
-                        backgroundColor={white}
                         hoverColor={green}
                         icon={<Done/>}
                         onClick={closeFunc}
+                    />
+                    <FlatButton disabled={zone.Status == ZoneStatuses.Undefined}
+                        hoverColor={red}
+                        icon={<Clear/>}
+                        onClick={clearFunc}
                     />
 
                     {/*<LinearProgress mode="indeterminate"/>*/}

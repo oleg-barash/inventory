@@ -20,7 +20,7 @@ const configs = [{
         new webpack.DefinePlugin({
             'process.env':{
                 'NODE_ENV': JSON.stringify('production'),
-                'PORT': 85
+                'PORT': 91
             }
         }),
         // Minify the bundle
@@ -60,7 +60,9 @@ const configs = [{
     // Define production build to allow React to strip out unnecessary checks
     new webpack.DefinePlugin({
       'process.env':{
-        'NODE_ENV': JSON.stringify('production')
+        'NODE_ENV': JSON.stringify('production'),
+        'API_URL': JSON.stringify('http://193.124.113.47:81/api/'),
+        'ASSETS_URL': JSON.stringify('http://193.124.113.47:82/api/')
       }
     }),
     // Minify the bundle

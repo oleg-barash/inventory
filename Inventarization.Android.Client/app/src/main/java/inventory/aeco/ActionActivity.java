@@ -24,6 +24,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 
 import android.widget.Toast;
 
@@ -74,7 +77,7 @@ public class ActionActivity extends Activity {
     private ActionType currentActionType;
     private String inventorizationId = "81d51f07-9ff3-46c0-961c-c8ebfb7b47e3";
     Action newAction;
-    LinkedList<String> actionList = new LinkedList<>();
+    private static LinkedList<String> actionList = new LinkedList<>();
 
     ArrayAdapter<String> adapter;
 
@@ -108,11 +111,6 @@ public class ActionActivity extends Activity {
     };
 
     private void addAction(String code){
-
-        if (newAction != null){
-            actionList.addFirst(newAction.BarCode);
-            adapter.notifyDataSetChanged();
-        }
         newAction = new Action();
         newAction.BarCode = code;
         showScanResult.setText(newAction.BarCode);
@@ -134,7 +132,7 @@ public class ActionActivity extends Activity {
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + "/action", new JSONObject(params),
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + currentZone +"/action", new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -144,6 +142,11 @@ public class ActionActivity extends Activity {
                             description.setText(item.Description);
                             description.setBackgroundColor(Color.argb(128,0,0,64));
                             newAction.Status = ActionStatus.Sent;
+                            actionList.addFirst(newAction.BarCode + "зафиксирован");
+                            if (actionList.size() > 4){
+                                actionList.removeLast();
+                            }
+                            adapter.notifyDataSetChanged();
                         }
                         catch (IOException exception){
                             Log.e(TAG, "Error parsing item: " + response.toString());
@@ -155,21 +158,29 @@ public class ActionActivity extends Activity {
             public void onErrorResponse(VolleyError error) {
                 showScanResult.setText("");
                 newAction.Status = ActionStatus.Error;
+                String text = newAction.BarCode;
                 if (error.networkResponse != null && error.networkResponse.statusCode == 404){
                     soundpool.play(errorSoundid, 1, 1, 0, 0, 1);
                     description.setText("Товар не найден.");
                     description.setBackgroundColor(Color.RED);
+                    text += " Товар не найден.";
                 }
                 else {
                     if (error.networkResponse != null && error.networkResponse.statusCode == 403){
                         showToast("Зона уже закрыта. Выберите другую зону.");
                         Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
                         startActivity(intent);
+                        text += " не был добавлен в зону";
                     }
                     else {
                         showToast("Ошибка при регистрации штрих-кода: " + error.toString());
                     }
                 }
+                actionList.addFirst(text);
+                if (actionList.size() > 4){
+                    actionList.removeLast();
+                }
+                adapter.notifyDataSetChanged();
             }
         });
         jsonRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
@@ -232,6 +243,27 @@ public class ActionActivity extends Activity {
     private void setupView() {
         // TODO Auto-generated method stub
         showScanResult = (EditText) findViewById(R.id.scan_result);
+        showScanResult.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                if(s.length() != 0) {
+                    findButton.setEnabled(true);
+                }
+                else {
+                    findButton.setEnabled(false);
+                }
+            }
+        });
 
         quantity = (EditText) findViewById(R.id.quantity);
 
@@ -264,45 +296,56 @@ public class ActionActivity extends Activity {
         closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                try {
-                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                    HashMap<String, String> params = new HashMap<String, String>();
-                    params.put("zoneId", currentZone);
-                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, baseUrl + "zone/close"
-                            , new JSONObject(params),
-                            new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    showToast("Зона закрыта");
-                                    Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
-                                    Bundle extras = new Bundle();
-                                    extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());
-                                    intent.putExtras(extras);
-                                    startActivity(intent);
+
+                new AlertDialog.Builder(ActionActivity.this)
+                        .setTitle("Закрытие зоны")
+                        .setMessage("После закрытия зоны добавление товара в зону будет запрещено. Для повторного открытия нужно будет обратиться к менеджеру. Закрыть зону?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(R.string.close_zone, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                try {
+                                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                                    HashMap<String, String> params = new HashMap<String, String>();
+                                    params.put("zoneId", currentZone);
+                                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, baseUrl + "zone/close"
+                                            , new JSONObject(params),
+                                            new Response.Listener<JSONObject>() {
+                                                @Override
+                                                public void onResponse(JSONObject response) {
+                                                    showToast("Зона закрыта");
+                                                    Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
+                                                    Bundle extras = new Bundle();
+                                                    extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());
+                                                    intent.putExtras(extras);
+                                                    startActivity(intent);
+                                                }
+                                            }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            if (error.networkResponse != null) {
+                                                if (error.networkResponse.statusCode == 403) {
+                                                    showToast("Зона уже закрыта");
+                                                    Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
+                                                    startActivity(intent);
+                                                } else {
+                                                    showToast("Ошибка при закрытии зоны. Код " + error.networkResponse.statusCode);
+                                                }
+                                            }
+                                            else {
+                                                showToast("Ошибка при закрытии зоны. Текст ошибки " + error.getMessage());
+                                            }
+                                        }
+                                    });
+                                    queue.add(request);
                                 }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            if (error.networkResponse != null) {
-                                if (error.networkResponse.statusCode == 403) {
-                                    showToast("Зона уже закрыта");
-                                    Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
-                                    startActivity(intent);
-                                } else {
-                                    showToast("Ошибка при закрытии зоны. Код " + error.networkResponse.statusCode);
+                                catch (Exception ex){
+                                    showToast("Ошибка при закрытии зоны.");
+                                    Log.e(TAG, ex.getMessage());
                                 }
-                            }
-                            else {
-                                showToast("Ошибка при закрытии зоны. Текст ошибки " + error.getMessage());
-                            }
-                        }
-                    });
-                    queue.add(request);
-                }
-                catch (Exception ex){
-                    showToast("Ошибка при закрытии зоны.");
-                    Log.e(TAG, ex.getMessage());
-                }
+                            }})
+                        .setNegativeButton(R.string.no, null).show();
+
+
             }
         });
 

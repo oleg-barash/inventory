@@ -6,10 +6,11 @@ import { FILTER_ACTION,
     DELETING_ACTION,
     SET_CURRENT_ACTION,
     VALIDATE_ACTION,
+    SHOW_LOADING,
+    HIDE_LOADING,
     ACTION_SAVED
 } from '../constants/actionTypes'
 import {toastr} from 'react-redux-toastr'
-import { BASE_URL } from '../constants/configuration'
 
 export function addItemFromAction(action){
     return {
@@ -20,10 +21,22 @@ export function addItemFromAction(action){
     }
 }
 
+export function loadCurrentAction(id){
+    return function (dispatch){
+        dispatch(showLoading())
+        return fetch(process.env.API_URL + 'action?id=' + id)
+            .then(response => response.json())
+            .then(json => {
+                dispatch(hideLoading())
+                dispatch(setCurrentAction(json))
+            })
+    }
+}
+
 export function addAction(action){
     return function (dispatch){
         dispatch(showLoading())
-        return fetch(BASE_URL + 'inventorization/' + inventorization + '/action', 
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/action', 
             {  
                 method: "POST",
                 headers: {
@@ -55,19 +68,21 @@ export function validateAction(actionData){
 
 export function saveAction(action){
         return function (dispatch){
-            return fetch(BASE_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/action', {
+            return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/action', {
                 method: "POST",
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(action)})
+                .then(response => { return response.json()})
                 .then(response => {
-                    if (!response.ok){
-                        toastr.error("Произошла ошибка при создании действия ")
+                    debugger;
+                    if (response.ErrorMessage){
+                        toastr.error("Произошла ошибка при создании действия: " + response.ErrorMessage)
                     }
                     else{
-                        toastr.success("Действие успешно создано")
+                        toastr.success("Действие успешно сохранено")
                         dispatch(actionSaved(action))
                     }
                 })
@@ -96,7 +111,7 @@ function hideLoading(){
 export function fetchActions(inventorization){
     return function (dispatch){
         dispatch(requestActions(inventorization))
-        return fetch(BASE_URL + 'inventorization/' + inventorization + '/actions')
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/actions')
             .then(response => response.json())
             .then(json =>
                 dispatch(receiveActions(json))
@@ -107,7 +122,7 @@ export function fetchActions(inventorization){
 export function deleteAction(action){
     return function (dispatch){
         dispatch(deletingAction(action))
-        return fetch(BASE_URL + 'action', {method: "DELETE",
+        return fetch(process.env.API_URL + 'action', {method: "DELETE",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'

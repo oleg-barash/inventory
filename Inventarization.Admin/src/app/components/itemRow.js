@@ -7,9 +7,9 @@ import moment from 'moment';
 import { green100 as green}  from 'material-ui/styles/colors';
 import { yellow100 as yellow}  from 'material-ui/styles/colors';
 import { red100 as red}  from 'material-ui/styles/colors';
-import {
-  Link
-} from 'react-router'
+import FlatButton from 'material-ui/FlatButton';
+import Edit from 'material-ui/svg-icons/Content/create';
+import { Link, browserHistory } from 'react-router'
 moment.locale("ru-RU")
 class ItemRow extends Component {
     constructor(props) {
@@ -17,19 +17,33 @@ class ItemRow extends Component {
     }
 
     render() {
-        var item = this.props.item;
-        var rowStyle = {
+        let item = this.props.item;
+        let rowStyle = {
             backgroundColor: item.QuantityFact === 0 ? red : item.QuantityFact < item.QuantityPlan ? yellow : green
         }
-        
+
+        let editItem = function() {
+            browserHistory.push('/editItem?id=' + item.Id);
+        }
+        let details = item.Actions.reduce( (previousValue, currentValue) => previousValue.concat(currentValue.ZoneDetails), []);
         return (
             <TableRow style={rowStyle}>
                 <TableRowColumn style={{width: '280px'}}>{item.Name}</TableRowColumn>
-                <TableRowColumn>{item.Number}</TableRowColumn>
                 <TableRowColumn>{item.BarCode}</TableRowColumn>
-                <TableRowColumn>{item.Actions.map((action) => <Link key={action.Zone} to={{pathname: "/actions", query: { ZoneName: action.Zone, Code: item.BarCode} }}>{action.Zone}<br/></Link>)}</TableRowColumn>
+                <TableRowColumn>{details.map((info) => {
+                    return <Link key={info.Zone} to={{pathname: "/actions", query: { ZoneName: info.Zone, Code: item.BarCode} }}>{info.Zone}({info.Quantity})<br/>
+                    </Link>
+                }
+                )}</TableRowColumn>
                 <TableRowColumn>{item.QuantityPlan}</TableRowColumn>
                 <TableRowColumn>{item.QuantityFact}</TableRowColumn>
+                <TableRowColumn>
+                    <FlatButton disabled={item.IsDeleting}
+                        hoverColor={green}
+                        icon={<Edit/>}
+                        onClick={editItem}
+                    />
+                </TableRowColumn>
             </TableRow>)
     }
 }

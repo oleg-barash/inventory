@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Inventorization.Api.Models
 {
-    public class CloseZoneVM
+    public class ZoneVM
     {
         public Guid ZoneId { get; set; }
         public string ZoneCode { get; set; }

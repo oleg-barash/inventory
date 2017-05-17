@@ -4,20 +4,20 @@
 import React from 'react';
 import { IndexRoute, Route }  from 'react-router';
 import App from './app';
-import ItemsPage from './ItemsPage.js';
-import NewItemPage from './NewItemPage.js';
+import ItemListPage from './ItemListPage.js';
+import ItemPage from './ItemPage.js';
 import ReportPage from './ReportPage.js';
 import ZonesPage from './ZonesPage.js';
-import ActionsPage from './ActionsPage.js';
+import ActionListPage from './ActionListPage.js';
 import LoginPage from './LoginPage.js';
-import NewActionPage from './NewActionPage.js';
+import ActionPage from './ActionPage.js';
 export default (<Route path="/" component={App}>
     <div>
-        <IndexRoute  component={ItemsPage}/>
-        <Route path="items" component={ItemsPage}/>
-        <Route path="newItem" component={NewItemPage}/>
-        <Route path="newAction" component={NewActionPage}/>
-        <Route path="actions" component={ActionsPage}/>
+        <IndexRoute  component={ItemListPage}/>
+        <Route path="items" component={ItemListPage}/>
+        <Route path="editItem" component={ItemPage}/>
+        <Route path="editAction" component={ActionPage}/>
+        <Route path="actions" component={ActionListPage}/>
         <Route path="zones" component={ZonesPage}/>
         <Route path="report" component={ReportPage}/>
         <Route path="login" component={LoginPage}/>

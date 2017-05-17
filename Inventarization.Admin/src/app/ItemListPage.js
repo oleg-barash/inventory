@@ -15,7 +15,7 @@ const styles = {
 };
 
 
-class ItemsPage extends AuthorizedComponent {
+class ItemListPage extends AuthorizedComponent {
   render() {
     return (
           <div>
@@ -25,4 +25,4 @@ class ItemsPage extends AuthorizedComponent {
     )};
 }
 
-export default ItemsPage
+export default ItemListPage

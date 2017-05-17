@@ -8,7 +8,7 @@ import { match, RouterContext } from 'react-router';
 import routes from './routes';
 
 const app = express();
-
+app.use(express.static('public'));
 app.use((req, res) => {
     match({ routes, location: req.url }, (error, redirectLocation, renderProps) => {
           if (redirectLocation) { // Если необходимо сделать redirect
@@ -29,13 +29,10 @@ app.use((req, res) => {
          });
 });
 
-const assetUrl = process.env.NODE_ENV === 'production' ? 'http://193.124.113.47:82/' : 'http://localhost:8050/public/';
-
 function renderHTML(componentHTML) {
     return `
     <!doctype html>
 <html class="no-js" lang="">
-
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -47,12 +44,11 @@ function renderHTML(componentHTML) {
     content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1, minimum-scale=1"
   >
 <link href="http://diegoddox.github.io/react-redux-toastr/4.4/react-redux-toastr.min.css" rel="stylesheet" type="text/css">
-  <link rel="stylesheet" type="text/css" href="${assetUrl}main.css">
+  <link rel="stylesheet" type="text/css" href="${process.env.ASSETS_URL}main.css">
 </head>
 
 <body>
   <div id="app"></div>
-
   <!-- This script adds the Roboto font to our project. For more detail go to this site:  http://www.google.com/fonts#UsePlace:use/Collection:Roboto:400,300,500 -->
   <script>
     var WebFontConfig = {
@@ -67,13 +63,9 @@ function renderHTML(componentHTML) {
       s.parentNode.insertBefore(wf, s);
     })();
   </script>
-  <script src="${assetUrl}client.js">${componentHTML}</script>
-</body>
-
-  `;
+  <script src="${process.env.ASSETS_URL}client.js">${componentHTML}</script>
+</body>`;
 }
-
-console.log(`Port: ${process.env.PORT}`);
 
 app.listen(process.env.PORT, '0.0.0.0', () => {
     console.log(`Server listening on: ${process.env.PORT}`);

@@ -12,9 +12,12 @@ import {
     UPDATE_ITEMS_FILTER,
     SET_ITEMS_LOADING,
     FILTER_ITEMS,
+    SHOW_LOADING,
+    HIDE_LOADING,
+    START_IMPORT,
+    STOP_IMPORT,
     SET_CURRENT_ITEM
 } from '../constants/actionTypes'
-import { BASE_URL } from '../constants/configuration'
 import {toastr} from 'react-redux-toastr'
 
 export function filterItems(filter){
@@ -73,9 +76,42 @@ export function setCurrentItem(item){
     }
 }
 
+export function loadCurrentItem(id){
+    return function (dispatch){
+        dispatch(showLoading())
+        return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/item?id=' + id)
+            .then(response => response.json())
+            .then(json => {
+                dispatch(hideLoading())
+                dispatch(setCurrentItem(json))
+            })
+    }
+}
+
+export function importItems(items){
+    return function (dispatch){
+        dispatch(startImport())
+        return fetch(process.env.API_URL + 'company/' + '9e0e8591-293d-4603-898d-59334e4c53dc' + '/import', {
+            method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(items)})
+            .then(response => {
+                dispatch(stopImport())
+                if (!response.ok){
+                    toastr.error("Произошла ошибка при импорте товаров")
+                }
+                else{
+                    toastr.success("Справочник успешно импортирован")
+                }
+            })
+    }  
+}
 export function saveItem(item){
         return function (dispatch){
-            return fetch(BASE_URL + 'company/' + '9e0e8591-293d-4603-898d-59334e4c53dc' + '/item', {
+            return fetch(process.env.API_URL + 'company/' + '9e0e8591-293d-4603-898d-59334e4c53dc' + '/item', {
                 method: "POST",
                     headers: {
                         'Accept': 'application/json',
@@ -88,7 +124,7 @@ export function saveItem(item){
                         toastr.error("Произошла ошибка при создании действия ")
                     }
                     else{
-                        toastr.success("Товар успешно создан")
+                        toastr.success("Товар успешно сохранён")
                         dispatch(itemSaved(item))
                     }
                 })
@@ -98,7 +134,7 @@ export function saveItem(item){
 export function fetchItems(inventorization, filter){
     return function (dispatch){
         dispatch(requestItems())
-        return fetch(BASE_URL + 'inventorization/' + inventorization + '/items')
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/items')
             .then(response => response.json())
             .then(json =>
                 dispatch(receiveItems(json, filter))
@@ -113,6 +149,17 @@ export function itemSaved(item){
     }
 }
 
+function showLoading(){
+    return {
+        type: SHOW_LOADING
+    }
+}
+
+function hideLoading(){
+    return {
+        type: HIDE_LOADING
+    }
+}
 
 function receiveItems(data, filter){
     return {
@@ -120,5 +167,17 @@ function receiveItems(data, filter){
         items: data, 
         filter,
         receivedAt: Date.now()
+    }
+}
+
+function startImport(){
+    return {
+        type: START_IMPORT
+    }
+}
+
+function stopImport(){
+    return {
+        type: STOP_IMPORT
     }
 }

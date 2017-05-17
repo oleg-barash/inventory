@@ -17,6 +17,13 @@ const config = {
       publicPath
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env':{
+        'NODE_ENV': JSON.stringify('production'),
+        'API_URL': JSON.stringify('http://localhost/api/'),
+        'ASSETS_URL': JSON.stringify('http://193.124.113.47:82/api/')
+      }
+    }),
     // Enables Hot Modules Replacement
     new webpack.HotModuleReplacementPlugin(),
     // Allows error warnings but does not stop compiling.

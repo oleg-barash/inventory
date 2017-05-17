@@ -15,4 +15,27 @@ namespace Inventorization.Business.Model
         public Guid OpenedBy { get; set; }
         public Guid? ClosedBy { get; set; }
     }
+
+    public static class ZoneStateExtensions
+    {
+        public static ZoneStatus GetStatus(this ZoneState state)
+        {
+            if (state == null)
+            {
+                return ZoneStatus.Undefined;
+            }
+            if (state.ClosedAt.HasValue && state.ClosedAt < DateTime.MaxValue) {
+                return ZoneStatus.Closed;
+            }
+            return ZoneStatus.Opened;
+        }
+    }
+
+    public enum ZoneStatus
+    {
+        Undefined,
+        Opened,
+        Closed
+    }
+
 }

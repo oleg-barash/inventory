@@ -28,7 +28,8 @@ export const SET_CURRENT_ITEM = 'SET_CURRENT_ITEM';
 export const SAVE_ITEM = 'SAVE_ITEM';
 export const UPDATE_ITEMS_FILTER = 'UPDATE_ITEMS_FILTER';
 export const SET_ITEMS_LOADING = 'SET_ITEMS_LOADING';
-
+export const START_IMPORT = 'START_IMPORT';
+export const STOP_IMPORT = 'STOP_IMPORT';
 
 
 export const OPEN_IMPORT_DIALOG = 'OPEN_IMPORT_DIALOG';
@@ -43,3 +44,4 @@ export const ZONE_CLOSED = 'ZONE_CLOSED';
 
 export const SHOW_LOADING = 'SHOW_LOADING';
 export const HIDE_LOADING = 'HIDE_LOADING';
+

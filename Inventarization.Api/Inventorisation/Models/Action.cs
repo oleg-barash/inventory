@@ -13,7 +13,7 @@ namespace Inventorization.Api.Models
         public ActionType Type { get; set; }
         public string User { get; set; }
         public string BarCode { get; set; }
-        public string Zone { get; set; }
+        public ZoneViewModel Zone { get; set; }
         public int Quantity { get; set; }
         public bool FoundInItems { get; set; }
         public string Description { get; set; }
@@ -27,9 +27,9 @@ namespace Inventorization.Api.Models
         public DateTime? DateTime { get; set; }
         public ActionType Type { get; set; }
         public string BarCode { get; set; }
-        public ZoneViewModel Zone { get; set; }
         public int Quantity { get; set; }
         public string Description { get; set; }
+        public ZoneViewModel Zone { get; set; }
     }
 
     public class DeleteModel

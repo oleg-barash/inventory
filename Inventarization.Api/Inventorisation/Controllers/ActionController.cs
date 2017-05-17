@@ -1,7 +1,9 @@
 ﻿using Inventorization.Api.Models;
+using Inventorization.Business.Model;
 using Inventorization.Data;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -14,15 +16,53 @@ namespace Inventorization.Api.Controllers
     public class ActionController : ApiController
     {
         private ActionRepository _actionRepository;
-        public ActionController(ActionRepository actionRepository)
+        private ZoneRepository _zoneRepository;
+        private CompanyRepository _companyRepository;
+        private InventorizationRepository _inventorizationRepository;
+        
+        public ActionController(ActionRepository actionRepository, ZoneRepository zoneRepository, CompanyRepository companyRepository, InventorizationRepository inventorizationRepository)
         {
             _actionRepository = actionRepository;
+            _zoneRepository = zoneRepository;
+            _companyRepository = companyRepository;
+            _inventorizationRepository = inventorizationRepository;
         }
 
         [HttpGet]
         public HttpResponseMessage Get(Guid id)
         {
-            return Request.CreateResponse(HttpStatusCode.OK, _actionRepository.GetActionsByInventorization(id));
+            var action = _actionRepository.GetAction(id);
+            var zone = _zoneRepository.GetZone(action.Zone);
+            var company = _inventorizationRepository.GetInventorization(action.Inventorization).Company;
+            var items = _companyRepository.GetItems(company, new[] { action.BarCode });
+            List<ZoneState> states = _inventorizationRepository.GetZoneStates(action.Inventorization).Where(x => x.ZoneId != Guid.Empty).ToList();
+            var foundItem = items.FirstOrDefault(i => i.Code == action.BarCode);
+            var foundState = states.FirstOrDefault(z => z.ZoneId == zone.Id);
+
+            var zoneVm = new ZoneViewModel()
+            {
+                ZoneStatusId = zone.Id,
+                Code = zone.Code,
+                ClosedAt = foundState?.ClosedAt,
+                ClosedBy = foundState?.ClosedBy,
+                OpenedAt = foundState?.OpenedAt,
+                OpenedBy = foundState?.OpenedBy,
+                ZoneName = zone.Name
+            };
+            var res = new Models.Action()
+            {
+                Id = action.Id,
+                DateTime = action.DateTime,
+                Quantity = action.Quantity,
+                Type = action.Type,
+                //User = "тестовый",
+                Zone = zoneVm,
+                BarCode = action.BarCode,
+                FoundInItems = foundItem != null,
+                Name = foundItem != null ? foundItem.Name : "Не найдена в номенклатуре",
+                Description = foundItem != null ? foundItem.Description : "Не найдена в номенклатуре",
+            };
+            return Request.CreateResponse(HttpStatusCode.OK, res);
         }
 
         [HttpPost]
@@ -42,3 +82,4 @@ namespace Inventorization.Api.Controllers
 
     }
 }
+

@@ -5,12 +5,11 @@ import {
     ZONE_OPENED,
     ZONE_CLOSED,
 } from '../constants/actionTypes'
-import { BASE_URL } from '../constants/configuration'
 
 export function fetchZones(inventorization){
     return function (dispatch){
         dispatch(requestZones())
-        return fetch(BASE_URL + 'inventorization/' + inventorization + '/zones')
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zones')
             .then(response => response.json())
             .then(json =>
                 dispatch(receiveZones(json))
@@ -20,7 +19,7 @@ export function fetchZones(inventorization){
 
 export function openZone(zone){
     return function (dispatch){
-        return fetch(BASE_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/reopen?code=' + zone.Code)
+        return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/reopen?code=' + zone.Code)
             .then(response => {
                 dispatch(zoneOpened(zone))
                 dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
@@ -30,13 +29,29 @@ export function openZone(zone){
 
 export function closeZone(zone){
     return function (dispatch){
-        return fetch(BASE_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/close',
+        return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/close',
             {method: "POST",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: zone.Code})
+                body: JSON.stringify({zoneId: zone.ZoneStatusId})})
+            .then(response => {
+                dispatch(zoneClosed(zone))
+                dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+            })
+    }
+}
+
+export function clearZone(zone){
+    return function (dispatch){
+        return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/clear',
+            {method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({zoneId: zone.ZoneStatusId})})
             .then(response => {
                 dispatch(zoneClosed(zone))
                 dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
