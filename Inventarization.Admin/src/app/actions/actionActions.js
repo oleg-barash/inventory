@@ -33,25 +33,6 @@ export function loadCurrentAction(id){
     }
 }
 
-export function addAction(action){
-    return function (dispatch){
-        dispatch(showLoading())
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/action', 
-            {  
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(action)})
-            .then(response => response.json())
-            .then(json => {
-                dispatch(hideLoading())
-                dispatch(receiveActions(json))
-            })
-    }
-}
-
 export function setCurrentAction(action){    
     return {
         type: SET_CURRENT_ACTION,
@@ -66,9 +47,9 @@ export function validateAction(actionData){
     }
 }
 
-export function saveAction(action){
+export function saveAction(action, inventorization){
         return function (dispatch){
-            return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/action', {
+            return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/action', {
                 method: "POST",
                     headers: {
                         'Accept': 'application/json',
@@ -130,7 +111,7 @@ export function deleteAction(action){
             body: JSON.stringify({id:action.Id})})
             .then(response => {
                 dispatch(actionDeleted(action))
-                dispatch(fetchActions('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+                dispatch(fetchActions(action.Inventorization))
             })
     }
 }

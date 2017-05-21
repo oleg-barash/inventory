@@ -70,6 +70,28 @@ namespace Inventorization.Data
             return result;
         }
 
+        public List<Business.Model.Inventorization> GetInventorizations()
+        {
+            List<Business.Model.Inventorization> result = new List<Business.Model.Inventorization>();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT * FROM public.\"Inventorizations\"";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.ToInventorization());
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         public List<Business.Model.Inventorization> GetInventorizationsForCompany(Guid companyId)
         {
             List<Business.Model.Inventorization> result = new List<Business.Model.Inventorization>();

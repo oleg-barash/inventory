@@ -7,7 +7,7 @@ import { TableRow, TableRowColumn} from 'material-ui/Table';
 import FlatButton from 'material-ui/FlatButton';
 import Replay from 'material-ui/svg-icons/av/replay';
 import Done from 'material-ui/svg-icons/action/done';
-import Clear from 'material-ui/svg-icons/action/cached';
+import Clear from 'material-ui/svg-icons/content/clear';
 import {blue200 as blue}  from 'material-ui/styles/colors';
 import {green200 as green}  from 'material-ui/styles/colors';
 import {red200 as red}  from 'material-ui/styles/colors';
@@ -26,22 +26,22 @@ class ZoneRow extends Component {
     }
 
     render() {
-        let {zone, dispatch} = this.props;
+        let {zone, dispatch, inventorization} = this.props;
 
         let openFunc = function () {
-            dispatch(openZone(zone))
+            dispatch(openZone(zone, inventorization.Id))
         }
 
         let closeFunc = function () {
-            dispatch(closeZone(zone))
+            dispatch(closeZone(zone, inventorization.Id))
         }
 
         let clearFunc = function () {
-            dispatch(clearZone(zone))
+            dispatch(clearZone(zone, inventorization.Id))
         }
 
         let newAction = function() {
-            dispatch(setCurrentAction({Zone: zone.ZoneName, Type: 0}))
+            dispatch(setCurrentAction({Zone: zone, Type: 0}))
             browserHistory.push('/editAction');
         }
 
@@ -67,7 +67,7 @@ class ZoneRow extends Component {
                         icon={<Add/>}
                         onClick={newAction}
                     />
-                    <FlatButton disabled={zone.ClosedAt == undefined}
+                    <FlatButton disabled={zone.Status != ZoneStatuses.NotOpened && zone.Status != ZoneStatuses.Closed}
                         hoverColor={red}
                         icon={<Replay/>}
                         onClick={openFunc}
@@ -96,4 +96,10 @@ ZoneRow.propTypes = {
     }).isRequired
 }
 
-export default connect()(ZoneRow)
+const mapStateToProps = (state) => {
+    return {
+        inventorization: state.SelectInventorization
+    }
+}
+
+export default connect(mapStateToProps)(ZoneRow)

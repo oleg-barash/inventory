@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.device.ScanManager;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -96,7 +97,6 @@ public class ActionActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO Auto-generated method stub
             isScaning = false;
             soundpool.play(soundid, 1, 1, 0, 0, 1);
             showScanResult.setText("");
@@ -243,6 +243,7 @@ public class ActionActivity extends Activity {
     private void setupView() {
         // TODO Auto-generated method stub
         showScanResult = (EditText) findViewById(R.id.scan_result);
+        showScanResult.setInputType(InputType.TYPE_NULL);
         showScanResult.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -283,6 +284,7 @@ public class ActionActivity extends Activity {
         };
 
         quantity.addTextChangedListener(fieldValidatorTextWatcher);
+        quantity.setInputType(InputType.TYPE_NULL);
 
         okButton = (Button) findViewById(R.id.okButton);
         okButton.setOnClickListener(new OnClickListener() {
@@ -359,6 +361,7 @@ public class ActionActivity extends Activity {
 
         description = (TextView) findViewById(R.id.description);
         zone_title =  (TextView) findViewById(R.id.zone_title);
+        zone_title.setInputType(InputType.TYPE_NULL);
         historyList = (ListView)findViewById(R.id.historyList);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actionList);
         historyList.setAdapter(adapter);

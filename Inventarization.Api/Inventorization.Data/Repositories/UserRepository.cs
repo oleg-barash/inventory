@@ -1,4 +1,5 @@
 ﻿using Inventorization.Business.Model;
+using Inventorization.Data.Support;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -71,6 +72,31 @@ namespace Inventorization.Data
                 }
             }
             return result;
+        }
+
+        public User GetUserByLogin(string login)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT * FROM public.\"Users\" WHERE \"Login\" = @Login";
+                    cmd.Parameters.Add(new NpgsqlParameter("Login", login));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                        {
+                            throw new UserLoadingException(login, "Пользователь не найден");
+                        }
+
+                        reader.Read();
+                        return reader.ToUser();
+
+                    }
+                }
+            }
         }
 
         public void DeleteUser(Guid id)

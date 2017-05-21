@@ -13,8 +13,9 @@ const ItemList = ({ items }) => {
                 <TableHeaderColumn style={{width: '280px'}}>Наименование</TableHeaderColumn>
                 <TableHeaderColumn>Код</TableHeaderColumn>
                 <TableHeaderColumn>Зоны</TableHeaderColumn>
-                <TableHeaderColumn>План</TableHeaderColumn>
-                <TableHeaderColumn>Факт</TableHeaderColumn>
+                <TableHeaderColumn>Факт/План</TableHeaderColumn>
+                <TableHeaderColumn>Сумма</TableHeaderColumn>
+                <TableHeaderColumn>Действия</TableHeaderColumn>
             </TableRow>
         </TableHeader>
         <TableBody>

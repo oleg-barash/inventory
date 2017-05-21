@@ -13,7 +13,7 @@ import LoginPage from './LoginPage.js';
 import ActionPage from './ActionPage.js';
 export default (<Route path="/" component={App}>
     <div>
-        <IndexRoute  component={ItemListPage}/>
+        <IndexRoute  component={LoginPage}/>
         <Route path="items" component={ItemListPage}/>
         <Route path="editItem" component={ItemPage}/>
         <Route path="editAction" component={ActionPage}/>

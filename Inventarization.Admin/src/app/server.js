@@ -6,9 +6,11 @@ import React    from 'react';
 import ReactDom from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
 import routes from './routes';
-
+import { CookiesProvider } from 'react-cookie';
+import cookiesMiddleware from 'universal-cookie-express'
 const app = express();
 app.use(express.static('public'));
+app.use(cookiesMiddleware());
 app.use((req, res) => {
     match({ routes, location: req.url }, (error, redirectLocation, renderProps) => {
           if (redirectLocation) { // Если необходимо сделать redirect
@@ -22,8 +24,9 @@ app.use((req, res) => {
           if (!renderProps) { // Мы не определили путь, который бы подошел для URL
                 return res.status(404).send('Not found');
               }
-
-          const componentHTML = ReactDom.renderToString(<RouterContext {...renderProps} />);
+          const componentHTML = ReactDom.renderToString(<CookiesProvider cookies={req.universalCookies}>
+              <RouterContext {...renderProps } />
+            </CookiesProvider>);
 
           return res.end(renderHTML(componentHTML));
          });

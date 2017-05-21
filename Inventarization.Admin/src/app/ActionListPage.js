@@ -21,6 +21,10 @@ const styles = {
 };
 
 class ActionListPage extends AuthorizedComponent {
+    constructor(props) {
+        debugger
+        super(props);
+    }
     componentDidMount() {
         const { ZoneName, Code } = this.props.location.query
         this.props.dispatch(filterActions({ZoneName, Code}))
@@ -34,14 +38,9 @@ class ActionListPage extends AuthorizedComponent {
         )}
 };
 
-
-const mapStateToProps = (state) => {
-    return {}
-}
-
 ActionListPage.propTypes = {
     dispatch: PropTypes.func.isRequired
 }
 
-export default connect(mapStateToProps)(ActionListPage)
+export default connect()(ActionListPage)
 

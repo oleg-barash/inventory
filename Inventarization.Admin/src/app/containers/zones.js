@@ -7,11 +7,9 @@ import ZoneList from '../components/zoneList'
 import { fetchZones } from '../actions/zoneActions'
 
 const mapStateToProps = (state) => {
-    if (state.zones.items == undefined){
-        return [];
-    }
     return {
-        zones: state.zones.items
+        zones: state.zones.items,
+        inventorization: state.auth.SelectInventorization
     }
 }
 
@@ -20,8 +18,8 @@ class Zones extends Component {
         super(props)
     }
     componentDidMount() {
-        const { dispatch } = this.props
-        dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+        const { dispatch, inventorization } = this.props
+        dispatch(fetchZones(inventorization.Id))
     }
     render() {
         return (

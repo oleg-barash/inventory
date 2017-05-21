@@ -156,7 +156,7 @@ namespace Inventorization.Data
             return items;
         }
 
-        public Item GetItem(Guid companyId, int itemId)
+        public Item GetItem(int itemId)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -164,10 +164,8 @@ namespace Inventorization.Data
                 using (var cmd = new NpgsqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = @"SELECT items.* FROM public.""Companies"" AS companies
-                        JOIN public.""Item"" AS items ON items.""CompanyId"" = companies.""Id""
-                        WHERE companies.""Id"" = @Id AND items.""Id"" = @ItemId";
-                    cmd.Parameters.Add(new NpgsqlParameter("Id", companyId));
+                    cmd.CommandText = @"SELECT * FROM items
+                        WHERE items.""Id"" = @ItemId";
                     cmd.Parameters.Add(new NpgsqlParameter("ItemId", itemId));
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -192,14 +190,15 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""Quantity"", ""CreatedAt"", ""Name"") VALUES(:Company, :Code, :Description, :Quantity, :CreatedAt, :Name)";
+                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""Quantity"", ""CreatedAt"", ""Name"", ""Price"") VALUES(:Company, :Code, :Description, :Quantity, :CreatedAt, :Name, :Price)";
                     cmd.Parameters.Add(new NpgsqlParameter("Company", companyId));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", item.Name));
                     cmd.Parameters.Add(new NpgsqlParameter("Code", item.Code));
                     cmd.Parameters.Add(new NpgsqlParameter("Description", string.IsNullOrWhiteSpace(item.Description) ? string.Empty : item.Description));
                     cmd.Parameters.Add(new NpgsqlParameter("Quantity", item.Quantity));
                     cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", item.CreatedAt));
-                    
+                    cmd.Parameters.Add(new NpgsqlParameter("Price", item.Price));
+
                     cmd.ExecuteNonQuery();
 
                 }

@@ -113,7 +113,8 @@ namespace Inventorization.Data
                 Id = reader.IsDBNull(5) ? default(int) : reader.GetInt32(5),
                 Source = reader.IsDBNull(6) ? ItemSource.Undefined : (ItemSource)reader.GetInt32(6),
                 Name = reader.GetString(7),
-                CreatedAt = reader.IsDBNull(8) ? default(DateTime) : reader.GetDateTime(8)
+                CreatedAt = reader.IsDBNull(8) ? default(DateTime) : reader.GetDateTime(8),
+                Price = reader.IsDBNull(9) ? default(decimal) : reader.GetDecimal(9)
             };
         }
 

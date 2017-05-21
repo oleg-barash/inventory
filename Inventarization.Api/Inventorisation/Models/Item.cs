@@ -28,5 +28,6 @@ namespace Inventorization.Api.Models
         public int Id { get; set; }
         public DateTime? CreatedAt { get; set; }
         public bool Readonly { get; set; }
+        public decimal Price { get; internal set; }
     }
 }

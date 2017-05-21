@@ -24,12 +24,12 @@ export function filterItems(filter){
     return { 
         type: FILTER_ITEMS, 
         filter,
-        meta: {
-            throttle: {
-                wait: 3000,
-                leading: false
-                } // wait time
-        } 
+        // meta: {
+        //     throttle: {
+        //         wait: 3000,
+        //         leading: false
+        //         } // wait time
+        // } 
     }
 }
 
@@ -76,10 +76,10 @@ export function setCurrentItem(item){
     }
 }
 
-export function loadCurrentItem(id){
+export function loadCurrentItem(id, inventorization){
     return function (dispatch){
         dispatch(showLoading())
-        return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/item?id=' + id)
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/item?id=' + id)
             .then(response => response.json())
             .then(json => {
                 dispatch(hideLoading())
@@ -88,10 +88,11 @@ export function loadCurrentItem(id){
     }
 }
 
-export function importItems(items){
+
+export function importItems(items, company){
     return function (dispatch){
         dispatch(startImport())
-        return fetch(process.env.API_URL + 'company/' + '9e0e8591-293d-4603-898d-59334e4c53dc' + '/import', {
+        return fetch(process.env.API_URL + 'company/' + company + '/import', {
             method: "POST",
                 headers: {
                     'Accept': 'application/json',
@@ -109,9 +110,9 @@ export function importItems(items){
             })
     }  
 }
-export function saveItem(item){
+export function saveItem(item, company){
         return function (dispatch){
-            return fetch(process.env.API_URL + 'company/' + '9e0e8591-293d-4603-898d-59334e4c53dc' + '/item', {
+            return fetch(process.env.API_URL + 'company/' + company + '/item', {
                 method: "POST",
                     headers: {
                         'Accept': 'application/json',
@@ -119,7 +120,6 @@ export function saveItem(item){
                     },
                     body: JSON.stringify(item)})
                 .then(response => {
-                    debugger;
                     if (!response.ok){
                         toastr.error("Произошла ошибка при создании действия ")
                     }

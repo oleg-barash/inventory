@@ -7,6 +7,7 @@ import {
 } from '../constants/actionTypes'
 
 export function fetchZones(inventorization){
+    debugger
     return function (dispatch){
         dispatch(requestZones())
         return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zones')
@@ -17,19 +18,19 @@ export function fetchZones(inventorization){
     }
 }
 
-export function openZone(zone){
+export function openZone(zone, inventorization){
     return function (dispatch){
-        return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/reopen?code=' + zone.Code)
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/reopen?code=' + zone.Code)
             .then(response => {
                 dispatch(zoneOpened(zone))
-                dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+                dispatch(fetchZones(inventorization.Id))
             })
     }
 }
 
-export function closeZone(zone){
+export function closeZone(zone, inventorization){
     return function (dispatch){
-        return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/close',
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/close',
             {method: "POST",
                 headers: {
                     'Accept': 'application/json',
@@ -38,14 +39,14 @@ export function closeZone(zone){
                 body: JSON.stringify({zoneId: zone.ZoneStatusId})})
             .then(response => {
                 dispatch(zoneClosed(zone))
-                dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+                dispatch(fetchZones(inventorization.Id))
             })
     }
 }
 
-export function clearZone(zone){
+export function clearZone(zone, inventorization){
     return function (dispatch){
-        return fetch(process.env.API_URL + 'inventorization/' + '81d51f07-9ff3-46c0-961c-c8ebfb7b47e3' + '/zone/clear',
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/clear',
             {method: "POST",
                 headers: {
                     'Accept': 'application/json',
@@ -54,7 +55,7 @@ export function clearZone(zone){
                 body: JSON.stringify({zoneId: zone.ZoneStatusId})})
             .then(response => {
                 dispatch(zoneClosed(zone))
-                dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+                dispatch(fetchZones(inventorization.Id))
             })
     }
 }

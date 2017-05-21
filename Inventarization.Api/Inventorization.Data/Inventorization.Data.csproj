@@ -85,6 +85,7 @@
     <Compile Include="Repositories\TaskRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Repositories\ZoneRepository.cs" />
+    <Compile Include="Support\UserNotFoundException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Inventorization.Business\Inventorization.Business.csproj">

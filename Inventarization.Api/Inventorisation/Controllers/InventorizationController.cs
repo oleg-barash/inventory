@@ -164,14 +164,9 @@ namespace Inventorization.Api.Controllers
             {
                 Zone zone = _zoneRepository.GetZone(code);
                 ZoneState state = _inventorizationRepository.GetZoneState(inventorization, code);
-                if (state != null)
-                {
-
-                    _inventorizationRepository.ReopenZone(inventorization, zone.Id);
-                    state = _inventorizationRepository.GetZoneState(inventorization, code);
-                    return Request.CreateResponse(HttpStatusCode.OK, zone);
-                }
-                return Request.CreateResponse(HttpStatusCode.BadRequest, "Зона не была открыта");
+                _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
+                state = _inventorizationRepository.GetZoneState(inventorization, code);
+                return Request.CreateResponse(HttpStatusCode.OK, zone);
             }
             catch (Exception ex)
             {
@@ -247,7 +242,7 @@ namespace Inventorization.Api.Controllers
                 ZoneState zoneState = _inventorizationRepository.GetZoneState(inventorization, action.Zone);
                 if (zoneState == null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.Forbidden, $"Зона не была открыта. Сначала откройте зону.");
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, new { ErrorMessage = $"Зона не была открыта. Сначала откройте зону." });
                     //_inventorizationRepository.OpenZone(inventorization, action.Zone, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
                     //zoneState = _inventorizationRepository.GetZoneState(inventorization, action.Zone);
                 }
@@ -330,7 +325,7 @@ namespace Inventorization.Api.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
-            Business.Model.Item item = _companyRepository.GetItem(inventorization.Company, id);
+            Business.Model.Item item = _companyRepository.GetItem(id);
             if (item == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -344,6 +339,7 @@ namespace Inventorization.Api.Controllers
             res.Name = item.Name;
             res.Id = item.Id;
             res.CreatedAt = item.CreatedAt;
+            res.Price = item.Price;
             res.Readonly = item.Source == ItemSource.Import;
 
             var actions = _actionRepository.GetActionsByCode(inventorizationId, item.Code);
@@ -384,6 +380,7 @@ namespace Inventorization.Api.Controllers
                 res.Name = x.Name;
                 res.Id = x.Id;
                 res.CreatedAt = x.CreatedAt;
+                res.Price = x.Price;
 
                 var actionsByType = actions.Where(a => a.BarCode == res.BarCode).GroupBy(a => a.Type);
                 res.Actions = new List<ItemDetails>();

@@ -22,7 +22,7 @@ namespace Inventorization.Business.Model
         {
             if (state == null)
             {
-                return ZoneStatus.Undefined;
+                return ZoneStatus.NotOpened;
             }
             if (state.ClosedAt.HasValue && state.ClosedAt < DateTime.MaxValue) {
                 return ZoneStatus.Closed;
@@ -34,6 +34,7 @@ namespace Inventorization.Business.Model
     public enum ZoneStatus
     {
         Undefined,
+        NotOpened,
         Opened,
         Closed
     }

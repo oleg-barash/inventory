@@ -17,8 +17,10 @@ const styles = {
 class NewItemPage extends AuthorizedComponent {
    componentDidMount() {
         const { dispatch } = this.props
-        const { id } = this.props.location.query
-        dispatch(loadCurrentItem(id));
+        const { id, inventorization } = this.props.location.query
+        if (id != undefined){
+            dispatch(loadCurrentItem(id, inventorization.Id));
+        }
   }
   render() {
     return (
@@ -32,7 +34,9 @@ class NewItemPage extends AuthorizedComponent {
 
 const mapStateToProps = (state) => {
     return {
-        item : state.item
+        item : state.item,
+        inventorization: state.auth.SelectedInventorization,
+        userInfo: state.auth,
     }
 }
 

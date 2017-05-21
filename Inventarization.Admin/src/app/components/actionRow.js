@@ -42,8 +42,8 @@ class ActionRow extends Component {
 
 
         var newItem = function() {
-            dispatch(setCurrentItem({Code: action.BarCode, Quantity: action.Quantity}))
-            browserHistory.push('/newItem');
+            dispatch(setCurrentItem({BarCode: action.BarCode, QuantityPlan: action.Quantity}))
+            browserHistory.push('/editItem');
         }
 
         var editAction = function() {

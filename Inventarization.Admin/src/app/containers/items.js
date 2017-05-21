@@ -15,6 +15,7 @@ import {
     requestItems,
     importItems
 } from '../actions/itemActions'
+import {fetchZones} from '../actions/zoneActions';
 import TextField from 'material-ui/TextField';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import Paper from 'material-ui/Paper';
@@ -23,6 +24,9 @@ import { green100 as green}  from 'material-ui/styles/colors';
 import Dialog from 'material-ui/Dialog';
 import FileInput  from 'react-file-input';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
+import ZoneSelect from '../components/zoneSelect'
+import AuthorizedComponent from '../components/authorizedComponent'
+import { openInventorizationDialog } from '../actions/authorizationActions'
 
 const mapStateToProps = (state) => {
     return {
@@ -30,7 +34,9 @@ const mapStateToProps = (state) => {
         isFetching: state.items.isFetching,
         isDialogOpened: state.items.isImportDialogOpened,
         filter: state.items.filter,
-        dispatch: state.dispatch
+        dispatch: state.dispatch,
+        userInfo: state.auth,
+        availabledZones: state.zones
     }
 }
 const styles = {
@@ -50,18 +56,31 @@ const paperStyle = {
     display: 'inline-block',
 };
 
-class Items extends Component {
+class Items extends AuthorizedComponent {
     constructor(props) {
-        super(props)
+      super(props);
     }
-    
-    componentDidMount() {
-        this.props.dispatch(fetchItems('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'))
+    componentWillMount() {
+        if (this.props.userInfo.SelectedInventorization !== undefined){
+            this.props.dispatch(fetchItems(this.props.userInfo.SelectedInventorization.Id))
+        }
+        else{
+            this.props.dispatch(openInventorizationDialog());
+        }
     }
 
     render() {
         let objectClosure = this;
         let itemsToUpload = [];
+
+        if (!objectClosure.props.userInfo.SelectedInventorization){
+            return null;
+        }
+
+        if (!this.props.availabledZones || this.props.availabledZones.length == 0){
+            objectClosure.props.dispatch(fetchZones(objectClosure.props.userInfo.SelectedInventorization.Id));
+        }
+
         function handleFilterChange(event, value) {
             objectClosure.props.dispatch(updateItemsFilter({ text: value }))
             objectClosure.props.dispatch(filterItems({ text: value }))
@@ -84,8 +103,30 @@ class Items extends Component {
             objectClosure.props.dispatch(closeImportDialog())
         };
 
+        function handleDeviationChange(event, value) {
+            objectClosure.props.dispatch(updateItemsFilter({ devation: value }))
+            objectClosure.props.dispatch(filterItems({ devation: value }))
+        };
+
+        function handlePriceDeviationChange(event, value) {
+            objectClosure.props.dispatch(updateItemsFilter({ priceDevation: value }))
+            objectClosure.props.dispatch(filterItems({ priceDevation: value }))
+        };
+
+
+        let onZoneChange = function(value) {
+            if (typeof value === "string"){
+                objectClosure.props.dispatch(updateItemsFilter({ zone: undefined }))
+                objectClosure.props.dispatch(filterItems({ zone: undefined }))
+            }
+            else{
+                objectClosure.props.dispatch(updateItemsFilter({ zone: value }))
+                objectClosure.props.dispatch(filterItems({ zone: value }))
+            }
+        }
+
         function onImport () {
-            objectClosure.props.dispatch(importItems(itemsToUpload))
+            objectClosure.props.dispatch(importItems(itemsToUpload, userInfo.SelectedInventorization.Company))
         };
 
         function updateProgress(evt) {
@@ -120,7 +161,6 @@ class Items extends Component {
 
         function handleChange(event) {
             console.log('Selected file:', event.target.files[0]);
-            debugger
             var reader = new FileReader();
             reader.readAsText(event.target.files[0], "UTF-8");
             reader.onprogress = updateProgress;
@@ -139,7 +179,6 @@ class Items extends Component {
         };
 
         const actions = [
-            <RefreshIndicator status={this.props.importInProgress ? "loading" : "none" } left={70} top={0}/>,
             <FlatButton style={{display: this.props.importInProgress ? "none" : "inlineBlock"}} label="Выбрать" keyboardFocused={true}>
                 <FileInput name="dictionaryFile"
                    accept=".csv"
@@ -160,42 +199,61 @@ class Items extends Component {
                 onTouchTap={handleClose}
             />];
         return (
-        <div>    
-            <Paper style={paperStyle} zDepth={3} rounded={false}>
-                <TextField 
-                    id="text-filter"
-                    value={this.props.filter.text}
-                    onChange={handleFilterChange}
-                    hintText="Поиск"/>
-
-                <RadioButtonGroup name="itemState" defaultSelected="0" onChange={handleStateChange}>
-                    <RadioButton
-                        value="0"
-                        label="Показывать все"
-                        style={styles.radioButton}
-                    />
-                    <RadioButton
-                        value="1"
-                        label="Показать недостачу"
-                        style={styles.radioButton}
-                    />
-                    <RadioButton
-                        value="2"
-                        label="Показать избытки"
-                        style={styles.radioButton}
-                    />
-                </RadioButtonGroup>
-            </Paper>
-            <Paper style={paperStyle} zDepth={3} rounded={false}>
-                <FlatButton label="Импорт" hoverColor={green} onClick={handleOpen}/>
-                <Dialog
-                    title="Загрузка справочника товаров"
-                    actions={actions}
-                    modal={false}
-                    open={this.props.isDialogOpened}
-                    onRequestClose={handleClose}>
-                    Для загрузки справочника выберите файл и нажмите "Загрузить"
-                </Dialog>
+        <div>  
+            <Paper style={paperStyle} zDepth={3} rounded={false}>  
+                <h2 style={{display: "block"}}>Фильтр</h2>
+                <Paper style={paperStyle} zDepth={3} rounded={false}>
+                    <TextField 
+                        id="text-filter"
+                        floatingLabelText="Текстовый поиск"
+                        value={this.props.filter.text}
+                        onChange={handleFilterChange}/>
+                    <br/>
+                    <RadioButtonGroup name="itemState" defaultSelected="0" onChange={handleStateChange}>
+                        <RadioButton
+                            value="0"
+                            label="Показывать все"
+                            style={styles.radioButton}
+                        />
+                        <RadioButton
+                            value="1"
+                            label="Показать недостачу"
+                            style={styles.radioButton}
+                        />
+                        <RadioButton
+                            value="2"
+                            label="Показать избытки"
+                            style={styles.radioButton}
+                        />
+                    </RadioButtonGroup>
+                    <ZoneSelect zone={!!this.props ? this.props.filter.zone : {}} onZoneChange={onZoneChange}/>
+                </Paper>
+                <Paper style={paperStyle} zDepth={3} rounded={false}>
+                    <TextField 
+                        id="deviation-filter"
+                        value={this.props.filter.deviation}
+                        onChange={handleDeviationChange}
+                        floatingLabelText="Расхождения по количеству"
+                        type="number"/>
+                    <br/>
+                    <TextField 
+                        id="priceDevation-filter"
+                        value={this.props.filter.priceDevation}
+                        onChange={handlePriceDeviationChange}
+                        floatingLabelText="Расхождения по сумме"
+                        type="number"/>
+                </Paper>
+                <Paper style={paperStyle} zDepth={3} rounded={false}>
+                    <FlatButton label="Импорт" hoverColor={green} onClick={handleOpen}/>
+                    <Dialog
+                        title="Загрузка справочника товаров"
+                        actions={actions}
+                        modal={false}
+                        open={this.props.isDialogOpened}
+                        onRequestClose={handleClose}>
+                        Для загрузки справочника выберите файл и нажмите "Загрузить"
+                    </Dialog>
+                </Paper>
             </Paper>
             <h2 style={{display: this.props.isFetching ? "block" : "none"}}>
                 Загрузка...

@@ -12,7 +12,7 @@ import TextField from 'material-ui/TextField';
 import { validateAction, saveAction, loadCurrentAction } from '../actions/actionActions'
 import { fetchItems } from '../actions/itemActions'
 import { fetchZones } from '../actions/zoneActions'
-
+import ZoneSelect from './zoneSelect'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { browserHistory } from 'react-router'
@@ -25,6 +25,7 @@ moment.locale("ru-RU")
 
 const mapStateToProps = (state) => {
     return {
+        inventorization: state.SelectInventorization,
         action: state.action,
         availabledZones: state.zones.items || [],
         availabledItems: state.items.items || []
@@ -41,23 +42,18 @@ const itemNameDataSourceConfig = {
   value: 'Name',
 };
 
-const zoneDataSourceConfig = {
-  text: 'ZoneName',
-  value: 'ZoneStatusId',
-};
-
 class ActionForm extends Component {
     constructor(props) {
         super(props);
     }
 
     render() {
-        let {action, dispatch, availabledItems} = this.props;
+        let {action, dispatch, availabledItems, inventorization} = this.props;
         if (!this.props.availabledItems || this.props.availabledItems.length == 0){
-             dispatch(fetchItems('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'));
+             dispatch(fetchItems(inventorization.Id));
         }
         if (!this.props.availabledZones || this.props.availabledZones.length == 0){
-            dispatch(fetchZones('81d51f07-9ff3-46c0-961c-c8ebfb7b47e3'));
+            dispatch(fetchZones(inventorization.Id));
         }
         let onItemChange = function(value) {
             dispatch(validateAction({Name: value.Name, BarCode: value.BarCode}));
@@ -77,7 +73,7 @@ class ActionForm extends Component {
         }
         let save = function() {
             if (!!action.BarCode && !!action.Zone && !!action.Quantity){
-                dispatch(saveAction(action));
+                dispatch(saveAction(action, inventorization.Id));
             }
             else{
                 dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone, Quantity: action.Quantity || ''}));
@@ -114,14 +110,8 @@ class ActionForm extends Component {
                 <Divider />
                 <TextField id="Quantity" hintText="0" value={action.Quantity} onChange={onQuantityChange} floatingLabelText="Количество единиц товара" errorText={action != null ? action.QuantityError || '' : '' }/>
                 <Divider />
-                <AutoComplete 
-                    id="Zone"
-                    hintText="Зона 1" 
-                    floatingLabelText="Зона"
-                    dataSource={this.props.availabledZones}
-                    searchText={action && action.Zone ? action.Zone.ZoneName : ''} 
-                    onNewRequest={onZoneChange}  
-                    dataSourceConfig={zoneDataSourceConfig}
+                <ZoneSelect zone={!!action ? action.Zone : {}} 
+                    onZoneChange={onZoneChange}  
                     errorText={action != null ? action.ZoneError || '' : '' }/>
                 <Divider />
                 <SelectField

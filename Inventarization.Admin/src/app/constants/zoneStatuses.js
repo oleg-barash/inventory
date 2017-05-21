@@ -1,5 +1,6 @@
 export const ZoneStatuses = {
     Undefined: 0,
-    Opened: 1,
-    Closed: 2
+    NotOpened: 1,
+    Opened: 2,
+    Closed: 3
 }

@@ -26,5 +26,6 @@ namespace Inventorization.Business.Model
         public string Name { get; set; }
         public int Id { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public decimal Price { get; set; }
     }
 }

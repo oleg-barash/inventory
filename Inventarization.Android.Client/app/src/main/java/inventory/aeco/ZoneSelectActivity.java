@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.os.Vibrator;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -118,8 +119,8 @@ public class ZoneSelectActivity extends Activity {
 
 
     private void setupView() {
-        // TODO Auto-generated method stub
         showScanResult = (EditText) findViewById(R.id.scan_result);
+        showScanResult.setInputType(InputType.TYPE_NULL);
         showScanResult.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -332,6 +333,21 @@ public class ZoneSelectActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // TODO Auto-generated method stub
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.i("key pressed", String.valueOf(event.getKeyCode()));
+        if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
+            if (showScanResult.getText() != null && !showScanResult.getText().toString().isEmpty()) {
+                openZone(showScanResult.getText().toString());
+            }
+            else{
+                showToast("Просканируйте зону, либо укажите номер зоны при помощи клавиатуры");
+            }
+            return false;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     @Override

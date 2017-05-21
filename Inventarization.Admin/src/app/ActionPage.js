@@ -18,7 +18,9 @@ class ActionPage extends AuthorizedComponent {
   componentDidMount() {
         const { dispatch } = this.props
         const { id } = this.props.location.query
-        dispatch(loadCurrentAction(id));
+        if (id !== undefined){
+            dispatch(loadCurrentAction(id));
+        }
   }
   render() {
     return (

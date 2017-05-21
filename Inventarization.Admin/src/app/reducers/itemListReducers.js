@@ -20,7 +20,7 @@ function _applyFilter(items, filter){
                 }
 
             }
-            if (filter.text !== undefined){
+            if (filter.text !== undefined && filter.text.length > 4){
                 result = _.filter(result, (item) => {
                     let val = filter.text.toUpperCase();
                     return item.BarCode && item.BarCode.toUpperCase().startsWith(val) 
@@ -30,6 +30,25 @@ function _applyFilter(items, filter){
                 })
             }
 
+            if (filter.zone !== undefined){
+                result = _.filter(result, (item) => {
+                    let details = item.Actions.reduce( (previousValue, currentValue) => previousValue.concat(currentValue.ZoneDetails), [])
+                    return details.some(x => x.Zone === filter.zone.ZoneName);
+                })
+            }
+
+            if (filter.devation !== undefined){
+                result = _.filter(result, (item) => {
+                    return item.QuantityPlan - item.QuantityFact >= filter.devation
+                });
+            }
+            if (filter.priceDevation !== undefined){
+                let priceDevation = parseInt(filter.priceDevation);
+                result = _.filter(result, (item) => {
+                    return item.QuantityPlan*item.Price - item.QuantityFact*item.Price >= priceDevation
+                });
+            }
+
             return _.take(result, filter.pageSize * filter.currentPage);
 }
 
@@ -37,7 +56,6 @@ export function itemList(state = { isFetching: false, items: [], displayItems:[]
 {
     switch (action.type){
         case FILTER_ITEMS:
-            debugger;
             var filter = Object.assign({}, state.filter, action.filter);
             var result = _applyFilter(state.items, filter)
             return Object.assign({}, state, {isFetching: false, filter: filter, displayItems: result.map(x => {

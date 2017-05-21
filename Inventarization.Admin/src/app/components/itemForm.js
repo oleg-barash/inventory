@@ -18,7 +18,8 @@ moment.locale("ru-RU")
 
 const mapStateToProps = (state) => {
     return {
-        item: state.item
+        item: state.item,
+        inventorization: state.auth.Inventorization
     }
 }
 
@@ -50,7 +51,7 @@ class ItemForm extends Component {
         }
         let save = function() {
             if (!!item.Name && !!item.BarCode && !!item.QuantityPlan){
-                dispatch(saveItem(item));
+                dispatch(saveItem(item, inventorization.Company));
             }
             else{
                 dispatch(validateItem({BarCode: item.BarCode || '', Name: item.Name || '', QuantityPlan: item.QuantityPlan || ''}));

@@ -3,6 +3,7 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 import Items from './containers/items'
 import AllActions from './containers/allActions'
 import AuthorizedComponent from './components/authorizedComponent'
+import { connect } from 'react-redux'
 
 
 const styles = {
@@ -14,15 +15,25 @@ const styles = {
   }
 };
 
+const mapStateToProps = (state) => {
+    return {
+        userInfo: state.auth,
+        dispatch: state.dispatch
+    }
+}
+
 
 class ItemListPage extends AuthorizedComponent {
+  constructor(props) {
+      super(props);
+  }
   render() {
     return (
           <div>
               <h2 style={styles.headline}>Товары</h2>
-              <Items/>
+              <Items cookies={this.props.cookies}/>
           </div>
     )};
 }
 
-export default ItemListPage
+export default connect(mapStateToProps)(ItemListPage)

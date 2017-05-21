@@ -2,20 +2,32 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import _ from 'lodash';
- 
-class AuthorizedComponent extends Component {
+import { login } from '../actions/authorizationActions'
+import { browserHistory } from 'react-router'
+import { loginFinished } from '../actions/authorizationActions'
+import { Cookies } from 'react-cookie';
 
+
+class AuthorizedComponent extends Component {
   componentWillMount() {
-    // const { routes } = this.props; // array of routes
- 
-    // // check if user data available
-    // const user = JSON.parse(localStorage.getItem('user'));
-    // if (!user) {
-    //   // redirect to login if not
-    //   this.props.router.push('/login');
-    //   return null;
-    // }
-    // // get all roles available for this route
+    const { userInfo, dispatch, cookies } = this.props;
+    if (!userInfo || !userInfo.IsAuthorized) {
+        let user = cookies.get('credentials');
+        if (!user || !user.IsAuthorized){
+          if (this.props.router){
+            this.props.router.push('/login');
+          }
+          if (browserHistory){
+            browserHistory.push('/login');
+          }
+          return null;
+        }
+        else{
+          dispatch(loginFinished(user));
+        }
+    }
+
+    // get all roles available for this route
     // const routeRoles = _.chain(routes)
     //   .filter(item => item.authorize) // access to custom attribute
     //   .map(item => item.authorize)
@@ -28,5 +40,7 @@ class AuthorizedComponent extends Component {
     // }
   }
 }
-
+AuthorizedComponent.propTypes = {
+    cookies: PropTypes.shape(Cookies).isRequired
+}
 export default AuthorizedComponent
