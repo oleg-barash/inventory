@@ -1,7 +1,7 @@
 ﻿using Inventorization.Business.Model;
 using System;
 
-namespace Inventorization.Api.Models
+namespace Inventorization.Api.ViewModels
 {
     public class ZoneViewModel
     {

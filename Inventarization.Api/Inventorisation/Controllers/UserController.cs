@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Inventorization.Api.ViewModels;
 
 namespace Inventorization.Api.Controllers
 {
@@ -41,7 +42,7 @@ namespace Inventorization.Api.Controllers
             }
             try
             {
-                User user = _userRepository.GetUserByLogin(loginInfo.Username);
+                Business.Model.User user = _userRepository.GetUserByLogin(loginInfo.Username);
                 if (user.Password == loginInfo.Password)
                 {
                     info.IsAuthorized = true;

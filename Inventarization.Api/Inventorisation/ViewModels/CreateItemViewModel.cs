@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Inventorization.Api.Models
+namespace Inventorization.Api.ViewModels
 {
     public class ItemViewModel
     {
