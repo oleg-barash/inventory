@@ -39,4 +39,11 @@
     <string name="OpenZone">Открыть зону</string>
     <string name="Accept">Применить</string>
     <string name="no">Нет</string>
+    <string name="prompt_login">Логин</string>
+    <string name="error_invalid_login">Некорректный логин</string>
+    <string name="error_invalid_password">Пароль слишком короткий</string>
+    <string name="error_incorrect_password">Неверный пароль</string>
+    <string name="prompt_email">Почта</string>
+    <string name="title_activity_login">Авторизация</string>
+    <string name="title_activity_workflow_selection">Выбор типа действия</string>
 </resources>

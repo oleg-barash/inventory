@@ -1,4 +1,4 @@
-package inventory.aeco;
+package inventory.aeco.network.models;
 
 /**
  * Created by Барашики on 26.03.2017.

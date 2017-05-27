@@ -1,5 +1,6 @@
 package inventory.aeco;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -52,6 +53,10 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 
 import inventory.R;
+import inventory.aeco.network.models.ActionStatus;
+import inventory.aeco.network.models.Action;
+import inventory.aeco.network.models.Item;
+import inventory.aeco.network.models.Zone;
 
 
 public class ActionActivity extends Activity {
@@ -89,6 +94,12 @@ public class ActionActivity extends Activity {
         toast.show();
     }
 
+    private String login;
+    public ActionActivity(){
+        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+        login = settings.getString("login", "undefined");
+    }
+
     private static final String TAG = "ActionActivity";
     private String baseUrl = Configuration.BaseUrl + "inventorization/" + inventorizationId + "/";
     private String baseZoneUrl = Configuration.BaseUrl + "zone/";
@@ -119,6 +130,7 @@ public class ActionActivity extends Activity {
         newAction.Type = currentActionType;
         newAction.Zone = currentZone;
         newAction.Inventorization = inventorizationId;
+        newAction.User = login;
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("id", newAction.Id);
         params.put("quantity", newAction.Quantity.toString());
@@ -126,6 +138,7 @@ public class ActionActivity extends Activity {
         params.put("barCode", newAction.BarCode);
         params.put("inventorization", newAction.Inventorization);
         params.put("zone", newAction.Zone);
+        params.put("user", newAction.User);
         SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
         formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
         params.put("dateTime", formatUTC.format(new Date()));
