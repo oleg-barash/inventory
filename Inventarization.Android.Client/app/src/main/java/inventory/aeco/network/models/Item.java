@@ -1,4 +1,4 @@
-package inventory.aeco;
+package inventory.aeco.network.models;
 
 import java.util.Date;
 

@@ -228,11 +228,10 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
-    <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Attributes\AuthAttribute.cs" />
     <Compile Include="Controllers\CompanyController.cs" />
     <Compile Include="Controllers\InventorizationController.cs" />
     <Compile Include="Controllers\ActionController.cs" />
@@ -245,19 +244,16 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountBindingModels.cs" />
-    <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\CloseZoneVM.cs" />
-    <Compile Include="Models\CreateItemViewModel.cs" />
-    <Compile Include="Models\ImportItemsErrorVM.cs" />
-    <Compile Include="Models\Item.cs" />
-    <Compile Include="Models\Action.cs" />
-    <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\LoginModel.cs" />
-    <Compile Include="Models\UserInfo.cs" />
-    <Compile Include="Models\Zone.cs" />
+    <Compile Include="Models\User.cs" />
+    <Compile Include="ViewModels\CloseZoneVM.cs" />
+    <Compile Include="ViewModels\CreateItemViewModel.cs" />
+    <Compile Include="ViewModels\ImportItemsErrorVM.cs" />
+    <Compile Include="ViewModels\Item.cs" />
+    <Compile Include="ViewModels\Action.cs" />
+    <Compile Include="ViewModels\LoginModel.cs" />
+    <Compile Include="ViewModels\UserInfo.cs" />
+    <Compile Include="ViewModels\Zone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -305,6 +301,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\" />
+    <Folder Include="Providers\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

@@ -1,5 +1,6 @@
 ﻿using Inventorization.Api.Formatters;
 using Inventorization.Api.Models;
+using Inventorization.Api.ViewModels;
 using Inventorization.Business.Model;
 using Inventorization.Data;
 using Newtonsoft.Json;
@@ -218,7 +219,7 @@ namespace Inventorization.Api.Controllers
 
         [HttpPost]
         [Route("{inventorization}/action")]
-        public HttpResponseMessage SaveAction(Guid inventorization, [FromBody]SaveActionVM actionVM)
+        public HttpResponseMessage SaveAction(Guid inventorization, [FromBody]ViewModels.Action actionVM)
         {
             try
             {
@@ -226,8 +227,8 @@ namespace Inventorization.Api.Controllers
                 Business.Model.Action action = new Business.Model.Action()
                 {
                     BarCode = actionVM.BarCode,
-                    DateTime = actionVM.DateTime ?? DateTime.UtcNow,
-                    Id = actionVM.Id ?? Guid.NewGuid(),
+                    DateTime = actionVM.DateTime,
+                    Id = actionVM.Id,
                     Inventorization = inventorization,
                     Quantity = actionVM.Quantity,
                     Type = actionVM.Type,
@@ -291,7 +292,7 @@ namespace Inventorization.Api.Controllers
                     OpenedBy = foundState?.OpenedBy,
                     ZoneName = foundZone.Name
                 };
-                var res = new Models.Action()
+                var res = new ViewModels.Action()
                 {
                     Id = x.Id,
                     DateTime = x.DateTime,
@@ -325,7 +326,7 @@ namespace Inventorization.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            Models.Item res = new Models.Item();
+            ViewModels.Item res = new ViewModels.Item();
             res.QuantityPlan = item.Quantity;
             res.BarCode = item.Code;
             res.Description = item.Description;
@@ -366,7 +367,7 @@ namespace Inventorization.Api.Controllers
 
             var result = items.Select(x =>
             {
-                Models.Item res = new Models.Item();
+                ViewModels.Item res = new ViewModels.Item();
                 res.QuantityPlan = x.Quantity;
                 res.BarCode = x.Code;
                 res.Description = x.Description;

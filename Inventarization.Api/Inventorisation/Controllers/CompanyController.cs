@@ -1,4 +1,5 @@
 ﻿using Inventorization.Api.Models;
+using Inventorization.Api.ViewModels;
 using Inventorization.Business.Model;
 using Inventorization.Data;
 using System;

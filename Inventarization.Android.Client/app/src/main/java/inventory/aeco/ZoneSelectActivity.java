@@ -34,6 +34,7 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import inventory.R;
+import inventory.aeco.network.models.Zone;
 
 public class ZoneSelectActivity extends Activity {
 

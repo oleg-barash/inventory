@@ -1,4 +1,5 @@
 ﻿using Inventorization.Api.Models;
+using Inventorization.Api.ViewModels;
 using Inventorization.Business.Model;
 using Inventorization.Data;
 using System;
@@ -49,7 +50,7 @@ namespace Inventorization.Api.Controllers
                 OpenedBy = foundState?.OpenedBy,
                 ZoneName = zone.Name
             };
-            var res = new Models.Action()
+            var res = new ViewModels.Action()
             {
                 Id = action.Id,
                 DateTime = action.DateTime,
