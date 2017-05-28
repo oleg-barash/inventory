@@ -1,9 +1,29 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { FILTER_ACTION, REQUEST_ACTION, RECEIVE_ACTION, DELETING_ACTION, ACTION_DELETED, SHOW_LOADING, HIDE_LOADING } from '../constants/actionTypes'
+import { FILTER_ACTION, REQUEST_ACTION, RECEIVE_ACTION, DELETING_ACTION, ACTION_DELETED, SHOW_LOADING, HIDE_LOADING, UPDATE_ACTIONS_FILTER } from '../constants/actionTypes'
 
-export function actionList(state = { isFetching: false, items: [], filter: {}, action: {} }, action)
+const filterActions = (items, filter) => {
+    if (items == undefined){
+        return [];
+    }
+    var result = items;
+    if (filter !== undefined){
+        if (filter.ZoneName !== undefined){
+            result = result.filter((item) => {
+                return item.Zone.ZoneName.toUpperCase().startsWith(filter.ZoneName.toUpperCase());
+            })
+        }
+        if (filter.Code !== undefined){
+            result = result.filter((item) => {
+                return item.BarCode.toUpperCase().startsWith(filter.Code.toUpperCase());
+            })
+        }
+    }
+    return result;
+}
+
+export function actionList(state = { isFetching: false, items: [], filter: {}, action: {}, filtredActions: [] }, action)
 {
     switch (action.type){
         case ACTION_DELETED:
@@ -28,28 +48,23 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
             return Object.assign({}, state, { isFetching: true })
         case HIDE_LOADING:
             return Object.assign({}, state, { isFetching: false })
-        case FILTER_ACTION:
+        case UPDATE_ACTIONS_FILTER:
             var filter = Object.assign(state.filter, action.filter)
-            return Object.assign({}, state, { filter })
+            var items = filterActions(state.items, filter)
+            return Object.assign({}, state, { filter, filtredActions: items })
         case REQUEST_ACTION:
             return Object.assign({}, state, {
                 isFetching: true
             })
         case RECEIVE_ACTION:
-            var items = action.items
-            if (action.filter !== undefined){
-                if (action.filter.Code !== undefined){
-                    items = items.filter((item) => {
-                        return item.BarCode.startsWith(action.filter.Code);
-                    })
-                }
-            }
+            var items = filterActions(action.items, state.filter)
             return Object.assign({}, state, {
                     isFetching: false,
                     items: action.items.map(x => {
                         x.key = x.Id;
                         return x;
                     }),
+                    filtredActions: items,
                     lastUpdated: action.receivedAt
             })
         default:

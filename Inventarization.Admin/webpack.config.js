@@ -4,7 +4,7 @@ const path = require('path');
 const buildPath = path.resolve(__dirname, 'build');
 const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const TransferWebpackPlugin = require('transfer-webpack-plugin');
-var publicPath         = 'http://localhost:8050/public'
+var publicPath = 'http://localhost:8050/public'
 const config = {
   // Entry points to the project
   entry: [
@@ -19,9 +19,9 @@ const config = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env':{
-        'NODE_ENV': JSON.stringify('production'),
+        'NODE_ENV': JSON.stringify('debug'),
         'API_URL': JSON.stringify('http://localhost/api/'),
-        'ASSETS_URL': JSON.stringify('http://193.124.113.47:82/api/')
+        'ASSETS_URL': JSON.stringify(publicPath)
       }
     }),
     // Enables Hot Modules Replacement

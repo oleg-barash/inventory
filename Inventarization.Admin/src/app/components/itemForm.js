@@ -19,7 +19,7 @@ moment.locale("ru-RU")
 const mapStateToProps = (state) => {
     return {
         item: state.item,
-        inventorization: state.auth.Inventorization
+        inventorization: state.auth.SelectedInventorization
     }
 }
 
@@ -29,7 +29,7 @@ class ItemForm extends Component {
     }
 
     render() {
-        let {item, dispatch} = this.props;
+        let {item, dispatch, inventorization} = this.props;
         let onCodeChange = function(event) {
             dispatch(validateItem({BarCode: event.target.value}));
         }

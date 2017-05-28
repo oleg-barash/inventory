@@ -1,12 +1,18 @@
 /**
  * Created by Барашики on 26.03.2017.
  */
-import React, { PropTypes } from 'react';
+import React, { PropTypes, Component } from 'react';
+import { connect } from 'react-redux'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
 import ZoneRow from '../components/zoneRow';
 
-const ZoneList = ({ zones }) => (
-    <Table>
+class ZoneList extends Component {
+    constructor(props) {
+        super(props);
+    }
+    render(){
+        let { zones } = this.props;
+        return (<Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
                 <TableHeaderColumn style={{width: '100px'}}>Зона</TableHeaderColumn>
@@ -20,8 +26,9 @@ const ZoneList = ({ zones }) => (
                 <ZoneRow zone={zone} key={zone.ZoneStatusId}/>
             )}
         </TableBody>
-    </Table>
-)
+    </Table>)
+    }
+}
 
 
 ZoneList.propTypes = {

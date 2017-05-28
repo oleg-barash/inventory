@@ -8,6 +8,7 @@ import { FILTER_ACTION,
     VALIDATE_ACTION,
     SHOW_LOADING,
     HIDE_LOADING,
+    UPDATE_ACTIONS_FILTER,
     ACTION_SAVED
 } from '../constants/actionTypes'
 import {toastr} from 'react-redux-toastr'
@@ -55,11 +56,11 @@ export function saveAction(action, inventorization){
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(action)})
+                    body: JSON.stringify(Object.assign({}, action, { Zone: action.Zone.ZoneId}))})
                 .then(response => { return response.json()})
                 .then(response => {
                     debugger;
-                    if (response.ErrorMessage){
+                    if (typeof response === "string" || response.ErrorMessage){
                         toastr.error("Произошла ошибка при создании действия: " + response.ErrorMessage)
                     }
                     else{
@@ -144,4 +145,11 @@ function requestActions(inventarization){
 
 export function filterActions(filter){
     return { type: FILTER_ACTION, filter }
+}
+
+export function updateActionsFilter(filter){
+    return { 
+        type: UPDATE_ACTIONS_FILTER, 
+        filter
+    }
 }

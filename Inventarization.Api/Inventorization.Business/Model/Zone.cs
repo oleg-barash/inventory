@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Inventorization.Business.Model
 {
-    public class Zone
+    public class ZoneModel
     {
         public Guid Id { get; set; }
         [JsonProperty(PropertyName = "Name", Order = 1)]

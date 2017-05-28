@@ -52,6 +52,7 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 
 import inventory.R;
+import inventory.aeco.DTO.ItemSaveResult;
 
 
 public class ActionActivity extends Activity {
@@ -132,17 +133,25 @@ public class ActionActivity extends Activity {
 
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + currentZone +"/action", new JSONObject(params),
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseUrl + "action", new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try{
                             ObjectMapper mapper = new ObjectMapper();
-                            Item item = mapper.readValue(response.toString(), Item.class);
-                            description.setText(item.Description);
-                            description.setBackgroundColor(Color.argb(128,0,0,64));
-                            newAction.Status = ActionStatus.Sent;
-                            actionList.addFirst(newAction.BarCode + "зафиксирован");
+                            ItemSaveResult item = mapper.readValue(response.toString(), ItemSaveResult.class);
+                            if (item.foundItem != null) {
+                                description.setText(item.foundItem.Description);
+                                description.setBackgroundColor(Color.argb(128, 0, 0, 64));
+                                newAction.Status = ActionStatus.Sent;
+                                actionList.addFirst(newAction.BarCode + " зафиксирован");
+                            }
+                            else{
+                                newAction.Status = ActionStatus.Error;
+                                soundpool.play(errorSoundid, 1, 1, 0, 0, 1);
+                                description.setText(" Товар не найден.");
+                                description.setBackgroundColor(Color.RED);
+                            }
                             if (actionList.size() > 4){
                                 actionList.removeLast();
                             }
@@ -151,6 +160,10 @@ public class ActionActivity extends Activity {
                         catch (IOException exception){
                             Log.e(TAG, "Error parsing item: " + response.toString());
                         }
+                        catch (Exception exception){
+                            Log.e(TAG, "Error : " + response.toString());
+                        }
+
 
                     }
                 }, new Response.ErrorListener() {
@@ -159,13 +172,7 @@ public class ActionActivity extends Activity {
                 showScanResult.setText("");
                 newAction.Status = ActionStatus.Error;
                 String text = newAction.BarCode;
-                if (error.networkResponse != null && error.networkResponse.statusCode == 404){
-                    soundpool.play(errorSoundid, 1, 1, 0, 0, 1);
-                    description.setText("Товар не найден.");
-                    description.setBackgroundColor(Color.RED);
-                    text += " Товар не найден.";
-                }
-                else {
+                if (error.networkResponse != null){
                     if (error.networkResponse != null && error.networkResponse.statusCode == 403){
                         showToast("Зона уже закрыта. Выберите другую зону.");
                         Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);

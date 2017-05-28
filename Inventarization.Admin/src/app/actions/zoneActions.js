@@ -7,7 +7,6 @@ import {
 } from '../constants/actionTypes'
 
 export function fetchZones(inventorization){
-    debugger
     return function (dispatch){
         dispatch(requestZones())
         return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zones')
@@ -23,23 +22,24 @@ export function openZone(zone, inventorization){
         return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/reopen?code=' + zone.Code)
             .then(response => {
                 dispatch(zoneOpened(zone))
-                dispatch(fetchZones(inventorization.Id))
+                dispatch(fetchZones(inventorization))
             })
     }
 }
 
 export function closeZone(zone, inventorization){
     return function (dispatch){
+        debugger;
         return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/close',
             {method: "POST",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({zoneId: zone.ZoneStatusId})})
+                body: JSON.stringify({zoneId: zone.ZoneId})})
             .then(response => {
                 dispatch(zoneClosed(zone))
-                dispatch(fetchZones(inventorization.Id))
+                dispatch(fetchZones(inventorization))
             })
     }
 }
@@ -52,10 +52,10 @@ export function clearZone(zone, inventorization){
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({zoneId: zone.ZoneStatusId})})
+                body: JSON.stringify({zoneId: zone.ZoneId})})
             .then(response => {
                 dispatch(zoneClosed(zone))
-                dispatch(fetchZones(inventorization.Id))
+                dispatch(fetchZones(inventorization))
             })
     }
 }

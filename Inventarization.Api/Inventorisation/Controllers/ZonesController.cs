@@ -32,15 +32,15 @@ namespace Inventorization.Controllers
         [Route("generate")]
         public HttpResponseMessage CreateZoneList([FromUri]int count)
         {
-            List<Zone> zones = new List<Zone>();
-            Zone[] currentZones = _zoneRepository.GetZones().ToArray();
+            List<ZoneModel> zones = new List<ZoneModel>();
+            ZoneModel[] currentZones = _zoneRepository.GetZones().ToArray();
             for (int i = 1; i <= count; i++)
             {
                 string code = i.ToString();
-                Zone zone = currentZones.FirstOrDefault(x => x.Code == code);
+                ZoneModel zone = currentZones.FirstOrDefault(x => x.Code == code);
                 if (zone == null)
                 {
-                    zone = new Zone();
+                    zone = new ZoneModel();
                     zone.Id = Guid.NewGuid();
                     zone.Name = "Зона " + i;
                     zone.Code = code;
@@ -51,7 +51,7 @@ namespace Inventorization.Controllers
 
             var negotiator = this.Configuration.Services.GetContentNegotiator();
 
-            var result = negotiator.Negotiate(typeof(List<Zone>),
+            var result = negotiator.Negotiate(typeof(List<ZoneModel>),
                            this.Request,
                            this.Configuration.Formatters);
 
@@ -64,7 +64,7 @@ namespace Inventorization.Controllers
 
             var response = new HttpResponseMessage
             {
-                Content = new ObjectContent<List<Zone>>(
+                Content = new ObjectContent<List<ZoneModel>>(
                     zones,  // data
                     result.Formatter, // media formatter
                     result.MediaType.MediaType // MIME type
@@ -123,7 +123,7 @@ namespace Inventorization.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage Create([FromBody]Zone zone)
+        public HttpResponseMessage Create([FromBody]ZoneModel zone)
         {
             zone.Name = "Зона " + zone.Code;
             zone.Id = Guid.NewGuid();

@@ -164,8 +164,8 @@ namespace Inventorization.Data
                 using (var cmd = new NpgsqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = @"SELECT * FROM items
-                        WHERE items.""Id"" = @ItemId";
+                    cmd.CommandText = @"SELECT * FROM public.""Item""
+                        WHERE ""Id"" = @ItemId";
                     cmd.Parameters.Add(new NpgsqlParameter("ItemId", itemId));
                     using (var reader = cmd.ExecuteReader())
                     {

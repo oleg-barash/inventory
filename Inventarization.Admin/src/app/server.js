@@ -9,7 +9,7 @@ import routes from './routes';
 import { CookiesProvider } from 'react-cookie';
 import cookiesMiddleware from 'universal-cookie-express'
 const app = express();
-app.use(express.static('public'));
+app.use(express.static('www'));
 app.use(cookiesMiddleware());
 app.use((req, res) => {
     match({ routes, location: req.url }, (error, redirectLocation, renderProps) => {

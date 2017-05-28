@@ -15,9 +15,12 @@ const styles = {
 
 
 class NewItemPage extends AuthorizedComponent {
+    constructor(props) {
+        super(props);
+    }
    componentDidMount() {
-        const { dispatch } = this.props
-        const { id, inventorization } = this.props.location.query
+        const { dispatch, inventorization } = this.props
+        const { id } = this.props.location.query
         if (id != undefined){
             dispatch(loadCurrentItem(id, inventorization.Id));
         }

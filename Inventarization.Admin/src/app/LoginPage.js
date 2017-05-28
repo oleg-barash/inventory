@@ -57,7 +57,9 @@ class LoginPage extends Component {
 
       if (!!this.props.userInfo && (this.props.userInfo.IsAuthorized === true)){
         if (this.props.userInfo.SelectedInventorization !== undefined){
-          browserHistory.push('/items')
+          if (browserHistory){ //TODO: надо подумать, как сделать работу с browserHistory на стороне сервера
+            browserHistory.push('/items')
+          }
         }
         else if (!this.props.userInfo.isInventorizationDialogOpened){
           dispatch(openInventorizationDialog())

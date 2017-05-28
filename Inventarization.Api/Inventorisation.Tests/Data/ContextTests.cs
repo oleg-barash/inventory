@@ -81,13 +81,13 @@ namespace Inventorization.Tests.Data
             Company company = companyRepositoriy.CreateCompany("Тест1");
             Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, DateTime.UtcNow);
             Guid firstZoneId = Guid.NewGuid();
-            Zone firstZone = new Zone()
+            ZoneModel firstZone = new ZoneModel()
             {
                 Id = firstZoneId,
                 Name = "тестовая зона 1"
             };
             zoneRepository.Create(firstZone);
-            List<Zone> zones = zoneRepository.GetZones(new Guid[] { firstZoneId });
+            List<ZoneModel> zones = zoneRepository.GetZones(new Guid[] { firstZoneId });
 
             Assert.IsNotNull(zones);
             Assert.AreEqual(1, zones.Count());
@@ -131,7 +131,7 @@ namespace Inventorization.Tests.Data
             Company company = companyRepositoriy.CreateCompany("Тест1");
             Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, DateTime.UtcNow);
             Guid firstZoneId = Guid.NewGuid();
-            Zone firstZone = new Zone()
+            ZoneModel firstZone = new ZoneModel()
             {
                 Id = firstZoneId,
                 Name = "тестовая зона 1"

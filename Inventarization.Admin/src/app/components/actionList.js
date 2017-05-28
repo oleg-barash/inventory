@@ -6,31 +6,11 @@ import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'mater
 import ActionRow from '../components/actionRow';
 import { connect } from 'react-redux'
 import TextField from 'material-ui/TextField';
-import { filterActions } from '../actions/actionActions'
-const getActions = (items, filter) => {
-    if (items == undefined){
-        return [];
-    }
-    var result = items;
-    if (filter !== undefined){
-        if (filter.ZoneName !== undefined){
-            result = result.filter((item) => {
-                return item.Zone.ZoneName.toUpperCase().startsWith(filter.ZoneName.toUpperCase());
-            })
-        }
-        if (filter.Code !== undefined){
-            result = result.filter((item) => {
-                return item.BarCode.toUpperCase().startsWith(filter.Code.toUpperCase());
-            })
-        }
-    }
-    return result;
-}
-
+import { filterActions, updateActionsFilter } from '../actions/actionActions'
 
 const mapStateToProps = (state) => {
     return {
-        actions: getActions(state.actions.items, state.actions.filter),
+        actions: state.actions.filtredActions,
         filter: state.actions.filter
     }
 }
@@ -44,10 +24,10 @@ class ActionList extends Component {
         var {actions, dispatch} = this.props;
         var objectClosure = this;
         function handleZoneChange(event) {
-            objectClosure.props.dispatch(filterActions({ ZoneName: event.target.value }))
+            objectClosure.props.dispatch(updateActionsFilter({ ZoneName: event.target.value }))
         };
         function handleCodeChange(event) {
-            objectClosure.props.dispatch(filterActions({ Code: event.target.value }))
+            objectClosure.props.dispatch(updateActionsFilter({ Code: event.target.value }))
         };
         return (
             <div>

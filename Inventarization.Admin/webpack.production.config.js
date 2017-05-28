@@ -20,7 +20,8 @@ const configs = [{
         new webpack.DefinePlugin({
             'process.env':{
                 'NODE_ENV': JSON.stringify('production'),
-                'PORT': 91
+                'PORT': 91,
+                'ASSETS_URL': JSON.stringify('http://193.124.113.47:82/')
             }
         }),
         // Minify the bundle

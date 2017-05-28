@@ -5,7 +5,7 @@ import React, { PropTypes } from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Items from './containers/items'
 import AllActions from './containers/allActions'
-import { filterActions } from './actions/actionActions'
+import { updateActionsFilter } from './actions/actionActions'
 import { connect } from 'react-redux'
 
 import AuthorizedComponent from './components/authorizedComponent'
@@ -22,12 +22,11 @@ const styles = {
 
 class ActionListPage extends AuthorizedComponent {
     constructor(props) {
-        debugger
         super(props);
     }
     componentDidMount() {
         const { ZoneName, Code } = this.props.location.query
-        this.props.dispatch(filterActions({ZoneName, Code}))
+        this.props.dispatch(updateActionsFilter({ZoneName, Code}))
     }
     render() {
         return (

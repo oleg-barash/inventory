@@ -15,6 +15,9 @@ const styles = {
 
 
 class ActionPage extends AuthorizedComponent {
+  constructor(props) {
+    super(props);
+  }
   componentDidMount() {
         const { dispatch } = this.props
         const { id } = this.props.location.query

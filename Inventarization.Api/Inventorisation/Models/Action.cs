@@ -11,6 +11,7 @@ namespace Inventorization.Api.Models
         public Guid Id { get; set; }
         public DateTime DateTime { get; set; }
         public ActionType Type { get; set; }
+        public Guid Inventorization { get; set; }
         public string User { get; set; }
         public string BarCode { get; set; }
         public ZoneViewModel Zone { get; set; }
@@ -21,7 +22,7 @@ namespace Inventorization.Api.Models
         
     }
 
-    public class CreateActionVM
+    public class SaveActionVM
     {
         public Guid? Id { get; set; }
         public DateTime? DateTime { get; set; }
@@ -29,7 +30,7 @@ namespace Inventorization.Api.Models
         public string BarCode { get; set; }
         public int Quantity { get; set; }
         public string Description { get; set; }
-        public ZoneViewModel Zone { get; set; }
+        public Guid Zone { get; set; }
     }
 
     public class DeleteModel

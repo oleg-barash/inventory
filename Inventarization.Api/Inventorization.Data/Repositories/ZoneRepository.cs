@@ -16,7 +16,7 @@ namespace Inventorization.Data
             _connectionString = connectionString;
         }
 
-        public void Create(Zone zone)
+        public void Create(ZoneModel zone)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -34,7 +34,7 @@ namespace Inventorization.Data
             }
         }
 
-        public void Update(Zone zone)
+        public void Update(ZoneModel zone)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -53,9 +53,9 @@ namespace Inventorization.Data
         }
 
 
-        public List<Zone> GetZones()
+        public List<ZoneModel> GetZones()
         {
-            List<Zone> result = new List<Zone>();
+            List<ZoneModel> result = new List<ZoneModel>();
             using (var conn = new NpgsqlConnection(_connectionString))
             {
                 conn.Open();
@@ -75,9 +75,9 @@ namespace Inventorization.Data
             return result;
         }
 
-        public List<Zone> GetZones(Guid[] ids)
+        public List<ZoneModel> GetZones(Guid[] ids)
         {
-            List<Zone> result = new List<Zone>();
+            List<ZoneModel> result = new List<ZoneModel>();
             using (var conn = new NpgsqlConnection(_connectionString))
             {
                 conn.Open();
@@ -102,9 +102,9 @@ namespace Inventorization.Data
             return result;
         }
 
-        public List<Zone> GetAllZones()
+        public List<ZoneModel> GetAllZones()
         {
-            List<Zone> result = new List<Zone>();
+            List<ZoneModel> result = new List<ZoneModel>();
             using (var conn = new NpgsqlConnection(_connectionString))
             {
                 conn.Open();
@@ -127,7 +127,7 @@ namespace Inventorization.Data
         }
 
 
-        public Zone GetZone(Guid id)
+        public ZoneModel GetZone(Guid id)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -147,7 +147,7 @@ namespace Inventorization.Data
             }
         }
 
-        public Zone GetZone(string code)
+        public ZoneModel GetZone(string code)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {

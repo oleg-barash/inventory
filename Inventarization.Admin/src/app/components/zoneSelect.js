@@ -8,7 +8,7 @@ const mapStateToProps = (state) => {
 }
 const zoneDataSourceConfig = {
   text: 'ZoneName',
-  value: 'ZoneStatusId',
+  value: 'ZoneId',
 };
 class ZoneSelect extends Component {
     constructor(props) {

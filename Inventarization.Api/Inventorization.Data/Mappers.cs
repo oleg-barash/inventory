@@ -76,9 +76,9 @@ namespace Inventorization.Data
             };
         }
 
-        public static Zone ToZone(this NpgsqlDataReader reader)
+        public static ZoneModel ToZone(this NpgsqlDataReader reader)
         {
-            return new Zone()
+            return new ZoneModel()
             {
                 Id = reader.GetGuid(0),
                 Name = reader.GetString(1),

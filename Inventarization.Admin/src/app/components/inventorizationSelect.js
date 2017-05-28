@@ -17,12 +17,15 @@ const inventorizationDataSourceConfig = {
 };
 
 class InventorizationSelect extends AuthorizedComponent {
+    constructor(props) {
+        super(props);
+    }
     render() {
         let { inventorization, 
             onInventorizationChanged, 
             errorText 
         } = this.props;
-        let items = this.props.availabledInventorizations.map(item => <MenuItem value={item} primaryText={item.Id} />);
+        let items = this.props.availabledInventorizations.map(item => <MenuItem key={item.Id} value={item} primaryText={item.Id} />);
         return (
             <SelectField floatingLabelText="Инвентаризация" value={inventorization} onChange={onInventorizationChanged}>
                 {items}

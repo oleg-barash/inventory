@@ -31,7 +31,7 @@ class ItemListPage extends AuthorizedComponent {
     return (
           <div>
               <h2 style={styles.headline}>Товары</h2>
-              <Items cookies={this.props.cookies}/>
+              <Items/>
           </div>
     )};
 }

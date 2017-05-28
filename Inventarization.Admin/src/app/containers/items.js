@@ -36,7 +36,7 @@ const mapStateToProps = (state) => {
         filter: state.items.filter,
         dispatch: state.dispatch,
         userInfo: state.auth,
-        availabledZones: state.zones
+        availabledZones: state.zones.items
     }
 }
 const styles = {
@@ -76,7 +76,6 @@ class Items extends AuthorizedComponent {
         if (!objectClosure.props.userInfo.SelectedInventorization){
             return null;
         }
-
         if (!this.props.availabledZones || this.props.availabledZones.length == 0){
             objectClosure.props.dispatch(fetchZones(objectClosure.props.userInfo.SelectedInventorization.Id));
         }
@@ -126,7 +125,7 @@ class Items extends AuthorizedComponent {
         }
 
         function onImport () {
-            objectClosure.props.dispatch(importItems(itemsToUpload, userInfo.SelectedInventorization.Company))
+            objectClosure.props.dispatch(importItems(itemsToUpload, objectClosure.props.userInfo.SelectedInventorization.Company))
         };
 
         function updateProgress(evt) {

@@ -43,7 +43,6 @@ function authCookies({ getState }) {
             case LOGIN_FINISHED:
             case INVENTORIZATION_SELECTED:
             case CLOSE_INVENTORIZATION_DIALOG:
-                debugger
                 document.cookie = 'credentials=' + escape(JSON.stringify(state.auth));
                 break
             case LOGOUT:

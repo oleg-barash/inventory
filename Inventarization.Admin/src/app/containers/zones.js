@@ -9,7 +9,7 @@ import { fetchZones } from '../actions/zoneActions'
 const mapStateToProps = (state) => {
     return {
         zones: state.zones.items,
-        inventorization: state.auth.SelectInventorization
+        inventorization: state.auth.SelectedInventorization
     }
 }
 

@@ -10,6 +10,7 @@ const mapStateToProps = (state) => {
 }
 class UserControl extends AuthorizedComponent{
     constructor(props) {
+        debugger
         super(props);
     }
     render(){

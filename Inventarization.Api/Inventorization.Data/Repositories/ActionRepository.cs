@@ -54,14 +54,31 @@ namespace Inventorization.Data
                     cmd.Parameters.Add(new NpgsqlParameter("Id", id));
                     using (var reader = cmd.ExecuteReader())
                     {
-                        while (reader.Read())
-                        {
-                            return reader.ToAction();
-                        }
+                        reader.Read();
+                        return reader.ToAction();
                     }
                 }
             }
-            return null;
+        }
+
+        public bool ActionExists(Guid id)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+
+                    cmd.CommandText = @"SELECT * FROM public.""Actions""
+                                    WHERE ""Id"" =  @Id";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", id));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        return reader.HasRows;
+                    }
+                }
+            }
         }
 
         public List<Business.Model.Action> GetActionsByInventorization(Guid inventarisation)

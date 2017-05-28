@@ -36,17 +36,21 @@ function _applyFilter(items, filter){
                     return details.some(x => x.Zone === filter.zone.ZoneName);
                 })
             }
-
             if (filter.devation !== undefined){
-                result = _.filter(result, (item) => {
-                    return item.QuantityPlan - item.QuantityFact >= filter.devation
-                });
+                let devation = parseInt(filter.devation);
+                if (!isNaN(devation)){
+                    result = _.filter(result, (item) => {
+                        return item.QuantityPlan - item.QuantityFact >= devation
+                    });
+                }
             }
             if (filter.priceDevation !== undefined){
                 let priceDevation = parseInt(filter.priceDevation);
-                result = _.filter(result, (item) => {
-                    return item.QuantityPlan*item.Price - item.QuantityFact*item.Price >= priceDevation
-                });
+                if (!isNaN(priceDevation)){
+                    result = _.filter(result, (item) => {
+                        return item.QuantityPlan*item.Price - item.QuantityFact*item.Price >= priceDevation
+                    });
+                }
             }
 
             return _.take(result, filter.pageSize * filter.currentPage);

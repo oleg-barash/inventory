@@ -62,7 +62,7 @@ class ZoneRow extends Component {
                 <TableRowColumn style={{width: '100px'}}>{zone.OpenedAt == undefined ? "не открыта" : moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
                 <TableRowColumn >
-                    <FlatButton disabled={zone.ClosedAt != undefined}
+                    <FlatButton disabled={zone.Status == ZoneStatuses.Closed || zone.Status == ZoneStatuses.NotOpened}
                         hoverColor={blue}
                         icon={<Add/>}
                         onClick={newAction}
@@ -72,7 +72,7 @@ class ZoneRow extends Component {
                         icon={<Replay/>}
                         onClick={openFunc}
                     />
-                    <FlatButton disabled={zone.ClosedAt != undefined}
+                    <FlatButton disabled={zone.Status == ZoneStatuses.Closed || zone.Status == ZoneStatuses.NotOpened}
                         hoverColor={green}
                         icon={<Done/>}
                         onClick={closeFunc}
@@ -98,7 +98,7 @@ ZoneRow.propTypes = {
 
 const mapStateToProps = (state) => {
     return {
-        inventorization: state.SelectInventorization
+        inventorization: state.auth.SelectedInventorization
     }
 }
 

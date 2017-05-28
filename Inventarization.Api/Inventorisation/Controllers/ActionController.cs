@@ -41,7 +41,7 @@ namespace Inventorization.Api.Controllers
 
             var zoneVm = new ZoneViewModel()
             {
-                ZoneStatusId = zone.Id,
+                ZoneId = zone.Id,
                 Code = zone.Code,
                 ClosedAt = foundState?.ClosedAt,
                 ClosedBy = foundState?.ClosedBy,
