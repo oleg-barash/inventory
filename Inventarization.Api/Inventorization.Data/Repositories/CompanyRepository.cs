@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Inventorization.Data
 {
-    public class CompanyRepository
+    public class CompanyRepository : ICompanyRepository
     {
 
         private string _connectionString;

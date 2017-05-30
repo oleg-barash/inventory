@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Inventorization.Business
+namespace Inventorization.Api.ViewModels
 {
     public class ActionZoneDetails
     {

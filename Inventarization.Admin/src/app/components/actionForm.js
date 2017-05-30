@@ -89,6 +89,7 @@ class ActionForm extends Component {
                     searchText={action.BarCode} 
                     floatingLabelText="Укажите код товара" 
                     dataSource={this.props.availabledItems}
+                    visible={action.Type == 0}
                     onNewRequest={onItemChange} 
                     dataSourceConfig={itemDataSourceConfig}
                     filter={(searchText, key) => (key.startsWith(searchText))}
@@ -103,6 +104,7 @@ class ActionForm extends Component {
                     floatingLabelText="Укажите наименование товара" 
                     dataSource={this.props.availabledItems}
                     onNewRequest={onItemChange} 
+                    visible={action.Type == 0}
                     dataSourceConfig={itemNameDataSourceConfig}
                     filter={(searchText, key) => (key.indexOf(searchText) != -1)}
                     errorText={action != null ? action.NameError || '' : '' }
@@ -120,7 +122,7 @@ class ActionForm extends Component {
                         onChange={onTypeChange}
                     >
                     <MenuItem value={0} primaryText="Первое сканирование" />
-                    <MenuItem value={1} primaryText="Повторное сканирование" />
+                    <MenuItem value={1} primaryText="Слепой просчёт" />
                     </SelectField>
                 <Divider />
                 <FlatButton label="Назад" onClick={goBack} />
