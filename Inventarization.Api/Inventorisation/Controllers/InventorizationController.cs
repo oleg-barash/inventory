@@ -1,6 +1,7 @@
 ﻿using Inventorization.Api.Formatters;
 using Inventorization.Api.Models;
 using Inventorization.Api.ViewModels;
+using Inventorization.Business;
 using Inventorization.Business.Model;
 using Inventorization.Data;
 using Newtonsoft.Json;
@@ -219,7 +220,7 @@ namespace Inventorization.Api.Controllers
 
         [HttpPost]
         [Route("{inventorization}/action")]
-        public HttpResponseMessage SaveAction(Guid inventorization, [FromBody]ViewModels.Action actionVM)
+        public HttpResponseMessage SaveAction(Guid inventorization, [FromBody]ViewModels.SaveActionVM actionVM)
         {
             try
             {
@@ -227,8 +228,7 @@ namespace Inventorization.Api.Controllers
                 Business.Model.Action action = new Business.Model.Action()
                 {
                     BarCode = actionVM.BarCode,
-                    DateTime = actionVM.DateTime,
-                    Id = actionVM.Id,
+                    DateTime = actionVM.DateTime.GetValueOrDefault(),
                     Inventorization = inventorization,
                     Quantity = actionVM.Quantity,
                     Type = actionVM.Type,
@@ -249,6 +249,7 @@ namespace Inventorization.Api.Controllers
                 }
                 if (actionExists)
                 {
+                    action.Id = actionVM.Id.GetValueOrDefault();
                     _actionRepository.UpdateAction(action);
                 }
                 else
@@ -326,7 +327,7 @@ namespace Inventorization.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            ViewModels.Item res = new ViewModels.Item();
+            Business.Item res = new Business.Item();
             res.QuantityPlan = item.Quantity;
             res.BarCode = item.Code;
             res.Description = item.Description;
@@ -367,7 +368,7 @@ namespace Inventorization.Api.Controllers
 
             var result = items.Select(x =>
             {
-                ViewModels.Item res = new ViewModels.Item();
+                Business.Item res = new Business.Item();
                 res.QuantityPlan = x.Quantity;
                 res.BarCode = x.Code;
                 res.Description = x.Description;

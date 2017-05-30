@@ -91,6 +91,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Business\Report17GeneratorTests.cs" />
     <Compile Include="Data\ContextTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -101,6 +102,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Inventorisation\Inventorization.Api.csproj">
+      <Project>{9B2967F9-8CAF-4286-88A6-78B6C37F24C7}</Project>
+      <Name>Inventorization.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Inventorization.Business\Inventorization.Business.csproj">
       <Project>{d5a8938b-62aa-4faa-92b3-bdf51d242713}</Project>
       <Name>Inventorization.Business</Name>
