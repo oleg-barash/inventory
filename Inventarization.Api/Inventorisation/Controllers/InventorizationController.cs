@@ -6,6 +6,7 @@ using Inventorization.Business.Domains;
 using Inventorization.Business.Interfaces;
 using Inventorization.Business.Model;
 using Inventorization.Data;
+using Microsoft.Owin;
 using Newtonsoft.Json;
 using NLog;
 using System;
@@ -15,11 +16,13 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
 namespace Inventorization.Api.Controllers
 {
+    //[Authorize]
     [EnableCors("*", "*", "*")]
     [RoutePrefix("api/inventorization")]
     public class InventorizationController : ApiController
@@ -110,6 +113,9 @@ namespace Inventorization.Api.Controllers
             //return response;
             try
             {
+                IOwinContext ctx = Request.GetOwinContext();
+                ClaimsPrincipal user = ctx.Authentication.User;
+                IEnumerable<Claim> claims = user.Claims;
                 List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorization).Where(x => x.ZoneId != Guid.Empty).ToList();
                 List<ZoneModel> zones = _zoneRepository.GetAllZones().OrderBy(x => x.Name).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK, zones.Select(x => {
@@ -153,8 +159,8 @@ namespace Inventorization.Api.Controllers
                         zone.Code = realCode;
                         _zoneRepository.Create(zone);
                     }
-
-                    _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
+                    var userClaims = Request.GetOwinContext().Authentication.User;
+                    _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value));
                     state = _inventorizationRepository.GetZoneState(inventorization, zone.Id);
                 }
                 if (state.ClosedAt.HasValue && state.ClosedAt.Value.ToUniversalTime() < DateTime.UtcNow)
@@ -165,7 +171,7 @@ namespace Inventorization.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Open zone error. Zone code:{Environment.NewLine} {JsonConvert.SerializeObject(code)}. InventorizationId: {inventorization}");
+                _logger.Error(ex, $"Open zone error. Zone code:{code}. InventorizationId: {inventorization}");
             }
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -178,7 +184,8 @@ namespace Inventorization.Api.Controllers
             {
                 ZoneModel zone = _zoneRepository.GetZone(code);
                 ZoneState state = _inventorizationRepository.GetZoneState(inventorization, code);
-                _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
+                var userClaims = Request.GetOwinContext().Authentication.User;
+                _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value));
                 state = _inventorizationRepository.GetZoneState(inventorization, code);
                 return Request.CreateResponse(HttpStatusCode.OK, zone);
             }
@@ -198,7 +205,8 @@ namespace Inventorization.Api.Controllers
                 ZoneState state = _inventorizationRepository.GetZoneState(inventorization, zone.ZoneId);
                 if (state != null)
                 {
-                    _inventorizationRepository.CloseZone(state, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"));
+                    var userClaims = Request.GetOwinContext().Authentication.User;
+                    _inventorizationRepository.CloseZone(state, Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value));
                     return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
                 }
                 return Request.CreateResponse(HttpStatusCode.Forbidden, new { Result = "Error", Reason = "Зона не была открыта" });
@@ -226,11 +234,13 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles="admin")]
         [Route("{inventorization}/action")]
         public HttpResponseMessage SaveAction(Guid inventorization, [FromBody]SaveActionVM actionVM)
         {
             try
             {
+                var userClaims = Request.GetOwinContext().Authentication.User;
 
                 Business.Model.Action action = new Business.Model.Action()
                 {
@@ -240,13 +250,17 @@ namespace Inventorization.Api.Controllers
                     Quantity = actionVM.Quantity,
                     Type = actionVM.Type,
                     Zone = actionVM.Zone,
-                    UserId = actionVM.User// Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3")
+                    UserId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value)
                 };
                 actionDomain.UpsertAction(action);
-                var inventarization = _inventorizationRepository.GetInventorization(inventorization);
-                List<Business.Model.Item> items = _companyRepository.GetItems(inventarization.Company);
-                Business.Model.Item foundItem = items.FirstOrDefault(x => x.Code == action.BarCode);
-                return Request.CreateResponse(HttpStatusCode.OK, new { foundItem });
+
+                if (actionVM.Type == ActionType.FirstScan)
+                {
+                    var inventarization = _inventorizationRepository.GetInventorization(inventorization);
+                    List<Business.Model.Item> items = _companyRepository.GetItems(inventarization.Company);
+                    Business.Model.Item foundItem = items.FirstOrDefault(x => x.Code == action.BarCode);
+                    return Request.CreateResponse(HttpStatusCode.OK, new { foundItem });
+                }
             }
             catch (Exception ex)
             {
@@ -254,6 +268,7 @@ namespace Inventorization.Api.Controllers
                 _logger.Error(ex, message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpGet]

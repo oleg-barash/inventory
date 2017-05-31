@@ -27,6 +27,7 @@
     "webpack-dev-server": "^2.4.1"
   },
   "dependencies": {
+    "axios": "^0.16.1",
     "babel-polyfill": "^6.23.0",
     "cookie-parser": "^1.4.3",
     "es6-promise": "^4.1.0",

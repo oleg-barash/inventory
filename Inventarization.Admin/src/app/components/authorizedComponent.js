@@ -11,20 +11,14 @@ import { Cookies } from 'react-cookie';
 class AuthorizedComponent extends Component {
   componentWillMount() {
     const { userInfo, dispatch, cookies } = this.props;
-    if (!userInfo || !userInfo.IsAuthorized) {
-        let user = cookies.get('credentials');
-        if (!user || !user.IsAuthorized){
-          if (this.props.router){
-            this.props.router.push('/login');
-          }
-          if (browserHistory){
-            browserHistory.push('/login');
-          }
-          return null;
-        }
-        else{
-          dispatch(loginFinished(user));
-        }
+    if (userInfo == undefined || userInfo.IsAuthorized === false){
+      if (this.props.router){
+        this.props.router.push('/login');
+      }
+      if (browserHistory){
+        browserHistory.push('/login');
+      }
+      return null;
     }
 
     // get all roles available for this route

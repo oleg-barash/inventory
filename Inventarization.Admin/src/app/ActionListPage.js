@@ -41,5 +41,12 @@ ActionListPage.propTypes = {
     dispatch: PropTypes.func.isRequired
 }
 
-export default connect()(ActionListPage)
+const mapStateToProps = (state) => {
+    return {
+        userInfo: state.auth,
+        dispatch: state.dispatch
+    }
+}
+
+export default connect(mapStateToProps)(ActionListPage)
 

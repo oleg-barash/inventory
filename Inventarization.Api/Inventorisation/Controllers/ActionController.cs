@@ -1,5 +1,6 @@
 ﻿using Inventorization.Api.Models;
 using Inventorization.Api.ViewModels;
+using Inventorization.Business.Interfaces;
 using Inventorization.Business.Model;
 using Inventorization.Data;
 using System;
@@ -16,12 +17,12 @@ namespace Inventorization.Api.Controllers
     [RoutePrefix("api/action")]
     public class ActionController : ApiController
     {
-        private ActionRepository _actionRepository;
-        private ZoneRepository _zoneRepository;
-        private CompanyRepository _companyRepository;
-        private InventorizationRepository _inventorizationRepository;
+        private IActionRepository _actionRepository;
+        private IZoneRepository _zoneRepository;
+        private ICompanyRepository _companyRepository;
+        private IInventorizationRepository _inventorizationRepository;
         
-        public ActionController(ActionRepository actionRepository, ZoneRepository zoneRepository, CompanyRepository companyRepository, InventorizationRepository inventorizationRepository)
+        public ActionController(IActionRepository actionRepository, IZoneRepository zoneRepository, ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository)
         {
             _actionRepository = actionRepository;
             _zoneRepository = zoneRepository;
@@ -56,7 +57,7 @@ namespace Inventorization.Api.Controllers
                 DateTime = action.DateTime,
                 Quantity = action.Quantity,
                 Type = action.Type,
-                //User = "тестовый",
+                User = action.UserId.ToString(),
                 Zone = zoneVm,
                 BarCode = action.BarCode,
                 FoundInItems = foundItem != null,
@@ -70,7 +71,7 @@ namespace Inventorization.Api.Controllers
         [Route("{id}")]
         public HttpResponseMessage Update(Guid id, [FromBody]Business.Model.Action action)
         {
-            _actionRepository.UpdateAction(id, Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3"), action.Quantity);
+            _actionRepository.UpdateAction(id, action.UserId, action.Quantity);
             return Request.CreateResponse(HttpStatusCode.OK, action);
         }
 

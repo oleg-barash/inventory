@@ -10,13 +10,12 @@ const mapStateToProps = (state) => {
 }
 class UserControl extends AuthorizedComponent{
     constructor(props) {
-        debugger
         super(props);
     }
     render(){
         let { userInfo } = this.props;
-        if (userInfo && userInfo.IsAuthorized === true){ 
-            return(<LoggedButton/>);
+        if (userInfo && userInfo.IsAuthorized){ 
+            return(<LoggedButton cookies={this.props.cookies}/>);
         }
         return(<LoginButton/>);
     }

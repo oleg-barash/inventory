@@ -27,16 +27,20 @@ function hash(string){
 export function login(username, password){
     return function (dispatch){
         dispatch(loginInProcess())
-        let userInfo = { Username: username, Password: /*hash(*/password/*)*/ };
+    let userInfo = { Username: username, Password: /*hash(*/password/*)*/ };
+    debugger
         return fetch(process.env.API_URL + 'user/login', 
             {  
                 method: "POST",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    "Accept": 'application/json',
+                    "Content-Type": 'application/json'
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify(userInfo)})
-            .then(response => response.json())
+            .then(response => {
+                return response.json()
+            })
             .then(json => {
                 dispatch(loginFinished(json))
             })
@@ -51,8 +55,13 @@ export function passwordChanged(passwordValue){
 }
 
 export function logout(){
-    return {
-        type: LOGOUT
+    return function (dispatch){
+        return fetch(process.env.API_URL + 'user/logout', { method: 'POST'})
+            .then(json => {
+                return {
+                    type: LOGOUT
+                }
+            })
     }
 }
 

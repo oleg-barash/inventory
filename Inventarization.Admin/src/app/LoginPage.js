@@ -28,17 +28,15 @@ const mapStateToProps = (state) => {
 
 class LoginPage extends Component {
    componentWillMount() {
-     const { cookies } = this.props;
-     const user = cookies.get('credentials');
-     if (user){
-       if (user.IsAuthorized === true){
+     const { cookies, userInfo } = this.props;
+     const user = Object.assign({}, userInfo, cookies.get('userData'));
+     if (user && user.IsAuthorized){
         if (user.SelectedInventorization){
           this.props.dispatch(loginFinished(user));
         }
         else{
           this.props.dispatch(openInventorizationDialog());
         }
-       }
      }
   }
   render(){
@@ -55,13 +53,13 @@ class LoginPage extends Component {
         dispatch(passwordChanged(value));
       }
 
-      if (!!this.props.userInfo && (this.props.userInfo.IsAuthorized === true)){
-        if (this.props.userInfo.SelectedInventorization !== undefined){
+      if (!!userInfo && userInfo.IsAuthorized){
+        if (userInfo.SelectedInventorization !== undefined){
           if (browserHistory){ //TODO: надо подумать, как сделать работу с browserHistory на стороне сервера
             browserHistory.push('/items')
           }
         }
-        else if (!this.props.userInfo.isInventorizationDialogOpened){
+        else if (!userInfo.isInventorizationDialogOpened){
           dispatch(openInventorizationDialog())
         }
       }

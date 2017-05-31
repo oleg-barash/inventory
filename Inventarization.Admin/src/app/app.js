@@ -22,7 +22,6 @@ import throttle from "redux-throttle";
 import UserControl from './components/userControl'
 import InventorizationDialog from './components/inventorizationDialog'
 import { withCookies } from 'react-cookie';
-import Cookies from 'js-cookie';
 import { LOGIN_FINISHED, LOGOUT, INVENTORIZATION_SELECTED, CLOSE_INVENTORIZATION_DIALOG } from './constants/actionTypes'
 import { browserHistory } from 'react-router'
 
@@ -43,10 +42,9 @@ function authCookies({ getState }) {
             case LOGIN_FINISHED:
             case INVENTORIZATION_SELECTED:
             case CLOSE_INVENTORIZATION_DIALOG:
-                document.cookie = 'credentials=' + escape(JSON.stringify(state.auth));
+                browserHistory.push('/items');
                 break
             case LOGOUT:
-                document.cookie = 'credentials=';
                 browserHistory.push('/login');
                 break
         }

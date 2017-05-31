@@ -1,4 +1,5 @@
-﻿using Inventorization.Business.Model;
+﻿using Inventorization.Business.Interfaces;
+using Inventorization.Business.Model;
 using Npgsql;
 using System;
 using System.Collections.Generic;

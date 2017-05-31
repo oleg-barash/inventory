@@ -8,6 +8,11 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using Inventorization.Api.ViewModels;
+using System.Threading.Tasks;
+using System.Security.Claims;
+using System.Collections.Generic;
+using Inventorization.Business.Interfaces;
+using Microsoft.AspNet.Identity;
 
 namespace Inventorization.Api.Controllers
 {
@@ -16,11 +21,11 @@ namespace Inventorization.Api.Controllers
     public class UserController : ApiController
     {
 
-        private CompanyRepository _companyRepository;
+        private ICompanyRepository _companyRepository;
         private UserRepository _userRepository;
-        private InventorizationRepository _inventorizationRepository;
+        private IInventorizationRepository _inventorizationRepository;
 
-        public UserController(CompanyRepository companyRepository, InventorizationRepository inventorizationRepository, UserRepository userRepository)
+        public UserController(ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository, UserRepository userRepository)
         {
             _companyRepository = companyRepository;
             _inventorizationRepository = inventorizationRepository;
@@ -33,9 +38,7 @@ namespace Inventorization.Api.Controllers
         public HttpResponseMessage Login([FromBody] LoginModel loginInfo)
         {
             UserInfo info = new UserInfo();
-            info.IsAuthorized = false;
-            if (string.IsNullOrWhiteSpace(loginInfo.Password) 
-                || string.IsNullOrWhiteSpace(loginInfo.Username))
+            if (string.IsNullOrWhiteSpace(loginInfo.Password) || string.IsNullOrWhiteSpace(loginInfo.Username))
             {
                 info.Error = "Необходимо указать логин и пароль";
                 return Request.CreateResponse(HttpStatusCode.OK, info);
@@ -48,19 +51,33 @@ namespace Inventorization.Api.Controllers
                     info.IsAuthorized = true;
                     info.FullName = $"{user.FirstName} {user.FamilyName}";
                     info.Inventorizations = _inventorizationRepository.GetInventorizations();
+                    var claims = new List<Claim> {
+                        new Claim(ClaimTypes.Sid, user.Id.ToString()),
+                        new Claim(ClaimTypes.Name,loginInfo.Username),
+                        new Claim(ClaimTypes.Role, "admin")
+                    };
+                    Request.GetOwinContext().Authentication.SignIn(new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie));
                     return Request.CreateResponse(HttpStatusCode.OK, info);
                 }
                 info.Error = "Неверно указан логин или пароль";
             }
             catch (UserLoadingException ex)
             {
-                info.Error = "Неверно указан логин или пароль";
+                info.Error = "Пользователь не найден";
             }
             catch (Exception ex)
             {
                 info.Error = $"Произошла непредвиденная ошибка";
             }
             return Request.CreateResponse(HttpStatusCode.OK, info);
+        }
+
+        [Route("logout")]
+        [HttpPost]
+        public HttpResponseMessage Logout()
+        {
+            Request.GetOwinContext().Authentication.SignOut();
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
     }
 }
