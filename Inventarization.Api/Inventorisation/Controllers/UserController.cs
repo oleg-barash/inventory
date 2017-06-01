@@ -50,12 +50,15 @@ namespace Inventorization.Api.Controllers
                 {
                     info.IsAuthorized = true;
                     info.FullName = $"{user.FirstName} {user.FamilyName}";
+                    info.Username = user.Login;
+                    info.Password = user.Login;
                     info.Inventorizations = _inventorizationRepository.GetInventorizations();
                     var claims = new List<Claim> {
                         new Claim(ClaimTypes.Sid, user.Id.ToString()),
                         new Claim(ClaimTypes.Name,loginInfo.Username),
                         new Claim(ClaimTypes.Role, "admin")
                     };
+
                     Request.GetOwinContext().Authentication.SignIn(new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie));
                     return Request.CreateResponse(HttpStatusCode.OK, info);
                 }

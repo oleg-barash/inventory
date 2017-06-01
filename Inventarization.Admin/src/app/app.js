@@ -36,15 +36,21 @@ const throttleMiddleware = throttle(defaultWait, defaultThrottleOption);
 function authCookies({ getState }) {
   return (next) => (action) => {
     let returnValue = next(action)
-    if (typeof document !== "undefined"){ // на сервере фиг знает как выставить куки в middleware
+    if (typeof document !== "undefined"){ // на сервере фиг знает как выставить куки в этом middleware
         let state = getState();
         switch (action.type){
             case LOGIN_FINISHED:
+                debugger;
+                action.userInfo.Token = "Basic " + btoa(action.userInfo.Username + ":" + action.userInfo.Password)
+                state.auth = action.userInfo
+                document.cookie = "UserData=" + JSON.stringify(action.userInfo)
+                browserHistory.push('/items');
             case INVENTORIZATION_SELECTED:
             case CLOSE_INVENTORIZATION_DIALOG:
                 browserHistory.push('/items');
                 break
             case LOGOUT:
+                document.cookie = ""
                 browserHistory.push('/login');
                 break
         }

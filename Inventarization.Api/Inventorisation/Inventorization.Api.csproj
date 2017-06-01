@@ -244,6 +244,9 @@
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ZonesController.cs" />
+    <Compile Include="MyAuthExtensions.cs" />
+    <Compile Include="MyAuthHandler.cs" />
+    <Compile Include="MyAuthMiddleware.cs" />
     <Compile Include="Support\Extensions\Extensions.cs" />
     <Compile Include="Support\Extensions\Helpers.cs" />
     <Compile Include="Support\Formatters\CSVMediaTypeFormatter.cs" />

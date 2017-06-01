@@ -25,6 +25,7 @@ namespace Inventorization.Api.Controllers
     //[Authorize]
     [EnableCors("*", "*", "*")]
     [RoutePrefix("api/inventorization")]
+    [Authorize]
     public class InventorizationController : ApiController
     {
         private IInventorizationRepository _inventorizationRepository;
@@ -275,6 +276,7 @@ namespace Inventorization.Api.Controllers
         [Route("{inventorizationId}/actions")]
         public HttpResponseMessage GetActions(Guid inventorizationId)
         {
+            var claims = Request.GetOwinContext().Authentication.User;
             var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
             var actions = inventorizationDomain.GetActions(inventorizationId);
             var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());

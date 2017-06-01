@@ -8,9 +8,12 @@ namespace Inventorization.Api.ViewModels
 {
     public class UserInfo
     {
-        public string Error { get; set; }
-        public string FullName { get; set; }
-        public List<Business.Model.Inventorization> Inventorizations { get; set; }
-        public bool IsAuthorized { get; set; }
+        public string Token;
+        public string Error;
+        public string FullName;
+        public List<Business.Model.Inventorization> Inventorizations;
+        public bool IsAuthorized;
+        public string Username;
+        public string Password;
     }
 }

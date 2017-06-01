@@ -90,10 +90,10 @@ function hideLoading(){
     }
 }
 
-export function fetchActions(inventorization){
+export function fetchActions(inventorization, userToken){
     return function (dispatch){
         dispatch(requestActions(inventorization))
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/actions')
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/actions', { headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json =>
                 dispatch(receiveActions(json))

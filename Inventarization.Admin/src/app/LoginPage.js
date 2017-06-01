@@ -39,6 +39,7 @@ class LoginPage extends Component {
         }
      }
   }
+  
   render(){
       let { dispatch, userInfo } = this.props;
       let loginHandler = function(){

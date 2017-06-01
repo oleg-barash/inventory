@@ -8,7 +8,7 @@ import { fetchActions } from '../actions/actionActions'
 
 const mapStateToProps = (state) => {
     return {
-        inventorization: state.auth.SelectedInventorization
+        userInfo: state.auth
     }
 }
 
@@ -17,8 +17,8 @@ class AllActionList extends Component {
         super(props)
     }
     componentDidMount() {
-        const { dispatch, inventorization } = this.props
-        dispatch(fetchActions(inventorization.Id))
+        const { dispatch, inventorization, userInfo } = this.props
+        dispatch(fetchActions(userInfo.SelectedInventorization.Id, userInfo.Token))
     }
     render() {
         return (
