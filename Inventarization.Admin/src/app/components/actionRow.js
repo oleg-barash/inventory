@@ -33,11 +33,11 @@ class ActionRow extends Component {
     }
 
     render() {
-        var {action, dispatch} = this.props;
+        var {action, dispatch, userInfo} = this.props;
         var rowStyle = {backgroundColor: action.FoundInItems ? green : white}
 
         var deleteFunc = function(){
-            dispatch(deleteAction(action))
+            dispatch(deleteAction(action, userInfo.Token))
         }
 
 
@@ -86,6 +86,10 @@ ActionRow.propTypes = {
         Id: PropTypes.string.isRequired,
     }).isRequired
 }
+const mapStateToProps = (state) => {
+    return {
+        userInfo: state.auth
+    }
+}
 
-
-export default connect()(ActionRow)
+export default connect(mapStateToProps)(ActionRow)

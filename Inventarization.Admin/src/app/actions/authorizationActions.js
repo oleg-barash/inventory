@@ -8,6 +8,7 @@ import { LOGIN,
     OPEN_INVENTORIZATION_DIALOG,
     INVENTORIZATION_SELECTED,
     CLOSE_INVENTORIZATION_DIALOG,
+    UPDATE_USER_INFO,
     LOGOUT } from '../constants/actionTypes'
 import {toastr} from 'react-redux-toastr'
 
@@ -93,6 +94,14 @@ export function loginFinished(userInfo){
         userInfo
     }
 }
+
+export function updateUserInfo(userInfo){
+    return {
+        type: UPDATE_USER_INFO,
+        userInfo
+    }
+}
+
 
 function loginInProcess(){
     return {

@@ -22,10 +22,10 @@ export function addItemFromAction(action){
     }
 }
 
-export function loadCurrentAction(id){
+export function loadCurrentAction(id, userToken){
     return function (dispatch){
         dispatch(showLoading())
-        return fetch(process.env.API_URL + 'action?id=' + id)
+        return fetch(process.env.API_URL + 'action?id=' + id, { headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json => {
                 dispatch(hideLoading())
@@ -48,11 +48,12 @@ export function validateAction(actionData){
     }
 }
 
-export function saveAction(action, inventorization){
+export function saveAction(action, inventorization, userToken){
         return function (dispatch){
             return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/action', {
                 method: "POST",
                     headers: {
+                        "Authorization": userToken,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
@@ -101,11 +102,12 @@ export function fetchActions(inventorization, userToken){
     }
 }
 
-export function deleteAction(action){
+export function deleteAction(action, userToken){
     return function (dispatch){
         dispatch(deletingAction(action))
         return fetch(process.env.API_URL + 'action', {method: "DELETE",
             headers: {
+                "Authorization": userToken,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },

@@ -26,6 +26,7 @@ moment.locale("ru-RU")
 const mapStateToProps = (state) => {
     return {
         inventorization: state.auth.SelectedInventorization,
+        userInfo: state.auth,
         action: state.action,
         availabledZones: state.zones.items || [],
         availabledItems: state.items.items || []
@@ -48,12 +49,12 @@ class ActionForm extends Component {
     }
 
     render() {
-        let {action, dispatch, availabledItems, inventorization} = this.props;
+        let {action, dispatch, availabledItems, inventorization, userInfo} = this.props;
         if (!this.props.availabledItems || this.props.availabledItems.length == 0){
-             dispatch(fetchItems(inventorization.Id));
+             dispatch(fetchItems(inventorization.Id, userInfo.Token));
         }
         if (!this.props.availabledZones || this.props.availabledZones.length == 0){
-            dispatch(fetchZones(inventorization.Id));
+            dispatch(fetchZones(inventorization.Id, userInfo.Token));
         }
         let onItemChange = function(value) {
             dispatch(validateAction({Name: value.Name, BarCode: value.BarCode}));
@@ -73,7 +74,7 @@ class ActionForm extends Component {
         }
         let save = function() {
             if (!!action.BarCode && !!action.Zone && !!action.Quantity){
-                dispatch(saveAction(action, inventorization.Id));
+                dispatch(saveAction(action, inventorization.Id, userInfo.Token));
             }
             else{
                 dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone, Quantity: action.Quantity || ''}));

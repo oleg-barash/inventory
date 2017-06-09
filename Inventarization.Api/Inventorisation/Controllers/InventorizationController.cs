@@ -303,7 +303,7 @@ namespace Inventorization.Api.Controllers
                     DateTime = x.DateTime,
                     Quantity = x.Quantity,
                     Type = x.Type,
-                    //User = "тестовый",
+                    User = x.UserId.ToString(),
                     Inventorization = x.Inventorization,
                     Zone = zoneVm,
                     BarCode = x.BarCode,

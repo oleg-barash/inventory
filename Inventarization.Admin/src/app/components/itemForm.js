@@ -19,7 +19,8 @@ moment.locale("ru-RU")
 const mapStateToProps = (state) => {
     return {
         item: state.item,
-        inventorization: state.auth.SelectedInventorization
+        inventorization: state.auth.SelectedInventorization,
+        userInfo: state.auth
     }
 }
 
@@ -29,7 +30,7 @@ class ItemForm extends Component {
     }
 
     render() {
-        let {item, dispatch, inventorization} = this.props;
+        let {item, dispatch, inventorization, userInfo} = this.props;
         let onCodeChange = function(event) {
             dispatch(validateItem({BarCode: event.target.value}));
         }
@@ -51,7 +52,7 @@ class ItemForm extends Component {
         }
         let save = function() {
             if (!!item.Name && !!item.BarCode && !!item.QuantityPlan){
-                dispatch(saveItem(item, inventorization.Company));
+                dispatch(saveItem(item, inventorization.Company, userInfo.Token));
             }
             else{
                 dispatch(validateItem({BarCode: item.BarCode || '', Name: item.Name || '', QuantityPlan: item.QuantityPlan || ''}));

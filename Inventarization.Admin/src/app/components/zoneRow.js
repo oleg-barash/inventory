@@ -26,18 +26,18 @@ class ZoneRow extends Component {
     }
 
     render() {
-        let {zone, dispatch, inventorization} = this.props;
+        let {zone, dispatch, inventorization, userInfo} = this.props;
 
         let openFunc = function () {
-            dispatch(openZone(zone, inventorization.Id))
+            dispatch(openZone(zone, inventorization.Id, userInfo.Token))
         }
 
         let closeFunc = function () {
-            dispatch(closeZone(zone, inventorization.Id))
+            dispatch(closeZone(zone, inventorization.Id, userInfo.Token))
         }
 
         let clearFunc = function () {
-            dispatch(clearZone(zone, inventorization.Id))
+            dispatch(clearZone(zone, inventorization.Id, userInfo.Token))
         }
 
         let newAction = function() {
@@ -98,7 +98,8 @@ ZoneRow.propTypes = {
 
 const mapStateToProps = (state) => {
     return {
-        inventorization: state.auth.SelectedInventorization
+        inventorization: state.auth.SelectedInventorization,
+        userInfo: state.auth
     }
 }
 

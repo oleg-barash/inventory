@@ -1,4 +1,4 @@
-import { LOGIN_FINISHED, LOGIN_IN_PROCESS, PASSWORD_CHANGED, LOGIN_CHANGED, LOGOUT, OPEN_INVENTORIZATION_DIALOG, CLOSE_INVENTORIZATION_DIALOG, INVENTORIZATION_SELECTED } from '../constants/actionTypes'
+import { LOGIN_FINISHED, LOGIN_IN_PROCESS, UPDATE_USER_INFO, PASSWORD_CHANGED, LOGIN_CHANGED, LOGOUT, OPEN_INVENTORIZATION_DIALOG, CLOSE_INVENTORIZATION_DIALOG, INVENTORIZATION_SELECTED } from '../constants/actionTypes'
 import { Cookies } from 'react-cookie';
 
 export function auth(state = { IsAuthorized: false, InProcess: false  }, action)
@@ -20,6 +20,9 @@ export function auth(state = { IsAuthorized: false, InProcess: false  }, action)
             return Object.assign({}, state, { isInventorizationDialogOpened: false });
         case INVENTORIZATION_SELECTED:
             return Object.assign({}, state, { SelectedInventorization: action.inventorization });
+        case UPDATE_USER_INFO:
+            debugger
+            return Object.assign({}, state, action.userInfo);  
         default:
             return state
     }

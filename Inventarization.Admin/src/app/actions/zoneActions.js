@@ -6,10 +6,10 @@ import {
     ZONE_CLOSED,
 } from '../constants/actionTypes'
 
-export function fetchZones(inventorization){
+export function fetchZones(inventorization, userToken){
     return function (dispatch){
         dispatch(requestZones())
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zones')
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zones', { headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json =>
                 dispatch(receiveZones(json))
@@ -17,45 +17,47 @@ export function fetchZones(inventorization){
     }
 }
 
-export function openZone(zone, inventorization){
+export function openZone(zone, inventorization, userToken){
     return function (dispatch){
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/reopen?code=' + zone.Code)
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/reopen?code=' + zone.Code, { headers: { "Authorization": userToken } })
             .then(response => {
                 dispatch(zoneOpened(zone))
-                dispatch(fetchZones(inventorization))
+                dispatch(fetchZones(inventorization, userToken))
             })
     }
 }
 
-export function closeZone(zone, inventorization){
+export function closeZone(zone, inventorization, userToken){
     return function (dispatch){
         debugger;
         return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/close',
             {method: "POST",
                 headers: {
+                    "Authorization": userToken,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({zoneId: zone.ZoneId})})
             .then(response => {
                 dispatch(zoneClosed(zone))
-                dispatch(fetchZones(inventorization))
+                dispatch(fetchZones(inventorization, userToken))
             })
     }
 }
 
-export function clearZone(zone, inventorization){
+export function clearZone(zone, inventorization, userToken){
     return function (dispatch){
         return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/clear',
             {method: "POST",
                 headers: {
+                    "Authorization": userToken,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({zoneId: zone.ZoneId})})
             .then(response => {
                 dispatch(zoneClosed(zone))
-                dispatch(fetchZones(inventorization))
+                dispatch(fetchZones(inventorization, userToken))
             })
     }
 }

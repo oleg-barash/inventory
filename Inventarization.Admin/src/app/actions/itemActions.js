@@ -76,10 +76,10 @@ export function setCurrentItem(item){
     }
 }
 
-export function loadCurrentItem(id, inventorization){
+export function loadCurrentItem(id, inventorization, userToken){
     return function (dispatch){
         dispatch(showLoading())
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/item?id=' + id)
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/item?id=' + id, { headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json => {
                 dispatch(hideLoading())
@@ -89,12 +89,13 @@ export function loadCurrentItem(id, inventorization){
 }
 
 
-export function importItems(items, company){
+export function importItems(items, company, userToken){
     return function (dispatch){
         dispatch(startImport())
         return fetch(process.env.API_URL + 'company/' + company + '/import', {
             method: "POST",
                 headers: {
+                    "Authorization": userToken,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
@@ -110,11 +111,12 @@ export function importItems(items, company){
             })
     }  
 }
-export function saveItem(item, company){
+export function saveItem(item, company, userToken){
         return function (dispatch){
             return fetch(process.env.API_URL + 'company/' + company + '/item', {
                 method: "POST",
                     headers: {
+                        "Authorization": userToken,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
@@ -131,10 +133,10 @@ export function saveItem(item, company){
     }
 }
 
-export function fetchItems(inventorization, filter){
+export function fetchItems(inventorization, filter, userToken){
     return function (dispatch){
         dispatch(requestItems())
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/items')
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/items', { headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json =>
                 dispatch(receiveItems(json, filter))

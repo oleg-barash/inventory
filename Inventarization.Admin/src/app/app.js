@@ -48,6 +48,8 @@ function authCookies({ getState }) {
             case INVENTORIZATION_SELECTED:
             case CLOSE_INVENTORIZATION_DIALOG:
                 browserHistory.push('/items');
+                state.auth = action.userInfo
+                document.cookie = "UserData=" + JSON.stringify(action.userInfo)
                 break
             case LOGOUT:
                 document.cookie = ""

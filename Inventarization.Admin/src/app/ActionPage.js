@@ -19,10 +19,10 @@ class ActionPage extends AuthorizedComponent {
     super(props);
   }
   componentDidMount() {
-        const { dispatch } = this.props
+        const { dispatch, userData } = this.props
         const { id } = this.props.location.query
         if (id !== undefined){
-            dispatch(loadCurrentAction(id));
+            dispatch(loadCurrentAction(id, userData.Token));
         }
   }
   render() {
@@ -37,7 +37,8 @@ class ActionPage extends AuthorizedComponent {
 
 const mapStateToProps = (state) => {
     return {
-        action : state.action
+        action : state.action,
+        userData: state.auth
     }
 }
 
