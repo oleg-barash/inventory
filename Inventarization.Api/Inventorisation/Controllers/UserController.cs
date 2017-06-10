@@ -13,6 +13,8 @@ using System.Security.Claims;
 using System.Collections.Generic;
 using Inventorization.Business.Interfaces;
 using Microsoft.AspNet.Identity;
+using System.Linq;
+using System.Text;
 
 namespace Inventorization.Api.Controllers
 {
@@ -48,12 +50,14 @@ namespace Inventorization.Api.Controllers
                 Business.Model.User user = _userRepository.GetUserByLogin(loginInfo.Username);
                 if (user.Password == loginInfo.Password)
                 {
-                    info.Id = user.Id;
                     info.IsAuthorized = true;
                     info.FullName = $"{user.FirstName} {user.FamilyName}";
                     info.Username = user.Login;
-                    info.Password = user.Login;
+                    info.Password = user.Password;
+                    info.Token = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Login + ":" +user.Password));
                     info.Inventorizations = _inventorizationRepository.GetInventorizations();
+                    info.DefaultInventorization = info.Inventorizations.First();
+
                     var claims = new List<Claim> {
                         new Claim(ClaimTypes.Sid, user.Id.ToString()),
                         new Claim(ClaimTypes.Name,loginInfo.Username),
@@ -67,11 +71,11 @@ namespace Inventorization.Api.Controllers
             }
             catch (UserLoadingException ex)
             {
-                info.Error = "Пользователь не найден";
+                info.Error = $"Пользователь не найден. {ex.Message}";
             }
             catch (Exception ex)
             {
-                info.Error = $"Произошла непредвиденная ошибка";
+                info.Error = $"Произошла непредвиденная ошибка. {ex.Message}";
             }
             return Request.CreateResponse(HttpStatusCode.OK, info);
         }

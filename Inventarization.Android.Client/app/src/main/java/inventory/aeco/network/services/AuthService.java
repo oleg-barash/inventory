@@ -24,6 +24,7 @@ import inventory.aeco.network.models.ActionStatus;
 import inventory.aeco.network.models.Item;
 import inventory.aeco.network.models.LoginResult;
 import inventory.aeco.network.models.LogoutResult;
+import inventory.aeco.network.models.UserInfo;
 
 /**
  * Created by Барашики on 27.05.2017.
@@ -54,14 +55,14 @@ public class AuthService  {
                     public void onResponse(JSONObject response) {
                         try{
                             ObjectMapper mapper = new ObjectMapper();
-                            LoginResult loginResult = mapper.readValue(response.toString(), LoginResult.class);
-                            BroadcastOnLogin(loginResult);
+                            UserInfo userInfo = mapper.readValue(response.toString(), UserInfo.class);
+                            BroadcastOnLogin(userInfo);
                         }
                         catch (IOException exception){
                             Log.e(TAG, "Error parsing login response: " + response.toString());
-                            LoginResult loginResult = new LoginResult();
-                            loginResult.Succeeded = false;
-                            loginResult.Reason = "Сервер ответил неверным форматом";
+                            UserInfo loginResult = new UserInfo();
+                            loginResult.IsAuthorized = false;
+                            loginResult.Error = "Сервер ответил неверным форматом";
                             BroadcastOnLogin(loginResult);
                         }
                     }
@@ -69,9 +70,9 @@ public class AuthService  {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "Error login response: " + error.getMessage());
-                LoginResult loginResult = new LoginResult();
-                loginResult.Succeeded = false;
-                loginResult.Reason = "Сервер вернул ошибку. Авторизация невозможна";
+                UserInfo loginResult = new UserInfo();
+                loginResult.IsAuthorized = false;
+                loginResult.Error = "Сервер вернул ошибку. Авторизация невозможна";
                 BroadcastOnLogin(loginResult);
             }
         });
@@ -79,7 +80,7 @@ public class AuthService  {
         queue.add(jsonRequest);
     }
 
-    private void BroadcastOnLogin(LoginResult result){
+    private void BroadcastOnLogin(UserInfo result){
         for(AuthServiceListener listener : listeners){
             if (listener != null){
                 listener.OnLogin(result);
@@ -88,7 +89,7 @@ public class AuthService  {
     }
 
     public interface AuthServiceListener{
-        void OnLogin(LoginResult result);
+        void OnLogin(UserInfo result);
         void OnLogout(LogoutResult result);
     }
 

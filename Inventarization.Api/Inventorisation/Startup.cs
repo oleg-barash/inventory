@@ -13,6 +13,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.OAuth;
 using Microsoft.Owin.Host.SystemWeb;
 using Inventorization.Api;
+using Inventorization.Data;
 
 [assembly: OwinStartup(typeof(Inventorization.Startup))]
 
@@ -46,10 +47,14 @@ namespace Inventorization
         }
         private async Task<IEnumerable<Claim>> Authenticate(string username, string password)
         {
-            // authenticate user
-            if (username == password)
+            Business.Model.User user = (GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(UserRepository)) as UserRepository).GetUserByLogin(username);
+            if (user != null && user.Password == password)
             {
-                return new List<Claim> { new Claim("name", username) };
+                return new List<Claim> {
+                    new Claim(ClaimTypes.Sid, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Login),
+                    new Claim(ClaimTypes.Role, "admin")
+                };
             }
 
             return null;

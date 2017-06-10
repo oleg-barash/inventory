@@ -1,4 +1,5 @@
 ﻿using Inventorization.Api.Formatters;
+using Inventorization.Business.Interfaces;
 using Inventorization.Business.Model;
 using Inventorization.Data;
 using Microsoft.AspNet.Identity.Owin;
@@ -17,10 +18,10 @@ namespace Inventorization.Controllers
     public class ZoneController : ApiController
     {
 
-        private ZoneRepository _zoneRepository;
-        private ActionRepository _actionRepository;
+        private IZoneRepository _zoneRepository;
+        private IActionRepository _actionRepository;
         private TaskRepository _taskRepository;
-        public ZoneController(ZoneRepository zoneRepository, TaskRepository taskRepository, ActionRepository actionRepository)
+        public ZoneController(IZoneRepository zoneRepository, TaskRepository taskRepository, IActionRepository actionRepository)
         {
             _zoneRepository = zoneRepository;
             _taskRepository = taskRepository;

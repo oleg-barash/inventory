@@ -47,6 +47,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.text.SimpleDateFormat;
@@ -56,8 +57,9 @@ import inventory.R;
 import inventory.aeco.DTO.ItemSaveResult;
 import inventory.aeco.network.models.ActionStatus;
 import inventory.aeco.network.models.Action;
-import inventory.aeco.network.models.Item;
 import inventory.aeco.network.models.Zone;
+
+import static java.util.UUID.*;
 
 
 public class ActionActivity extends Activity {
@@ -70,19 +72,15 @@ public class ActionActivity extends Activity {
 
     private Button findButton;
     private Button okButton;
-    private Button closeButton;
     private TextView description;
 
-    private ListView historyList;
     private Vibrator mVibrator;
     private ScanManager mScanManager;
     private SoundPool soundpool = null;
     private int soundid;
     private int errorSoundid;
-    private boolean isScaning = false;
     private String currentZone;
     private ActionType currentActionType;
-    private String inventorizationId = "81d51f07-9ff3-46c0-961c-c8ebfb7b47e3";
     Action newAction;
     private static LinkedList<String> actionList = new LinkedList<>();
 
@@ -95,21 +93,15 @@ public class ActionActivity extends Activity {
         toast.show();
     }
 
-    private String login;
-    public ActionActivity(){
-        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
-        login = settings.getString("login", "undefined");
-    }
-
+    private String token;
     private static final String TAG = "ActionActivity";
-    private String baseUrl = Configuration.BaseUrl + "inventorization/" + inventorizationId + "/";
+    private String baseUrl;
     private String baseZoneUrl = Configuration.BaseUrl + "zone/";
     private String baseActionUrl = Configuration.BaseUrl + "action/";
     private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            isScaning = false;
             soundpool.play(soundid, 1, 1, 0, 0, 1);
             showScanResult.setText("");
             mVibrator.vibrate(100);
@@ -126,13 +118,11 @@ public class ActionActivity extends Activity {
         newAction = new Action();
         newAction.BarCode = code;
         showScanResult.setText(newAction.BarCode);
-        newAction.Id = UUID.randomUUID().toString();
+        newAction.Id = randomUUID().toString();
         newAction.Quantity = 1;
         newAction.Type = currentActionType;
         newAction.Zone = currentZone;
-        newAction.Inventorization = inventorizationId;
-        newAction.User = login;
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("id", newAction.Id);
         params.put("quantity", newAction.Quantity.toString());
         params.put("type", newAction.Type.toString());
@@ -186,7 +176,7 @@ public class ActionActivity extends Activity {
                 newAction.Status = ActionStatus.Error;
                 String text = newAction.BarCode;
                 if (error.networkResponse != null){
-                    if (error.networkResponse != null && error.networkResponse.statusCode == 403){
+                    if (error.networkResponse.statusCode == 403){
                         showToast("Зона уже закрыта. Выберите другую зону.");
                         Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
                         startActivity(intent);
@@ -202,7 +192,14 @@ public class ActionActivity extends Activity {
                 }
                 adapter.notifyDataSetChanged();
             }
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders(){
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", token);
+                return headers;
+            }
+        };
         jsonRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(jsonRequest);
     }
@@ -223,6 +220,11 @@ public class ActionActivity extends Activity {
         currentZone = extras.getString(ActionActivity.ZONE_MESSAGE);
         currentActionType = ActionType.valueOf(extras.getString(ZoneSelectActivity.ACTION_TYPE_MESSAGE));
 
+        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+        token = settings.getString("token", "undefined");
+        UUID inventorization = UUID.fromString(settings.getString("inventorization", "undefined"));
+        baseUrl = Configuration.BaseUrl + "inventorization/" + inventorization.toString() + "/";
+
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         StringRequest stringRequest = new StringRequest(Request.Method.GET, baseZoneUrl + currentZone,
                 new Response.Listener<String>() {
@@ -230,11 +232,11 @@ public class ActionActivity extends Activity {
                     public void onResponse(String response) {
                         try {
                             ObjectMapper mapper = new ObjectMapper();
-                            Zone zone = mapper.readValue(response.toString(), Zone.class);
+                            Zone zone = mapper.readValue(response, Zone.class);
                             zone_title.setText(zone.Name);
                         }
                         catch (IOException exception){
-                            Log.e(TAG, "Error parsing zone: " + response.toString());
+                            Log.e(TAG, "Error parsing zone: " + response);
                         }
 
                     }
@@ -243,7 +245,14 @@ public class ActionActivity extends Activity {
             public void onErrorResponse(VolleyError error) {
                 showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
             }
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders(){
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", token);
+                return headers;
+            }
+        };
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
 
@@ -314,7 +323,7 @@ public class ActionActivity extends Activity {
                                         }
                                     });
 
-        closeButton = (Button) findViewById(R.id.closeButton);
+        Button closeButton = (Button) findViewById(R.id.closeButton);
         closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -327,7 +336,7 @@ public class ActionActivity extends Activity {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 try {
                                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                                    HashMap<String, String> params = new HashMap<String, String>();
+                                    HashMap<String, String> params = new HashMap<>();
                                     params.put("zoneId", currentZone);
                                     JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, baseUrl + "zone/close"
                                             , new JSONObject(params),
@@ -382,8 +391,8 @@ public class ActionActivity extends Activity {
         description = (TextView) findViewById(R.id.description);
         zone_title =  (TextView) findViewById(R.id.zone_title);
         zone_title.setInputType(InputType.TYPE_NULL);
-        historyList = (ListView)findViewById(R.id.historyList);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actionList);
+        ListView historyList = (ListView) findViewById(R.id.historyList);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, actionList);
         historyList.setAdapter(adapter);
 
     }
@@ -400,7 +409,6 @@ public class ActionActivity extends Activity {
         super.onPause();
         if(mScanManager != null) {
             mScanManager.stopDecode();
-            isScaning = false;
         }
         unregisterReceiver(mScanReceiver);
     }
@@ -431,7 +439,7 @@ public class ActionActivity extends Activity {
     public void updateQuantity(){
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         newAction.Quantity = Integer.parseInt(quantity.getText().toString());
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("quantity", newAction.Quantity.toString());
         JsonObjectRequest jsonRequest = new JsonObjectRequest(baseActionUrl + newAction.Id, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -454,7 +462,14 @@ public class ActionActivity extends Activity {
                 }
 
             }
-        });
+        }){
+            @Override
+            public Map<String, String> getHeaders(){
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", token);
+                return headers;
+            }
+        };
         queue.add(jsonRequest);
     }
 
