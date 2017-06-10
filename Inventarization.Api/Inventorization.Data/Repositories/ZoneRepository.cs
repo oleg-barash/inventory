@@ -1,4 +1,5 @@
-﻿using Inventorization.Business.Model;
+﻿using Inventorization.Business.Interfaces;
+using Inventorization.Business.Model;
 using Npgsql;
 using NpgsqlTypes;
 using System;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Inventorization.Data
 {
-    public class ZoneRepository
+    public class ZoneRepository : IZoneRepository
     {
 
         private string _connectionString;

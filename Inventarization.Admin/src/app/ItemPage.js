@@ -19,10 +19,10 @@ class NewItemPage extends AuthorizedComponent {
         super(props);
     }
    componentDidMount() {
-        const { dispatch, inventorization } = this.props
+        const { dispatch, inventorization, userInfo } = this.props
         const { id } = this.props.location.query
         if (id != undefined){
-            dispatch(loadCurrentItem(id, inventorization.Id));
+            dispatch(loadCurrentItem(id, inventorization.Id, userInfo.Token));
         }
   }
   render() {

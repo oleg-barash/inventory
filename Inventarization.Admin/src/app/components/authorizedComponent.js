@@ -4,28 +4,38 @@ import { push } from 'react-router-redux'
 import _ from 'lodash';
 import { login } from '../actions/authorizationActions'
 import { browserHistory } from 'react-router'
-import { loginFinished } from '../actions/authorizationActions'
+import { loginFinished, updateUserInfo } from '../actions/authorizationActions'
 import { Cookies } from 'react-cookie';
-
 
 class AuthorizedComponent extends Component {
   componentWillMount() {
     const { userInfo, dispatch, cookies } = this.props;
-    if (!userInfo || !userInfo.IsAuthorized) {
-        let user = cookies.get('credentials');
-        if (!user || !user.IsAuthorized){
-          if (this.props.router){
-            this.props.router.push('/login');
-          }
-          if (browserHistory){
-            browserHistory.push('/login');
-          }
-          return null;
+
+    // if (document != undefined)
+    // {
+    //   let userData = JSON.parse(document.cookie);
+    //   if (userData == null){
+    //     return null;
+    //   }
+    // }
+    // else{
+      let cookieUserData = cookies.get("UserData");
+      debugger;
+      if (cookieUserData == undefined || cookieUserData.Token == undefined){
+        if (this.props.router){
+          this.props.router.push('/login');
         }
-        else{
-          dispatch(loginFinished(user));
+        if (browserHistory){
+          browserHistory.push('/login');
         }
-    }
+        return null;
+      }
+      else{
+        if (userInfo.Token == undefined){
+          dispatch(updateUserInfo(cookieUserData))
+        }
+      }
+    //}
 
     // get all roles available for this route
     // const routeRoles = _.chain(routes)

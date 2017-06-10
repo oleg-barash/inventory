@@ -34,10 +34,10 @@ class InventorizationDialog extends AuthorizedComponent {
                         onTouchTap={handleClose}
                     />}
                     modal={true}
-                    open={userInfo.IsAuthorized && userInfo.isInventorizationDialogOpened}
+                    open={userInfo.isInventorizationDialogOpened}
                     onRequestClose={handleClose}>
                         Для продолжения работы выберите инвентаризацию
-                    <InventorizationSelect onInventorizationChanged={inventorizationSelected}/>
+                    <InventorizationSelect cookies={this.props.cookies} onInventorizationChanged={inventorizationSelected}/>
             </Dialog>)
     }
 }

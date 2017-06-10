@@ -4,10 +4,11 @@ import AuthorizedComponent from './authorizedComponent'
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 const mapStateToProps = (state) => {
+    debugger
     return {
         userInfo: state.auth,
-        inventorization: state.auth !== undefined ? state.auth.SelectedInventorization : undefined,
-        availabledInventorizations: state.auth !== undefined ? state.auth.Inventorizations : undefined
+        inventorization: state.auth.SelectedInventorization,
+        availabledInventorizations: state.auth.Inventorizations !== undefined ? state.auth.Inventorizations : []
     }
 }
 
@@ -25,6 +26,7 @@ class InventorizationSelect extends AuthorizedComponent {
             onInventorizationChanged, 
             errorText 
         } = this.props;
+        debugger
         let items = this.props.availabledInventorizations.map(item => <MenuItem key={item.Id} value={item} primaryText={item.Id} />);
         return (
             <SelectField floatingLabelText="Инвентаризация" value={inventorization} onChange={onInventorizationChanged}>

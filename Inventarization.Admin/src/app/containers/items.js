@@ -28,17 +28,7 @@ import ZoneSelect from '../components/zoneSelect'
 import AuthorizedComponent from '../components/authorizedComponent'
 import { openInventorizationDialog } from '../actions/authorizationActions'
 
-const mapStateToProps = (state) => {
-    return {
-        items: state.items.displayItems,
-        isFetching: state.items.isFetching,
-        isDialogOpened: state.items.isImportDialogOpened,
-        filter: state.items.filter,
-        dispatch: state.dispatch,
-        userInfo: state.auth,
-        availabledZones: state.zones.items
-    }
-}
+
 const styles = {
   block: {
     maxWidth: 250,
@@ -61,8 +51,8 @@ class Items extends AuthorizedComponent {
       super(props);
     }
     componentWillMount() {
-        if (this.props.userInfo.SelectedInventorization !== undefined){
-            this.props.dispatch(fetchItems(this.props.userInfo.SelectedInventorization.Id))
+        if (this.props.userInfo.Token != undefined && this.props.userInfo.SelectedInventorization !== undefined){
+            this.props.dispatch(fetchItems(this.props.userInfo.SelectedInventorization.Id, {}, this.props.userInfo.Token))
         }
         else{
             this.props.dispatch(openInventorizationDialog());
@@ -73,59 +63,61 @@ class Items extends AuthorizedComponent {
         let objectClosure = this;
         let itemsToUpload = [];
 
-        if (!objectClosure.props.userInfo.SelectedInventorization){
+        let {dispatch, userInfo, availabledZones, filter} = this.props;
+
+        if (!userInfo.SelectedInventorization){
             return null;
         }
-        if (!this.props.availabledZones || this.props.availabledZones.length == 0){
-            objectClosure.props.dispatch(fetchZones(objectClosure.props.userInfo.SelectedInventorization.Id));
+        if (!availabledZones || availabledZones.length == 0){
+            dispatch(fetchZones(userInfo.SelectedInventorization.Id, userInfo.Token));
         }
 
         function handleFilterChange(event, value) {
-            objectClosure.props.dispatch(updateItemsFilter({ text: value }))
-            objectClosure.props.dispatch(filterItems({ text: value }))
+            dispatch(updateItemsFilter({ text: value }))
+            dispatch(filterItems({ text: value }))
         };
         function handleStateChange(event, value) {
-            objectClosure.props.dispatch(updateItemsFilter({ type: value }))
-            objectClosure.props.dispatch(filterItems({ type: value }))
+            dispatch(updateItemsFilter({ type: value }))
+            dispatch(filterItems({ type: value }))
         };
 
         function handleOpen () {
-            objectClosure.props.dispatch(openImportDialog())
+            dispatch(openImportDialog())
         };
 
         function handleLoadMore () {
-            objectClosure.props.dispatch(requestItems())
-            objectClosure.props.dispatch(filterItems({currentPage: objectClosure.props.filter.currentPage + 1}))
+            dispatch(requestItems())
+            dispatch(filterItems({currentPage: filter.currentPage + 1}))
         };
 
         function handleClose () {
-            objectClosure.props.dispatch(closeImportDialog())
+            dispatch(closeImportDialog())
         };
 
         function handleDeviationChange(event, value) {
-            objectClosure.props.dispatch(updateItemsFilter({ devation: value }))
-            objectClosure.props.dispatch(filterItems({ devation: value }))
+            dispatch(updateItemsFilter({ devation: value }))
+            dispatch(filterItems({ devation: value }))
         };
 
         function handlePriceDeviationChange(event, value) {
-            objectClosure.props.dispatch(updateItemsFilter({ priceDevation: value }))
-            objectClosure.props.dispatch(filterItems({ priceDevation: value }))
+            dispatch(updateItemsFilter({ priceDevation: value }))
+            dispatch(filterItems({ priceDevation: value }))
         };
 
 
         let onZoneChange = function(value) {
             if (typeof value === "string"){
-                objectClosure.props.dispatch(updateItemsFilter({ zone: undefined }))
-                objectClosure.props.dispatch(filterItems({ zone: undefined }))
+                dispatch(updateItemsFilter({ zone: undefined }))
+                dispatch(filterItems({ zone: undefined }))
             }
             else{
-                objectClosure.props.dispatch(updateItemsFilter({ zone: value }))
-                objectClosure.props.dispatch(filterItems({ zone: value }))
+                dispatch(updateItemsFilter({ zone: value }))
+                dispatch(filterItems({ zone: value }))
             }
         }
 
         function onImport () {
-            objectClosure.props.dispatch(importItems(itemsToUpload, objectClosure.props.userInfo.SelectedInventorization.Company))
+            dispatch(importItems(itemsToUpload, userInfo.SelectedInventorization.Company, userInfo.Token))
         };
 
         function updateProgress(evt) {
@@ -270,6 +262,18 @@ Items.propTypes = {
     items: PropTypes.array.isRequired,
     filter: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired
+}
+
+const mapStateToProps = (state) => {
+    return {
+        items: state.items.displayItems,
+        isFetching: state.items.isFetching,
+        isDialogOpened: state.items.isImportDialogOpened,
+        filter: state.items.filter,
+        dispatch: state.dispatch,
+        userInfo: state.auth,
+        availabledZones: state.zones.items
+    }
 }
 
 export default connect(mapStateToProps)(Items)

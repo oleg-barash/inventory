@@ -8,6 +8,7 @@ import { LOGIN,
     OPEN_INVENTORIZATION_DIALOG,
     INVENTORIZATION_SELECTED,
     CLOSE_INVENTORIZATION_DIALOG,
+    UPDATE_USER_INFO,
     LOGOUT } from '../constants/actionTypes'
 import {toastr} from 'react-redux-toastr'
 
@@ -28,15 +29,33 @@ export function login(username, password){
     return function (dispatch){
         dispatch(loginInProcess())
         let userInfo = { Username: username, Password: /*hash(*/password/*)*/ };
+
+        // var XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
+        // var xhr = new XHR();
+        // xhr.open('POST', process.env.API_URL + 'user/login', true);
+        // xhr.setRequestHeader("Accept", 'application/json');
+        // xhr.setRequestHeader("Content-Type", 'application/json');
+        // debugger
+        // xhr.onload = function() {
+        //     dispatch(loginFinished(JSON.parse(this.responseText)))
+        // }
+        // xhr.onerror = function() {
+        //     alert( 'Ошибка ' + this.status );
+        // }
+        
+        // xhr.send(JSON.stringify(userInfo));
+
         return fetch(process.env.API_URL + 'user/login', 
             {  
                 method: "POST",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    "Accept": 'application/json',
+                    "Content-Type": 'application/json'
                 },
                 body: JSON.stringify(userInfo)})
-            .then(response => response.json())
+            .then(response => {
+                return response.json()
+            })
             .then(json => {
                 dispatch(loginFinished(json))
             })
@@ -51,8 +70,13 @@ export function passwordChanged(passwordValue){
 }
 
 export function logout(){
-    return {
-        type: LOGOUT
+    return function (dispatch){
+        return fetch(process.env.API_URL + 'user/logout', { method: 'POST'})
+            .then(json => {
+                return {
+                    type: LOGOUT
+                }
+            })
     }
 }
 
@@ -70,6 +94,14 @@ export function loginFinished(userInfo){
         userInfo
     }
 }
+
+export function updateUserInfo(userInfo){
+    return {
+        type: UPDATE_USER_INFO,
+        userInfo
+    }
+}
+
 
 function loginInProcess(){
     return {

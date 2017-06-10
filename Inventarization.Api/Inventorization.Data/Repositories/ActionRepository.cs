@@ -1,4 +1,5 @@
-﻿using Inventorization.Business.Model;
+﻿using Inventorization.Business.Interfaces;
+using Inventorization.Business.Model;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Web;
 
 namespace Inventorization.Data
 {
-    public class ActionRepository
+    public class ActionRepository : IActionRepository
     {
 
         private string _connectionString;

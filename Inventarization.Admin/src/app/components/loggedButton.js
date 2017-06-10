@@ -16,6 +16,9 @@ const mapStateToProps = (state) => {
 
 
 class LoggedButton extends AuthorizedComponent {
+    constructor(props) {
+        super(props);
+    }
     render(){
         let { dispatch } = this.props;
         let handleChangeItem = function(event, value) {

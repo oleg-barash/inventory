@@ -27,6 +27,7 @@ const mapStateToProps = (state) => {
     return {
         userInfo: state.auth,
         inventorization: state.auth.SelectedInventorization,
+        userInfo: state.auth,
         action: state.action,
         availabledZones: state.zones.items || [],
         availabledItems: state.items.items || []
@@ -51,10 +52,10 @@ class ActionForm extends Component {
     render() {
         let {action, dispatch, availabledItems, inventorization, userInfo} = this.props;
         if (!this.props.availabledItems || this.props.availabledItems.length == 0){
-             dispatch(fetchItems(inventorization.Id));
+             dispatch(fetchItems(inventorization.Id, userInfo.Token));
         }
         if (!this.props.availabledZones || this.props.availabledZones.length == 0){
-            dispatch(fetchZones(inventorization.Id));
+            dispatch(fetchZones(inventorization.Id, userInfo.Token));
         }
         let onItemChange = function(value) {
             dispatch(validateAction({Name: value.Name, BarCode: value.BarCode}));
@@ -74,7 +75,7 @@ class ActionForm extends Component {
         }
         let save = function() {
             if (!!action.BarCode && !!action.Zone && !!action.Quantity){
-                dispatch(saveAction(action, inventorization.Id, userInfo.Id));
+                dispatch(saveAction(action, inventorization.Id, userInfo.Token));
             }
             else{
                 dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone, Quantity: action.Quantity || ''}));
@@ -90,6 +91,7 @@ class ActionForm extends Component {
                     searchText={action.BarCode} 
                     floatingLabelText="Укажите код товара" 
                     dataSource={this.props.availabledItems}
+                    visible={action.Type == 0}
                     onNewRequest={onItemChange} 
                     dataSourceConfig={itemDataSourceConfig}
                     filter={(searchText, key) => (key.startsWith(searchText))}
@@ -104,6 +106,7 @@ class ActionForm extends Component {
                     floatingLabelText="Укажите наименование товара" 
                     dataSource={this.props.availabledItems}
                     onNewRequest={onItemChange} 
+                    visible={action.Type == 0}
                     dataSourceConfig={itemNameDataSourceConfig}
                     filter={(searchText, key) => (key.indexOf(searchText) != -1)}
                     errorText={action != null ? action.NameError || '' : '' }
@@ -121,7 +124,7 @@ class ActionForm extends Component {
                         onChange={onTypeChange}
                     >
                     <MenuItem value={0} primaryText="Первое сканирование" />
-                    <MenuItem value={1} primaryText="Повторное сканирование" />
+                    <MenuItem value={1} primaryText="Слепой просчёт" />
                     </SelectField>
                 <Divider />
                 <FlatButton label="Назад" onClick={goBack} />
