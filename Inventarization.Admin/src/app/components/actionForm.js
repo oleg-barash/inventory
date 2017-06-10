@@ -25,6 +25,7 @@ moment.locale("ru-RU")
 
 const mapStateToProps = (state) => {
     return {
+        userInfo: state.auth,
         inventorization: state.auth.SelectedInventorization,
         action: state.action,
         availabledZones: state.zones.items || [],
@@ -48,7 +49,7 @@ class ActionForm extends Component {
     }
 
     render() {
-        let {action, dispatch, availabledItems, inventorization} = this.props;
+        let {action, dispatch, availabledItems, inventorization, userInfo} = this.props;
         if (!this.props.availabledItems || this.props.availabledItems.length == 0){
              dispatch(fetchItems(inventorization.Id));
         }
@@ -73,7 +74,7 @@ class ActionForm extends Component {
         }
         let save = function() {
             if (!!action.BarCode && !!action.Zone && !!action.Quantity){
-                dispatch(saveAction(action, inventorization.Id));
+                dispatch(saveAction(action, inventorization.Id, userInfo.Id));
             }
             else{
                 dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone, Quantity: action.Quantity || ''}));

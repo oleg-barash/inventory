@@ -100,6 +100,7 @@ namespace Inventorization.Api.Controllers
                 List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorization).Where(x => x.ZoneId != Guid.Empty).ToList();
                 List<ZoneModel> zones = _zoneRepository.GetAllZones().OrderBy(x => x.Name).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK, zones.Select(x => {
+                    List<Business.Model.Action> actions = _actionRepository.GetActionsByInventorization(inventorization).Where(i => i.Zone == x.Id).ToList();
                     var state = states.FirstOrDefault(s => x.Id == s.ZoneId);
                     return new ZoneViewModel()
                     {
@@ -110,7 +111,8 @@ namespace Inventorization.Api.Controllers
                         OpenedAt = state?.OpenedAt,
                         OpenedBy = state?.OpenedBy,
                         ZoneName = x.Name,
-                        Status = state.GetStatus()
+                        Status = state.GetStatus(),
+                        TotalItems = actions.Sum(a => a.Quantity)
                     };
                 }));
             }
@@ -219,7 +221,7 @@ namespace Inventorization.Api.Controllers
 
         [HttpPost]
         [Route("{inventorization}/action")]
-        public HttpResponseMessage SaveAction(Guid inventorization, [FromBody]ViewModels.Action actionVM)
+        public HttpResponseMessage SaveAction(Guid inventorization, [FromBody]SaveActionVM actionVM)
         {
             try
             {
@@ -227,13 +229,12 @@ namespace Inventorization.Api.Controllers
                 Business.Model.Action action = new Business.Model.Action()
                 {
                     BarCode = actionVM.BarCode,
-                    DateTime = actionVM.DateTime,
-                    Id = actionVM.Id,
+                    DateTime = actionVM.DateTime.GetValueOrDefault(),
                     Inventorization = inventorization,
                     Quantity = actionVM.Quantity,
                     Type = actionVM.Type,
                     Zone = actionVM.Zone,
-                    UserId = Guid.Parse("c2425014-157f-4a73-bd92-7c514c4d35d3")
+                    UserId = actionVM.UserId
                 };
 
                 ZoneState zoneState = _inventorizationRepository.GetZoneState(inventorization, action.Zone);
@@ -249,6 +250,7 @@ namespace Inventorization.Api.Controllers
                 }
                 if (actionExists)
                 {
+                    action.Id = actionVM.Id.Value;
                     _actionRepository.UpdateAction(action);
                 }
                 else

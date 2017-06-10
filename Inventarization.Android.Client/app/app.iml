@@ -106,5 +106,6 @@
     <orderEntry type="library" exported="" name="platform_sdk_v1.0.2" level="project" />
     <orderEntry type="library" exported="" name="com.android.volley-2015.05.28" level="project" />
     <orderEntry type="library" exported="" name="json-20090211_1" level="project" />
+    <orderEntry type="library" exported="" name="android-android-22" level="project" />
   </component>
 </module>

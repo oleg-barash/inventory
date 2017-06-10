@@ -11,5 +11,6 @@ namespace Inventorization.Api.ViewModels
         public string FullName { get; set; }
         public bool IsAuthorized { get; set; }
         public List<Business.Model.Inventorization> Inventorizations { get; set; }
+        public Guid Id { get; set; }
     }
 }

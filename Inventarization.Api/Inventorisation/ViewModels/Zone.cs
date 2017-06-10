@@ -13,6 +13,7 @@ namespace Inventorization.Api.ViewModels
         public Guid? OpenedBy { get; set; }
         public Guid? ClosedBy { get; set; }
         public ZoneStatus Status { get; set; }
+        public int TotalItems { get; set; }
     }
 
 }

@@ -45,6 +45,7 @@ namespace Inventorization.Api.Controllers
                 Business.Model.User user = _userRepository.GetUserByLogin(loginInfo.Username);
                 if (user.Password == loginInfo.Password)
                 {
+                    info.Id = user.Id;
                     info.IsAuthorized = true;
                     info.FullName = $"{user.FirstName} {user.FamilyName}";
                     info.Inventorizations = _inventorizationRepository.GetInventorizations();

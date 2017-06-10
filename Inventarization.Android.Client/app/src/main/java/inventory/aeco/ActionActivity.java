@@ -53,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 
 import inventory.R;
+import inventory.aeco.DTO.ItemSaveResult;
 import inventory.aeco.network.models.ActionStatus;
 import inventory.aeco.network.models.Action;
 import inventory.aeco.network.models.Item;
