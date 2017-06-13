@@ -18,6 +18,7 @@ class ZoneList extends Component {
                 <TableHeaderColumn style={{width: '100px'}}>Зона</TableHeaderColumn>
                 <TableHeaderColumn style={{width: '100px'}}>Время открытия</TableHeaderColumn>
                 <TableHeaderColumn style={{width: '100px'}}>Время закрытия</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '100px'}}>Товаров в зоне</TableHeaderColumn>
                 <TableHeaderColumn>Действия</TableHeaderColumn>
             </TableRow>
         </TableHeader>

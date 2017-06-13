@@ -32,6 +32,7 @@ import java.util.List;
 
 import inventory.R;
 import inventory.aeco.network.models.LogoutResult;
+import inventory.aeco.network.models.UserInfo;
 import inventory.aeco.network.services.*;
 import inventory.aeco.network.models.LoginResult;
 
@@ -146,7 +147,7 @@ public class LoginActivity
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() > 1;
     }
 
     /**
@@ -223,18 +224,20 @@ public class LoginActivity
     }
 
     @Override
-    public void OnLogin(LoginResult result) {
+    public void OnLogin(UserInfo result) {
         showProgress(false);
 
-        if (result.Succeeded) {
+        if (result.IsAuthorized) {
             SharedPreferences settings = getSharedPreferences("UserInfo", 0);
             SharedPreferences.Editor editor = settings.edit();
-            editor.putString("login", result.Login);
+            editor.putString("login", result.Username);
+            editor.putString("token", result.Token);
+            editor.putString("inventorization", result.DefaultInventorization.Id.toString());
             editor.commit();
             Intent intent = new Intent(this, WorkflowSelection.class);
             startActivity(intent);
         } else {
-            mPasswordView.setError(result.Reason);
+            mPasswordView.setError(result.Error);
             mPasswordView.requestFocus();
 
         }

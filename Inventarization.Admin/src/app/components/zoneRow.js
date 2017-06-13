@@ -61,6 +61,7 @@ class ZoneRow extends Component {
                 <TableRowColumn style={{width: '100px'}}>{zone.ZoneName}</TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}>{zone.OpenedAt == undefined ? "не открыта" : moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}>{zone.TotalItems}</TableRowColumn>
                 <TableRowColumn >
                     <FlatButton disabled={zone.Status == ZoneStatuses.Closed || zone.Status == ZoneStatuses.NotOpened}
                         hoverColor={blue}

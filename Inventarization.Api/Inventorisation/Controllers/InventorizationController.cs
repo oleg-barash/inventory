@@ -38,7 +38,6 @@ namespace Inventorization.Api.Controllers
 
         public InventorizationController(IInventorizationRepository inventorizationRepository
             , IZoneRepository zoneRepository
-            , IActionRepository actionRepository
             , ICompanyRepository companyRepository
             , ActionDomain actionDomain
             , InventorizationDomain inventorizationDomain
@@ -120,6 +119,7 @@ namespace Inventorization.Api.Controllers
                 List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorization).Where(x => x.ZoneId != Guid.Empty).ToList();
                 List<ZoneModel> zones = _zoneRepository.GetAllZones().OrderBy(x => x.Name).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK, zones.Select(x => {
+                    List<Business.Model.Action> actions = inventorizationDomain.GetActions(inventorization).Where(i => i.Zone == x.Id).ToList();
                     var state = states.FirstOrDefault(s => x.Id == s.ZoneId);
                     return new ZoneViewModel()
                     {
@@ -130,7 +130,8 @@ namespace Inventorization.Api.Controllers
                         OpenedAt = state?.OpenedAt,
                         OpenedBy = state?.OpenedBy,
                         ZoneName = x.Name,
-                        Status = state.GetStatus()
+                        Status = state.GetStatus(),
+                        TotalItems = actions.Sum(a => a.Quantity)
                     };
                 }));
             }
@@ -235,7 +236,7 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles="admin")]
+        //[Authorize(Roles="admin")]
         [Route("{inventorization}/action")]
         public HttpResponseMessage SaveAction(Guid inventorization, [FromBody]SaveActionVM actionVM)
         {
@@ -256,6 +257,7 @@ namespace Inventorization.Api.Controllers
                 actionDomain.UpsertAction(action);
 
                 if (actionVM.Type == ActionType.FirstScan)
+                    action.Id = actionVM.Id.Value;
                 {
                     var inventarization = _inventorizationRepository.GetInventorization(inventorization);
                     List<Business.Model.Item> items = _companyRepository.GetItems(inventarization.Company);
@@ -269,7 +271,6 @@ namespace Inventorization.Api.Controllers
                 _logger.Error(ex, message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpGet]

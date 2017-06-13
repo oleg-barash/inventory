@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.device.ScanManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -32,6 +33,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import inventory.R;
 import inventory.aeco.network.models.Zone;
@@ -52,71 +56,10 @@ public class ZoneSelectActivity extends Activity {
     private TextView resultTextView;
     private Zone zone;
     private static final String TAG = "ZoneSelectActivity";
-    private String inventorizationId = "81d51f07-9ff3-46c0-961c-c8ebfb7b47e3";
-    private String baseInventorizationUrl = Configuration.BaseUrl + "inventorization/" + inventorizationId + "/";
+    private String baseInventorizationUrl;
     private ZoneActivityStates currentState = ZoneActivityStates.Initial;
     private ActionType currentActionType;
 
-    private void initScan() {
-        // TODO Auto-generated method stub
-        mScanManager = new ScanManager();
-        mScanManager.openScanner();
-        mScanManager.switchOutputMode( 0);
-        soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
-        soundid = soundpool.load("/etc/Scan_new.ogg", 1);
-    }
-
-    public void goToActionTypeSelect(View view){
-        Intent intent = new Intent(ZoneSelectActivity.this, WorkflowSelection.class);
-        startActivity(intent);
-    }
-
-    private void showToast(CharSequence text){
-        Context appContext = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(appContext, text, duration);
-        toast.show();
-    }
-
-    private void openZone(String code){
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, baseInventorizationUrl + "/zone/open?code=" + code,
-                            new Response.Listener<String>()  {
-                                @Override
-                    public void onResponse(String response) {
-                        try {
-                            ObjectMapper mapper = new ObjectMapper();
-                            zone = mapper.readValue(response.toString(), Zone.class);
-                            Intent intent = new Intent(ZoneSelectActivity.this, ActionActivity.class);
-                            Bundle extras = new Bundle();
-                            extras.putString(ActionActivity.ZONE_MESSAGE, zone.Id);
-                            extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());
-                            intent.putExtras(extras);
-                            startActivity(intent);
-                        }
-                        catch (IOException exception){
-                            Log.e(TAG, "Error parsing zone: " + response.toString());
-                            setState(ZoneActivityStates.Initial);
-                            showToast("При открытии зоны произошла ошибка.");
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                setState(ZoneActivityStates.Initial);
-                if (error.networkResponse.statusCode == 403) {
-                    showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
-                }
-                else {
-                    showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
-                }
-
-            }
-        });
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        queue.add(stringRequest);
-    }
 
 
     private void setupView() {
@@ -182,6 +125,60 @@ public class ZoneSelectActivity extends Activity {
             }
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+    }
+
+    private void openZone(String code){
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, baseInventorizationUrl + "/zone/open?code=" + code,
+                new Response.Listener<String>()  {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            ObjectMapper mapper = new ObjectMapper();
+                            zone = mapper.readValue(response.toString(), Zone.class);
+                            Intent intent = new Intent(ZoneSelectActivity.this, ActionActivity.class);
+                            Bundle extras = new Bundle();
+                            extras.putString(ActionActivity.ZONE_MESSAGE, zone.Id);
+                            extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());
+                            intent.putExtras(extras);
+                            startActivity(intent);
+                        }
+                        catch (IOException exception){
+                            Log.e(TAG, "Error parsing zone: " + response.toString());
+                            setState(ZoneActivityStates.Initial);
+                            showToast("При открытии зоны произошла ошибка.");
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                setState(ZoneActivityStates.Initial);
+                if (error.networkResponse.statusCode == 403) {
+                    showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
+                }
+                else {
+                    showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
+                }
+
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders(){
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", token);
+                return headers;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(stringRequest);
+    }
+
+    private void showToast(CharSequence text){
+        Context appContext = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(appContext, text, duration);
+        toast.show();
     }
 
     private void setState(ZoneActivityStates state){
@@ -274,20 +271,30 @@ public class ZoneSelectActivity extends Activity {
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    if (error.networkResponse.statusCode == 404){
-                        setState(ZoneActivityStates.ZoneNotFound);
-                        showToast("Зона не найдена.");// Вы можете создать её.");
+                    if (error.networkResponse != null) {
+                        if (error.networkResponse.statusCode == 404) {
+                            setState(ZoneActivityStates.ZoneNotFound);
+                            showToast("Зона не найдена.");// Вы можете создать её.");
+                        } else if (error.networkResponse.statusCode == 403) {
+                            setState(ZoneActivityStates.Initial);
+                            showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
+                        } else {
+                            setState(ZoneActivityStates.Initial);
+                            showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
+                        }
                     }
-                    else if (error.networkResponse.statusCode == 403) {
-                        setState(ZoneActivityStates.Initial);
-                        showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
-                    }
-                    else {
-                        setState(ZoneActivityStates.Initial);
-                        showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
+                    else{
+                        showToast("Ошибка. " + error.getMessage());
                     }
                 }
-            });
+            }){
+                @Override
+                public Map<String, String> getHeaders(){
+                    Map<String, String> headers = new HashMap<String, String>();
+                    headers.put("Authorization", token);
+                    return headers;
+                }
+            };
             stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             queue.add(stringRequest);
         }
@@ -324,6 +331,16 @@ public class ZoneSelectActivity extends Activity {
         registerReceiver(mScanReceiver, filter);
     }
 
+
+    private void initScan() {
+        // TODO Auto-generated method stub
+        mScanManager = new ScanManager();
+        mScanManager.openScanner();
+        mScanManager.switchOutputMode( 0);
+        soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
+        soundid = soundpool.load("/etc/Scan_new.ogg", 1);
+    }
+
     @Override
     protected void onStart() {
         // TODO Auto-generated method stub
@@ -351,6 +368,9 @@ public class ZoneSelectActivity extends Activity {
         return super.dispatchKeyEvent(event);
     }
 
+    private String token;
+    private UUID inventorization;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -359,6 +379,12 @@ public class ZoneSelectActivity extends Activity {
         setupView();
         Intent intent = getIntent();
         currentActionType = ActionType.valueOf(intent.getStringExtra(ACTION_TYPE_MESSAGE));
+
+        SharedPreferences settings = getSharedPreferences("UserInfo", 0);
+        token = settings.getString("token", "undefined");
+        inventorization = UUID.fromString(settings.getString("inventorization", "undefined"));
+        baseInventorizationUrl = Configuration.BaseUrl + "inventorization/" + inventorization.toString() + "/";
+
     }
 
 }

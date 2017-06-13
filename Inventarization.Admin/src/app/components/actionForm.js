@@ -25,6 +25,7 @@ moment.locale("ru-RU")
 
 const mapStateToProps = (state) => {
     return {
+        userInfo: state.auth,
         inventorization: state.auth.SelectedInventorization,
         userInfo: state.auth,
         action: state.action,
