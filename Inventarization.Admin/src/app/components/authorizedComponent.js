@@ -20,7 +20,6 @@ class AuthorizedComponent extends Component {
     // }
     // else{
       let cookieUserData = cookies.get("UserData");
-      debugger;
       if (cookieUserData == undefined || cookieUserData.Token == undefined){
         if (this.props.router){
           this.props.router.push('/login');
