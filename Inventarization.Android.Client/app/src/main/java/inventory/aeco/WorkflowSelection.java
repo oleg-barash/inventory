@@ -50,6 +50,10 @@ public class WorkflowSelection extends Activity {
                 if (checked)
                     selectedActionType = ActionType.SecondScan;
                     break;
+            case R.id.blindScan:
+                if (checked)
+                    selectedActionType = ActionType.BlindScan;
+                break;
         }
     }
 

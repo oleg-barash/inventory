@@ -59,7 +59,7 @@ namespace Inventorization.Business.Domains
         }
 
         public bool ActionExists(Guid id) {
-            return actionRepository.ActionExists(id);
+            return id != default(Guid) && actionRepository.ActionExists(id);
         }
 
     }

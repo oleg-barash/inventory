@@ -50,9 +50,13 @@
             android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".aeco.BlindScanActivity"
+            android:label="@string/title_activity_blind_scan"></activity>
     </application>
 
 </manifest>

@@ -37,6 +37,14 @@
             android:text="Повторное сканирование"
             android:visibility="visible" />
 
+        <RadioButton
+            android:id="@+id/blindScan"
+            android:layout_width="match_parent"
+            android:layout_height="67dp"
+            android:onClick="onRadioButtonClicked"
+            android:text="Слепой пересчёт"
+            android:visibility="visible" />
+
     </RadioGroup>
 
     <Button

@@ -19,7 +19,7 @@ class Zones extends Component {
         super(props)
     }
     componentDidMount() {
-        const { dispatch, inventorization } = this.props
+        const { dispatch, inventorization, userInfo } = this.props
         dispatch(fetchZones(inventorization.Id, userInfo.Token))
     }
     render() {

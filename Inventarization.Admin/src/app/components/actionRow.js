@@ -22,7 +22,7 @@ function getTypeName(type){
     switch(type){
         case 0: return "первое сканирование";
         case 1: return "второе сканирование";
-        case 2: return "третье сканирование";
+        case 2: return "слепой пересчёт";
         default: "неизвестно"
     }
 }

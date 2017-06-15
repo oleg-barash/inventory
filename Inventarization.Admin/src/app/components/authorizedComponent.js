@@ -19,20 +19,21 @@ class AuthorizedComponent extends Component {
     //   }
     // }
     // else{
-      let cookieUserData = cookies.get("UserData");
-      debugger;
-      if (cookieUserData == undefined || cookieUserData.Token == undefined){
-        if (this.props.router){
-          this.props.router.push('/login');
+      if (userInfo.Token == undefined){
+        let cookieUserData = cookies.get("UserData");
+        if (cookieUserData == undefined || cookieUserData.Token == undefined){
+          if (this.props.router){
+            this.props.router.push('/login');
+          }
+          if (browserHistory){
+            browserHistory.push('/login');
+          }
+          return null;
         }
-        if (browserHistory){
-          browserHistory.push('/login');
-        }
-        return null;
-      }
-      else{
-        if (userInfo.Token == undefined){
-          dispatch(updateUserInfo(cookieUserData))
+        else{
+          if (userInfo.Token == undefined){
+            dispatch(updateUserInfo(cookieUserData))
+          }
         }
       }
     //}

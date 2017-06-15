@@ -246,7 +246,8 @@ namespace Inventorization.Api.Controllers
 
                 Business.Model.Action action = new Business.Model.Action()
                 {
-                    BarCode = actionVM.BarCode,
+                    Id = actionVM.Id.GetValueOrDefault(),
+                    BarCode = actionVM.BarCode == null ? string.Empty : actionVM.BarCode,
                     DateTime = actionVM.DateTime.GetValueOrDefault(),
                     Inventorization = inventorization,
                     Quantity = actionVM.Quantity,
@@ -257,12 +258,15 @@ namespace Inventorization.Api.Controllers
                 actionDomain.UpsertAction(action);
 
                 if (actionVM.Type == ActionType.FirstScan)
-                    action.Id = actionVM.Id.Value;
-                {
+                { 
                     var inventarization = _inventorizationRepository.GetInventorization(inventorization);
                     List<Business.Model.Item> items = _companyRepository.GetItems(inventarization.Company);
                     Business.Model.Item foundItem = items.FirstOrDefault(x => x.Code == action.BarCode);
                     return Request.CreateResponse(HttpStatusCode.OK, new { foundItem });
+                }
+                if (actionVM.Type == ActionType.BlindScan)
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, new { ok = true });
                 }
             }
             catch (Exception ex)
@@ -271,6 +275,7 @@ namespace Inventorization.Api.Controllers
                 _logger.Error(ex, message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpGet]

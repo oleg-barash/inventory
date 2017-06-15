@@ -25,6 +25,7 @@ export function addItemFromAction(action){
 export function loadCurrentAction(id, userToken){
     return function (dispatch){
         dispatch(showLoading())
+        debugger
         return fetch(process.env.API_URL + 'action?id=' + id, { headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json => {

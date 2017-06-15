@@ -9,8 +9,6 @@ namespace Inventorization.Business.Model
     {
         FirstScan,
         SecondScan,
-        ThirdScan,
-        DeleteScan,
-        EditScan
+        BlindScan
     }
 }

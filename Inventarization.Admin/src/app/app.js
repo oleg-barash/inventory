@@ -40,16 +40,16 @@ function authCookies({ getState }) {
         let state = getState();
         switch (action.type){
             case LOGIN_FINISHED:
-                debugger;
                 action.userInfo.Token = "Basic " + btoa(action.userInfo.Username + ":" + action.userInfo.Password)
                 state.auth = action.userInfo
                 document.cookie = "UserData=" + JSON.stringify(action.userInfo)
                 browserHistory.push('/items');
+                break
             case INVENTORIZATION_SELECTED:
-            case CLOSE_INVENTORIZATION_DIALOG:
+                debugger
                 browserHistory.push('/items');
-                state.auth = action.userInfo
-                document.cookie = "UserData=" + JSON.stringify(action.userInfo)
+                state.auth.SelectedInventorization = action.inventorization
+                document.cookie = "UserData=" + JSON.stringify(state.auth)
                 break
             case LOGOUT:
                 document.cookie = ""

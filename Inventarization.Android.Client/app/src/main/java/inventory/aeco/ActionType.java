@@ -8,7 +8,5 @@ public enum ActionType
 {
     FirstScan,
     SecondScan,
-    ThirdScan,
-    DeleteScan,
-    EditScan
+    BlindScan
 }

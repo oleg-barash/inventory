@@ -15,7 +15,6 @@ namespace Inventorization.Api.Controllers
 {
     [EnableCors("*", "*", "*")]
     [RoutePrefix("api/action")]
-    [Authorize]
     public class ActionController : ApiController
     {
         private IActionRepository _actionRepository;

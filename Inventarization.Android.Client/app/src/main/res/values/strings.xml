@@ -57,4 +57,5 @@
     </string>
     <string name="prompt_login">Login</string>
     <string name="error_invalid_login">The login is invalid</string>
+    <string name="title_activity_blind_scan">BlindScanActivity</string>
 </resources>

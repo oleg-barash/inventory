@@ -25,7 +25,7 @@ class InventorizationDialog extends AuthorizedComponent {
         function inventorizationSelected(event, target, value){
             dispatch(setInventorization(value))
         }
-        return userInfo == undefined ? null : (<Dialog title="Выбор инвентаризации"
+        return userInfo === undefined || userInfo.Token === undefined || userInfo.SelectedInventorization !== undefined ? null : (<Dialog title="Выбор инвентаризации"
                     actions={<FlatButton
                         label="Готово"
                         disabled={userInfo.SelectedInventorization === undefined}

@@ -136,7 +136,7 @@ public class ZoneSelectActivity extends Activity {
                         try {
                             ObjectMapper mapper = new ObjectMapper();
                             zone = mapper.readValue(response.toString(), Zone.class);
-                            Intent intent = new Intent(ZoneSelectActivity.this, ActionActivity.class);
+                            Intent intent = new Intent(ZoneSelectActivity.this, currentActionType == ActionType.BlindScan ? BlindScanActivity.class : ActionActivity.class);
                             Bundle extras = new Bundle();
                             extras.putString(ActionActivity.ZONE_MESSAGE, zone.Id);
                             extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());

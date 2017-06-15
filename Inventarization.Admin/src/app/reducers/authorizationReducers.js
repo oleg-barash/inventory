@@ -21,7 +21,6 @@ export function auth(state = { IsAuthorized: false, InProcess: false  }, action)
         case INVENTORIZATION_SELECTED:
             return Object.assign({}, state, { SelectedInventorization: action.inventorization });
         case UPDATE_USER_INFO:
-            debugger
             return Object.assign({}, state, action.userInfo);  
         default:
             return state
