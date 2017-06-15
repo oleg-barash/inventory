@@ -91,6 +91,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Business\Report3GeneratorTests.cs" />
     <Compile Include="Business\Report17GeneratorTests.cs" />
     <Compile Include="Data\ContextTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -100,6 +101,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Templates\Report3.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Inventorization.Business\Inventorization.Business.csproj">

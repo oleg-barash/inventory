@@ -14,7 +14,7 @@ namespace Inventorisation.Tests.Business
     public class Report17GeneratorTests
     {
         [TestMethod]
-        public void ReportBuilds()
+        public void Report17Builds()
         {
             Report17Generator generator = new Report17Generator(@"C:\Users\BaranovO\Downloads\LAW27261_19_20170426_141522.XLSX");
             List<Item> data = new List<Item>() { new Item() {

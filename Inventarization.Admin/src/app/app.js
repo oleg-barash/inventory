@@ -1,28 +1,36 @@
 import React, { Component }  from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
 import AppBar from 'material-ui/AppBar';
+import Drawer from 'material-ui/Drawer';
+import MenuItem from 'material-ui/MenuItem';
+
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { Provider } from 'react-redux'
-import {
-  Link
-} from 'react-router'
-import { actionList } from './reducers/actionListReducers'
-import { itemList } from './reducers/itemListReducers'
-import { item } from './reducers/itemReducers'
-import { action } from './reducers/actionReducers'
-import { zoneList } from './reducers/zoneReducers'
-import { auth } from './reducers/authorizationReducers'
 import { createLogger } from 'redux-logger'
 import {reducer as toastrReducer} from 'react-redux-toastr'
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import ReduxToastr from 'react-redux-toastr'
 import PropTypes from 'prop-types';
 import throttle from "redux-throttle";
+
+import { actionList } from './reducers/actionListReducers'
+import { itemList } from './reducers/itemListReducers'
+import { item } from './reducers/itemReducers'
+import { action } from './reducers/actionReducers'
+import { zoneList } from './reducers/zoneReducers'
+import { global } from './reducers/globalReducers'
+import { auth } from './reducers/authorizationReducers'
+
+
 import UserControl from './components/userControl'
+import LeftMenu from './components/leftMenu'
 import InventorizationDialog from './components/inventorizationDialog'
+
 import { withCookies } from 'react-cookie';
-import { LOGIN_FINISHED, LOGOUT, INVENTORIZATION_SELECTED, CLOSE_INVENTORIZATION_DIALOG } from './constants/actionTypes'
+import { LOGIN_FINISHED, LOGOUT, INVENTORIZATION_SELECTED, CLOSE_INVENTORIZATION_DIALOG, TOGGLE_DRAWER } from './constants/actionTypes'
+import { toggleDrawer } from './actions/globalActions'
 import { browserHistory } from 'react-router'
 
 const defaultWait = 30000
@@ -66,7 +74,7 @@ injectTapEventPlugin();
 const loggerMiddleware = createLogger()
 const middleware = [thunkMiddleware,loggerMiddleware,throttleMiddleware, authCookies];
 let store = createStore(
-    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action, auth  }),
+    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action, auth, global  }),
     applyMiddleware(...middleware));
 
 
@@ -79,27 +87,28 @@ class App extends Component {
         super(props);
     }
     render() {
+        let {dispatch} = this.props;
         const childrenWithCookies = React.Children.map(this.props.children,
             (child) => React.cloneElement(child, 
                 {
                     cookies: this.props.cookies
                 })
             );
+        let handleToggle = function(){
+            store.dispatch(toggleDrawer());
+        };
         return (
             
         <MuiThemeProvider>
             <Provider store={store}>
                 <div>
                     <AppBar title="Title" 
+                        onLeftIconButtonTouchTap={handleToggle}
                         iconClassNameRight="muidocs-icon-navigation-expand-more"
                         iconElementRight={<UserControl cookies={this.props.cookies}/>}
                     />
+                    <LeftMenu/>
                     <div>
-                        <ul>
-                            <li><Link to="/items">Товары</Link></li>
-                            <li><Link to="/actions">Действия</Link></li>
-                            <li><Link to="/zones">Зоны</Link></li>
-                        </ul>
                         { childrenWithCookies }
                         <ReduxToastr
                             timeOut={4000}
