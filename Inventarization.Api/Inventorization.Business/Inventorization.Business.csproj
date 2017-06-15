@@ -74,6 +74,7 @@
     <Compile Include="Reports\GuidFileNameGenerator.cs" />
     <Compile Include="Reports\IFileNameGenerator.cs" />
     <Compile Include="Reports\IReportGenerator.cs" />
+    <Compile Include="Reports\Report3Generator.cs" />
     <Compile Include="Reports\Report17Generator.cs" />
     <Compile Include="Reports\ReportGenerator.cs" />
   </ItemGroup>

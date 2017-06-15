@@ -15,6 +15,6 @@ namespace Inventorization.Business.Reports
         {
         }
 
-        public abstract MemoryStream Generate(List<Item> items);
+        public abstract MemoryStream Generate(List<Item> items, List<Inventorization.Business.Model.Action> actions);
     }
 }
