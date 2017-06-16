@@ -2,10 +2,11 @@
  * Created by Барашики on 07.04.2017.
  */
 import React, { PropTypes } from 'react';
-import {Tabs, Tab} from 'material-ui/Tabs';
-import Items from './containers/items'
-import AllActions from './containers/allActions'
-
+import { connect } from 'react-redux';
+import { Tabs, Tab } from 'material-ui/Tabs';
+import AuthorizedComponent from './components/authorizedComponent'
+import { fetchUsers } from './actions/userActions'
+import { fetchActions } from './actions/actionActions'
 
 const styles = {
     headline: {
@@ -16,11 +17,40 @@ const styles = {
     }
 };
 
-const ReportPage = () => {
-    return (
-        <div>
-            <h2 style={styles.headline}>Отчёты</h2>
-        </div>
-    )};
+class ReportPage extends AuthorizedComponent {
+    componentWillMount() {
+        if (this.props.userInfo.IsInitialized()) {
+            this.props.dispatch(fetchUsers(this.props.userInfo.Token))
+            this.props.dispatch(fetchActions(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token))
+        }
+    }
+    render() {
+        let { users } = this.props;
+        return (
+            <div>
+                <h2 style={styles.headline}>Отчёты</h2>
+                <Tabs >
+                    <Tab label="Сотрудники">
+                        <ul>
+                            {
+                                users.map(user => {
+                                    return <li user={user} key={user.Login}>{user.Login}</li>
+                                })
+                            }
+                        </ul>
+                    </Tab>
+                </Tabs>
+            </div>
+        )
+    };
+}
 
-export default ReportPage
+const mapStateToProps = (state) => {
+    return {
+        userInfo: state.auth,
+        dispatch: state.dispatch,
+        users: state.users.list
+    }
+}
+
+export default connect(mapStateToProps)(ReportPage)

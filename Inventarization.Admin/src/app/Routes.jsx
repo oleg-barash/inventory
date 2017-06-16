@@ -20,7 +20,7 @@ export default (<Route path="/" component={App}>
         <Route path="editAction" component={ActionPage}/>
         <Route path="actions" component={ActionListPage}/>
         <Route path="zones" component={ZonesPage}/>
-        <Route path="report" component={ReportPage}/>
+        <Route path="reports" component={ReportPage}/>
         <Route path="login" component={LoginPage}/>
         <Route path="users" component={UsersPage}/>
     </div>

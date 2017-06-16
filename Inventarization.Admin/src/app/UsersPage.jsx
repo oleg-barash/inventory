@@ -29,7 +29,7 @@ class UsersPage extends AuthorizedComponent {
       super(props);
   }
     componentWillMount() {
-        if (this.props.userInfo.Token != undefined && this.props.userInfo.SelectedInventorization !== undefined){
+        if (this.props.userInfo.IsInitialized()){
             this.props.dispatch(fetchUsers(this.props.userInfo.Token))
         }
     }

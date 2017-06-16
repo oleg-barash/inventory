@@ -1,7 +1,11 @@
 import { LOGIN_FINISHED, LOGIN_IN_PROCESS, UPDATE_USER_INFO, PASSWORD_CHANGED, LOGIN_CHANGED, LOGOUT, OPEN_INVENTORIZATION_DIALOG, CLOSE_INVENTORIZATION_DIALOG, INVENTORIZATION_SELECTED } from '../constants/actionTypes'
 import { Cookies } from 'react-cookie';
 
-export function auth(state = { IsAuthorized: false, InProcess: false  }, action)
+function isInitializedFunction(){
+    return this.Token != undefined && this.SelectedInventorization !== undefined;
+}
+
+export function auth(state = { IsAuthorized: false, InProcess: false, IsInitialized: isInitializedFunction }, action)
 {
     switch (action.type){
         case LOGIN_IN_PROCESS:
