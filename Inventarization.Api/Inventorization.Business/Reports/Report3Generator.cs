@@ -35,6 +35,8 @@ namespace Inventorization.Business.Reports
                 IXLRow currentDataRow = GetFirstDataRow(worksheet.Rows());
                 currentDataRow.InsertRowsBelow(items.Count);
 
+                var grouppedActions = actions.GroupBy(x => x.BarCode);
+
                 int counter = 1;
 
                 foreach (Item item in items)
@@ -47,6 +49,9 @@ namespace Inventorization.Business.Reports
                     worksheet.Range(currentDataRow.Cell("O"), currentDataRow.Cell("P")).Merge();
                     worksheet.Range(currentDataRow.Cell("R"), currentDataRow.Cell("S")).Merge();
                     worksheet.Range(currentDataRow.Cell("U"), currentDataRow.Cell("W")).Merge();
+
+                    //var currentActions = grouppedActions.Where(x => x.Key == item.Code).SelectMany(x => x.);
+                    //currentActions.GroupBy(x => x.)
                     currentDataRow.Cell("A").Value = counter++;
                     currentDataRow.Cell("F").Value = item.Name;
                     currentDataRow.Cell("G").Value = item.Code;

@@ -42,7 +42,7 @@ namespace Inventorisation.Tests.Business
 
             };
 
-            using (MemoryStream stream = generator.Generate(data))
+            using (MemoryStream stream = generator.Generate(data, actions))
             {
                 using (FileStream fs = File.Create(Guid.NewGuid().ToString() + ".xlsx"))
                 {

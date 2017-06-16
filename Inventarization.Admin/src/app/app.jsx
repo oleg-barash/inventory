@@ -22,6 +22,7 @@ import { action } from './reducers/actionReducers'
 import { zoneList } from './reducers/zoneReducers'
 import { global } from './reducers/globalReducers'
 import { auth } from './reducers/authorizationReducers'
+import users from './reducers/userReducers'
 
 
 import UserControl from './components/userControl'
@@ -74,7 +75,7 @@ injectTapEventPlugin();
 const loggerMiddleware = createLogger()
 const middleware = [thunkMiddleware,loggerMiddleware,throttleMiddleware, authCookies];
 let store = createStore(
-    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action, auth, global  }),
+    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action, auth, global, users  }),
     applyMiddleware(...middleware));
 
 

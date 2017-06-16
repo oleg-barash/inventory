@@ -4,13 +4,14 @@
 import React from 'react';
 import { IndexRoute, Route }  from 'react-router';
 import App from './app';
-import ItemListPage from './ItemListPage.js';
-import ItemPage from './ItemPage.js';
-import ReportPage from './ReportPage.js';
-import ZonesPage from './ZonesPage.js';
-import ActionListPage from './ActionListPage.js';
-import LoginPage from './LoginPage.js';
-import ActionPage from './ActionPage.js';
+import ItemListPage from './ItemListPage';
+import ItemPage from './ItemPage';
+import ReportPage from './ReportPage';
+import ZonesPage from './ZonesPage';
+import ActionListPage from './ActionListPage';
+import LoginPage from './LoginPage';
+import ActionPage from './ActionPage';
+import UsersPage from './UsersPage'
 export default (<Route path="/" component={App}>
     <div>
         <IndexRoute  component={LoginPage}/>
@@ -21,5 +22,6 @@ export default (<Route path="/" component={App}>
         <Route path="zones" component={ZonesPage}/>
         <Route path="report" component={ReportPage}/>
         <Route path="login" component={LoginPage}/>
+        <Route path="users" component={UsersPage}/>
     </div>
 </Route>);

@@ -87,5 +87,12 @@ namespace Inventorization.Api.Controllers
             Request.GetOwinContext().Authentication.SignOut();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+        [Route("list"), HttpGet, Authorize]
+        public HttpResponseMessage List()
+        {
+            return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUsers());
+        }
+
     }
 }

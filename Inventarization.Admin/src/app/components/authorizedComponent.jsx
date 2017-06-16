@@ -10,7 +10,6 @@ import { Cookies } from 'react-cookie';
 class AuthorizedComponent extends Component {
   componentWillMount() {
     const { userInfo, dispatch, cookies } = this.props;
-
     // if (document != undefined)
     // {
     //   let userData = JSON.parse(document.cookie);

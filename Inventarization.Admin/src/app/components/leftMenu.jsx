@@ -16,6 +16,7 @@ class LeftMenu extends Component{
                 <MenuItem><Link to="/items">Товары</Link></MenuItem>
                 <MenuItem><Link to="/actions">Действия</Link></MenuItem>
                 <MenuItem><Link to="/zones">Зоны</Link></MenuItem>
+                <MenuItem><Link to="/users">Пользователи</Link></MenuItem>
             </Drawer>)
     }
 }

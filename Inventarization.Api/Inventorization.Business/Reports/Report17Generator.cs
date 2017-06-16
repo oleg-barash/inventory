@@ -24,7 +24,7 @@ namespace Inventorization.Business.Reports
             this.pathToTemplate = pathToTemplate;
             dataRows = new List<IXLRow>();
         }
-        public override MemoryStream Generate(List<Item> items)
+        public override MemoryStream Generate(List<Item> items, List<Model.Action> actions)
         {
             using (XLWorkbook book = new XLWorkbook(pathToTemplate))
             {

@@ -9,7 +9,7 @@ const config = {
   // Entry points to the project
   entry: [
     'webpack/hot/only-dev-server',
-    path.join(__dirname, '/src/app/client.js')
+    path.join(__dirname, '/src/app/client.jsx')
   ],
   output: {
       path: buildPath,
@@ -33,11 +33,14 @@ const config = {
       {from: 'www'},
     ], path.resolve(__dirname, 'src'))
   ],
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
   module: {
     loaders: [
       {
         // React-hot loader and
-        test: /\.js$/, // All .js files
+        test: /\.jsx$/, // All .jsx files
         loaders: ['react-hot-loader', 'babel-loader'], // react-hot is like browser sync and babel loads jsx and es6-7
         exclude: [nodeModulesPath]
       }

@@ -6,7 +6,7 @@ const TransferWebpackPlugin = require('transfer-webpack-plugin');
 
 const configs = [{
   name: 'server',
-    entry: [path.join(__dirname, '/src/app/server.js')],
+    entry: [path.join(__dirname, '/src/app/server.jsx')],
     target: 'node',
     // Render source-map file for final build
     devtool: 'source-map',
@@ -38,10 +38,13 @@ const configs = [{
             {from: 'www'},
         ], path.resolve(__dirname, 'src')),
     ],
+    resolve: {
+      extensions: ['.js', '.jsx']
+    },
     module: {
         loaders: [
             {
-                test: /\.js$/, // All .js files
+                test: /\.jsx$/, // All .jsx files
                 loaders: ['babel-loader'], // react-hot is like browser sync and babel loads jsx and es6-7
                 exclude: [nodeModulesPath],
             },
@@ -49,7 +52,7 @@ const configs = [{
     },
 },{
     name: 'client',
-  entry: [path.join(__dirname, '/src/app/client.js')],
+  entry: [path.join(__dirname, '/src/app/client.jsx')],
   // Render source-map file for final build
   devtool: 'source-map',
   // output config
@@ -80,10 +83,13 @@ const configs = [{
       {from: 'www'},
     ], path.resolve(__dirname, 'src')),
   ],
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
   module: {
     loaders: [
       {
-        test: /\.js$/, // All .js files
+        test: /\.jsx$/, // All .jsx files
         loaders: ['babel-loader'], // react-hot is like browser sync and babel loads jsx and es6-7
         exclude: [nodeModulesPath],
       },

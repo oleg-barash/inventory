@@ -74,6 +74,28 @@ namespace Inventorization.Data
             return result;
         }
 
+        public List<User> GetUsers()
+        {
+            List<User> result = new List<User>();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT * FROM public.\"Users\"";
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.ToUser());
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         public User GetUserByLogin(string login)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
