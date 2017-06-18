@@ -14,7 +14,7 @@ public class Action {
     public String Id;
     public Date DateTime;
     public ActionType Type;
-    public String User;
+    public String UserId;
     public String BarCode;
     public String Zone;
     public String Inventorization;

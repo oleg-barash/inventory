@@ -12,6 +12,7 @@ namespace Inventorization.Business.Interfaces
         Business.Model.Action GetAction(Guid id);
         List<Business.Model.Action> GetActionsByCode(Guid inventarisation, string code);
         List<Business.Model.Action> GetActionsByInventorization(Guid inventarisation);
+        List<Business.Model.Action> GetUsersActions(Guid userId, int lenght);
         void UpdateAction(Business.Model.Action action);
         void UpdateAction(Guid actionId, Guid userId, int quantity);
     }

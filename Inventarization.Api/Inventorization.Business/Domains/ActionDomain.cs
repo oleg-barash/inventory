@@ -62,5 +62,11 @@ namespace Inventorization.Business.Domains
             return id != default(Guid) && actionRepository.ActionExists(id);
         }
 
+
+        public List<Model.Action> GetUsersLastActions(Guid userId, int length)
+        {
+            return actionRepository.GetUsersActions(userId, length);
+        }
+
     }
 }

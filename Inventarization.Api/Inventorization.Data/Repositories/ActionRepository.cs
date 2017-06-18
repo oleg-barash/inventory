@@ -107,6 +107,30 @@ namespace Inventorization.Data
             return result;
         }
 
+        public List<Business.Model.Action> GetUsersActions(Guid userId, int length)
+        {
+            List<Business.Model.Action> result = new List<Business.Model.Action>();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+
+                    cmd.CommandText = $"SELECT * FROM public.\"Actions\" WHERE \"UserId\" =  @Id ORDER BY \"DateTime\" DESC LIMIT {length}";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", userId));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.ToAction());
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         public List<Business.Model.Action> GetActionsByCode(Guid inventarisation, string code)
         {
             List<Business.Model.Action> result = new List<Business.Model.Action>();

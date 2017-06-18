@@ -40,6 +40,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONObject;
@@ -47,6 +48,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -60,7 +62,7 @@ import inventory.aeco.network.models.Action;
 import inventory.aeco.network.models.Zone;
 
 import static java.util.UUID.*;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ActionActivity extends Activity {
 
@@ -129,7 +131,6 @@ public class ActionActivity extends Activity {
         params.put("barCode", newAction.BarCode);
         params.put("inventorization", newAction.Inventorization);
         params.put("zone", newAction.Zone);
-        params.put("user", newAction.User);
         SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
         formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
         params.put("dateTime", formatUTC.format(new Date()));
@@ -426,6 +427,7 @@ public class ActionActivity extends Activity {
 
     @Override
     protected void onStart() {
+        loadLastActions();
         // TODO Auto-generated method stub
         super.onStart();
     }
@@ -436,7 +438,7 @@ public class ActionActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
-    public void updateQuantity(){
+    private void updateQuantity(){
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         newAction.Quantity = Integer.parseInt(quantity.getText().toString());
         HashMap<String, String> params = new HashMap<>();
@@ -472,5 +474,45 @@ public class ActionActivity extends Activity {
         };
         queue.add(jsonRequest);
     }
+    private void loadLastActions(){
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        HashMap<String, String> params = new HashMap<>();
+        StringRequest stringRequest = new StringRequest(Configuration.BaseUrl + "user/lastActions",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            ObjectMapper mapper = new ObjectMapper();
+                            List<Action> lastActions = mapper.readValue(response, new TypeReference<List<Action>>(){});
+                            actionList.clear();
+                            for (int i = 0; i <= actionList.size(); i++) {
+                                actionList.addFirst(lastActions.get(i).BarCode);
+                            }
+                            adapter.notifyDataSetChanged();
+                        }catch (IOException ex){
+                            showToast("Ошибка загрузки последних действий. Код " + ex.getMessage());
+                        }
 
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse != null) {
+                    showToast("Ошибка загрузки последних действий. Код " + error.networkResponse.statusCode);
+                }
+                else{
+                    showToast("Ошибка загрузки последних действий.");
+                }
+
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders(){
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", token);
+                return headers;
+            }
+        };
+        queue.add(stringRequest);
+    }
 }

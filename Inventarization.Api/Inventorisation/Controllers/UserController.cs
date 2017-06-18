@@ -15,6 +15,8 @@ using Inventorization.Business.Interfaces;
 using Microsoft.AspNet.Identity;
 using System.Linq;
 using System.Text;
+using Microsoft.Owin;
+using Inventorization.Business.Domains;
 
 namespace Inventorization.Api.Controllers
 {
@@ -25,13 +27,15 @@ namespace Inventorization.Api.Controllers
 
         private ICompanyRepository _companyRepository;
         private UserRepository _userRepository;
+        private ActionDomain actionDomain;
         private IInventorizationRepository _inventorizationRepository;
 
-        public UserController(ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository, UserRepository userRepository)
+        public UserController(ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository, UserRepository userRepository, ActionDomain actionDomain)
         {
             _companyRepository = companyRepository;
             _inventorizationRepository = inventorizationRepository;
             _userRepository = userRepository;
+            this.actionDomain = actionDomain;
         }
 
 
@@ -92,6 +96,17 @@ namespace Inventorization.Api.Controllers
         public HttpResponseMessage List()
         {
             return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUsers());
+        }
+
+        [Route("lastActions"), HttpGet, Authorize]
+        public HttpResponseMessage LastActions()
+        {
+            IOwinContext ctx = Request.GetOwinContext();
+            ClaimsPrincipal user = ctx.Authentication.User;
+            IEnumerable<Claim> claims = user.Claims;
+            Guid userId = Guid.Parse(claims.Single(x => x.Type == ClaimTypes.Sid).Value);
+            List<Business.Model.Action> userActions = actionDomain.GetUsersLastActions(userId, 6);
+            return Request.CreateResponse(HttpStatusCode.OK, userActions);
         }
 
     }
