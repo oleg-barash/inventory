@@ -24,7 +24,7 @@ class UserForm extends Component {
 
     render() {
         let { dispatch, userInfo, user } = this.props;
-
+        debugger
         let { id } = this.props.location.query;
         if (id !== undefined && (user == null || user.Id != id)){
             dispatch(loadUser(id, userInfo.Token));
@@ -32,6 +32,11 @@ class UserForm extends Component {
         let goBack = function() {
             browserHistory.goBack();
         }
+
+        let onLoginChange = function(target, value) {
+            dispatch(validateUser({Login: value }));
+        }
+
         let save = function() {
             if (!!user.Login){
                 dispatch(saveUser(user, userInfo.Token));
@@ -42,7 +47,7 @@ class UserForm extends Component {
         }
         return (
             <Paper>
-                <TextField id="Login" value={user.Login} floatingLabelText="user_the_first" errorText={user != null ? user.LoginError || '' : '' }/>
+                <TextField id="Login" value={user.Login} onChange={onLoginChange}  floatingLabelText="user_the_first" errorText={user != null ? user.LoginError || '' : '' }/>
                 <Divider />
                 <FlatButton label="Назад" onClick={goBack} />
                 <FlatButton label="Сохранить" onClick={save} disabled={ !!user.LoginError } />

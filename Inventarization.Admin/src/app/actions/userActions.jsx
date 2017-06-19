@@ -39,7 +39,7 @@ export function validateUser(user){
 
 export function saveUser(user, userToken){
         return function (dispatch){
-            return fetch(process.env.API_URL + 'user', {
+            return fetch(process.env.API_URL + 'user/info', {
                 method: "POST",
                     headers: {
                         "Authorization": userToken,
@@ -66,7 +66,6 @@ export function loadUser(id, userToken){
         return fetch(process.env.API_URL + 'user/info?id=' + id, {withCredentials: false, method: 'GET', headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json => {
-                debugger;
                 dispatch(setCurrentUser(json))
             })
     }

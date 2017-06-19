@@ -104,6 +104,21 @@ namespace Inventorization.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUser(id));
         }
 
+        [Route("info"), HttpPost, Authorize]
+        public HttpResponseMessage SaveUser([FromBody]Business.Model.User user)
+        {
+            if (user.Id == default(Guid))
+            {
+                _userRepository.CreateUser(user);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            else
+            {
+                _userRepository.UpdateUserData(user);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+        }
+
         [Route("lastActions"), HttpGet, Authorize]
         public HttpResponseMessage LastActions()
         {

@@ -52,6 +52,37 @@ namespace Inventorization.Data
             return result;
         }
 
+        public void UpdateUserData(User user)
+        {
+            User result = new User();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"UPDATE public.""Users"" SET ""Id"" = @id,
+                        ""FirstName"" = @FirstName, 
+                        ""FamilyName"" =  @FamilyName, 
+                        ""MiddleName"" = @MiddleName, 
+                        ""Login"" = @Login,
+                        ""Password"" = @Password,
+                        ""CreatedAt"" = @CreatedAt,
+                        ""Level"" = @Level
+                        WHERE ""Id"" = @Id";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", user.Id));
+                    cmd.Parameters.Add(new NpgsqlParameter("FirstName", user.FirstName));
+                    cmd.Parameters.Add(new NpgsqlParameter("FamilyName", user.FamilyName));
+                    cmd.Parameters.Add(new NpgsqlParameter("MiddleName", user.MiddleName));
+                    cmd.Parameters.Add(new NpgsqlParameter("Login", user.Login));
+                    cmd.Parameters.Add(new NpgsqlParameter("Password", user.Password));
+                    cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", user.CreatedAt));
+                    cmd.Parameters.Add(new NpgsqlParameter("Level", (int)user.Level));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         public User GetUser(Guid id)
         {
             User result = new User();

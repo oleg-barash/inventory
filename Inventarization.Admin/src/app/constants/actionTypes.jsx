@@ -65,3 +65,4 @@ export const DELETE_USER = 'DELETE_USER';
 export const USER_DELETED = 'USER_DELETED';
 export const USER_SAVED = 'USER_SAVED ';
 export const SET_CURRENT_USER = 'SET_CURRENT_USER';
+export const VALIDATE_USER = 'VALIDATE_USER';
