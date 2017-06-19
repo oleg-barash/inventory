@@ -1,8 +1,6 @@
-﻿using Inventorization.Api.Models;
-using Inventorization.Api.ViewModels;
+﻿using Inventorization.Api.ViewModels;
 using Inventorization.Business.Interfaces;
 using Inventorization.Business.Model;
-using Inventorization.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;

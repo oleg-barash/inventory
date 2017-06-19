@@ -1,22 +1,19 @@
-﻿using Inventorization.Api.Models;
-using Inventorization.Business.Model;
+﻿using Inventorization.Api.ViewModels;
+using Inventorization.Business.Domains;
+using Inventorization.Business.Interfaces;
 using Inventorization.Data;
 using Inventorization.Data.Support;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using Inventorization.Api.ViewModels;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using System.Collections.Generic;
-using Inventorization.Business.Interfaces;
-using Microsoft.AspNet.Identity;
-using System.Linq;
-using System.Text;
-using Microsoft.Owin;
-using Inventorization.Business.Domains;
 
 namespace Inventorization.Api.Controllers
 {

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Owin;
-using Owin;
-using System.Web.Http;
-using Inventorization.Api.Formatters;
-using System.Net.Http.Formatting;
-using Thinktecture.IdentityModel.Owin;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security.OAuth;
-using Microsoft.Owin.Host.SystemWeb;
-using Inventorization.Api;
+﻿using Inventorization.Api;
 using Inventorization.Data;
+using Microsoft.Owin;
+using Microsoft.Owin.Security.OAuth;
+using Owin;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Web.Http;
+using Thinktecture.IdentityModel.Owin;
 
 [assembly: OwinStartup(typeof(Inventorization.Startup))]
 
