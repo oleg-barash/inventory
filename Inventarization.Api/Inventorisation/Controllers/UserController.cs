@@ -98,7 +98,7 @@ namespace Inventorization.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUsers());
         }
 
-        [HttpGet, Authorize]
+        [Route("info"), HttpGet, Authorize]
         public HttpResponseMessage GetUser([FromUri]Guid id)
         {
             return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUser(id));

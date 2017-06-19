@@ -60,6 +60,7 @@ namespace Inventorization.Data
                 conn.Open();
                 using (var cmd = new NpgsqlCommand())
                 {
+                    cmd.Connection = conn;
                     cmd.CommandText = "SELECT * FROM public.\"Users\" WHERE \"Id\" = @Id";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", id));
                     using (var reader = cmd.ExecuteReader())
