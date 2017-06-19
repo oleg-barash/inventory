@@ -2,13 +2,13 @@ import React, { PropTypes, Component  } from 'react';
 import { connect } from 'react-redux'
 import LoginButton from './loginButton';
 import LoggedButton from './loggedButton';
-import AuthorizedComponent from '../components/authorizedComponent'
+import AuthorizedComponent from '../authorizedComponent'
 const mapStateToProps = (state) => {
     return {
         userInfo: state.auth
     }
 }
-class UserControl extends AuthorizedComponent{
+class AuthStatus extends AuthorizedComponent{
     constructor(props) {
         super(props);
     }
@@ -21,4 +21,4 @@ class UserControl extends AuthorizedComponent{
     }
 }
 
-export default connect(mapStateToProps)(UserControl)
+export default connect(mapStateToProps)(AuthStatus)

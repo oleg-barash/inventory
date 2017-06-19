@@ -12,6 +12,7 @@ import ActionListPage from './ActionListPage';
 import LoginPage from './LoginPage';
 import ActionPage from './ActionPage';
 import UsersPage from './UsersPage'
+import UserForm from './components/user/userForm'
 export default (<Route path="/" component={App}>
     <div>
         <IndexRoute  component={LoginPage}/>
@@ -23,5 +24,7 @@ export default (<Route path="/" component={App}>
         <Route path="reports" component={ReportPage}/>
         <Route path="login" component={LoginPage}/>
         <Route path="users" component={UsersPage}/>
+        <Route path="editUser" component={UserForm}/>
+        <Route path="newUser" component={UserForm}/>
     </div>
 </Route>);

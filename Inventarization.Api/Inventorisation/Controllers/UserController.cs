@@ -98,6 +98,12 @@ namespace Inventorization.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUsers());
         }
 
+        [HttpGet, Authorize]
+        public HttpResponseMessage GetUser([FromUri]Guid id)
+        {
+            return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUser(id));
+        }
+
         [Route("lastActions"), HttpGet, Authorize]
         public HttpResponseMessage LastActions()
         {

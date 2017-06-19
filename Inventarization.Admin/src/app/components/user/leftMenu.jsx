@@ -2,7 +2,7 @@ import React, { Component }  from 'react';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import { connect } from 'react-redux'
-import { CLOSE_DRAWER } from '../constants/actionTypes'
+import { CLOSE_DRAWER } from '../../constants/actionTypes'
 import { Link } from 'react-router'
 
 class LeftMenu extends Component{

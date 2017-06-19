@@ -22,11 +22,12 @@ import { action } from './reducers/actionReducers'
 import { zoneList } from './reducers/zoneReducers'
 import { global } from './reducers/globalReducers'
 import { auth } from './reducers/authorizationReducers'
-import users from './reducers/userReducers'
+import users from './reducers/userListReducers'
+import user from './reducers/userReducers'
 
 
-import UserControl from './components/userControl'
-import LeftMenu from './components/leftMenu'
+import AuthStatus from './components/user/authStatus'
+import LeftMenu from './components/user/leftMenu'
 import InventorizationDialog from './components/inventorizationDialog'
 
 import { withCookies } from 'react-cookie';
@@ -75,7 +76,7 @@ injectTapEventPlugin();
 const loggerMiddleware = createLogger()
 const middleware = [thunkMiddleware,loggerMiddleware,throttleMiddleware, authCookies];
 let store = createStore(
-    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action, auth, global, users  }),
+    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action, auth, global, users, user  }),
     applyMiddleware(...middleware));
 
 
@@ -106,7 +107,7 @@ class App extends Component {
                     <AppBar title="Title" 
                         onLeftIconButtonTouchTap={handleToggle}
                         iconClassNameRight="muidocs-icon-navigation-expand-more"
-                        iconElementRight={<UserControl cookies={this.props.cookies}/>}
+                        iconElementRight={<AuthStatus cookies={this.props.cookies}/>}
                     />
                     <LeftMenu/>
                     <div>

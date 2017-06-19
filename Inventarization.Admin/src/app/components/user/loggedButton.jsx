@@ -1,8 +1,8 @@
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
-import { logout } from '../actions/authorizationActions'
-import AuthorizedComponent from '../components/authorizedComponent'
+import { logout } from '../../actions/authorizationActions'
+import AuthorizedComponent from '../authorizedComponent'
 import { connect } from 'react-redux'
 import React, { Component } from 'react';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';

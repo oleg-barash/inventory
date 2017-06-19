@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
-import Users from './components/userList'
+import Users from './components/user/userList'
 import { fetchUsers } from './actions/userActions'
 import AuthorizedComponent from './components/authorizedComponent'
 import { connect } from 'react-redux'

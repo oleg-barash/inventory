@@ -61,3 +61,7 @@ export const CLOSE_DRAWER = "CLOSE_DRAWER";
 
 export const USERS_RECEIVED = 'USERS_RECEIVED';
 export const FETCH_USERS = 'FETCH_USERS';
+export const DELETE_USER = 'DELETE_USER';
+export const USER_DELETED = 'USER_DELETED';
+export const USER_SAVED = 'USER_SAVED ';
+export const SET_CURRENT_USER = 'SET_CURRENT_USER';
