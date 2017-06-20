@@ -12,6 +12,11 @@
   "keywords": [
     "inventory"
   ],
+  "jest": {
+    "globals": {
+      "API_URL": "http://localhost/api/"
+    }
+  },
   "author": "Baranov Oleg",
   "license": "ISC",
   "devDependencies": {
