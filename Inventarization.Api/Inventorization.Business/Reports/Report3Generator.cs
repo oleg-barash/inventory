@@ -41,20 +41,69 @@ namespace Inventorization.Business.Reports
 
                 foreach (Item item in items)
                 {
-                    worksheet.Range(currentDataRow.Cell("A"), currentDataRow.Cell("B")).Merge();
-                    worksheet.Range(currentDataRow.Cell("C"), currentDataRow.Cell("E")).Merge();
-                    worksheet.Range(currentDataRow.Cell("G"), currentDataRow.Cell("H")).Merge();
-                    worksheet.Range(currentDataRow.Cell("J"), currentDataRow.Cell("K")).Merge();
-                    worksheet.Range(currentDataRow.Cell("L"), currentDataRow.Cell("M")).Merge();
-                    worksheet.Range(currentDataRow.Cell("O"), currentDataRow.Cell("P")).Merge();
-                    worksheet.Range(currentDataRow.Cell("R"), currentDataRow.Cell("S")).Merge();
-                    worksheet.Range(currentDataRow.Cell("U"), currentDataRow.Cell("W")).Merge();
+                    var numberCell = worksheet.Range(currentDataRow.Cell("A"), currentDataRow.Cell("B")).Merge(false);
+                    numberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
-                    //var currentActions = grouppedActions.Where(x => x.Key == item.Code).SelectMany(x => x.);
-                    //currentActions.GroupBy(x => x.)
+                    var billCell = worksheet.Range(currentDataRow.Cell("C"), currentDataRow.Cell("E")).Merge(false);
+                    billCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                    var nameCell = currentDataRow.Cell("F");
+                    nameCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                    var itemNumberCell = worksheet.Range(currentDataRow.Cell("G"), currentDataRow.Cell("H")).Merge(false);
+                    itemNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                    currentDataRow.Cell("I").Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    worksheet.Range(currentDataRow.Cell("J"), currentDataRow.Cell("K")).Merge(false).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                    var priceCell = worksheet.Range(currentDataRow.Cell("L"), currentDataRow.Cell("M")).Merge(false);
+                    priceCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    priceCell.Style.NumberFormat.Format = "# ### ### ₽";
+                    priceCell.DataType = XLCellValues.Number;
+
+                    var inventNumberCell = currentDataRow.Cell("N");
+                    inventNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                    worksheet.Range(currentDataRow.Cell("O"), currentDataRow.Cell("P")).Merge(false).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                    var countFactCell = currentDataRow.Cell("Q");
+                    countFactCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                    var sumFactCell = worksheet.Range(currentDataRow.Cell("R"), currentDataRow.Cell("S")).Merge(false);
+                    sumFactCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    sumFactCell.Style.NumberFormat.Format = "# ### ### ₽";
+                    sumFactCell.DataType = XLCellValues.Number;
+
+                    var countPlanCell = currentDataRow.Cell("T");
+                    countPlanCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    var sumPlanCell = worksheet.Range(currentDataRow.Cell("U"), currentDataRow.Cell("W")).Merge(false);
+                    sumPlanCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    sumPlanCell.Style.NumberFormat.Format = "# ### ### ₽";
+                    sumPlanCell.DataType = XLCellValues.Number;
+
+                    int? fact = grouppedActions.FirstOrDefault(x => x.Key == item.Code)?.Sum(x => x.Quantity);
                     currentDataRow.Cell("A").Value = counter++;
                     currentDataRow.Cell("F").Value = item.Name;
-                    currentDataRow.Cell("G").Value = item.Code;
+                    currentDataRow.Cell("G").Value = item.ItemNumber;
+                    currentDataRow.Cell("L").Value = item.Price;
+                    currentDataRow.Cell("N").Value = item.Code;
+                    if (fact.HasValue)
+                    {
+                        currentDataRow.Cell("Q").Value = fact.Value;
+                        if (item.Price != default(decimal))
+                        {
+                            currentDataRow.Cell("R").Value = fact.Value * item.Price;
+                        }
+                    }
+                    if (item.Quantity.HasValue)
+                    {
+                        currentDataRow.Cell("T").Value = item.Quantity.Value;
+                        if (item.Price != default(decimal))
+                        {
+                            currentDataRow.Cell("U").Value = item.Quantity.Value * item.Price;
+                        }
+                    }
+
                     currentDataRow = currentDataRow.RowBelow();
                 }
 

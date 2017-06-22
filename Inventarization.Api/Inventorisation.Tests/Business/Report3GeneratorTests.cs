@@ -1,8 +1,11 @@
 ﻿using Inventorization.Business.Model;
 using Inventorization.Business.Reports;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Ploeh.AutoFixture;
+using Ploeh.AutoFixture.NUnit3;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,46 +13,38 @@ using System.Threading.Tasks;
 
 namespace Inventorisation.Tests.Business
 {
-    [TestClass]
+    [TestFixture]
     public class Report3GeneratorTests
     {
-        [TestMethod]
+        [Test, AutoData]
         public void Report3Builds()
         {
-            Report3Generator generator = new Report3Generator(Directory.GetCurrentDirectory() + @"\Templates\Report3.XLSX");
-            List<Item> data = new List<Item>() { new Item() {
-                Code = "5515138483153",
-                Name = "Телефон",
-                Price = 50.5m,
-                ItemNumber = "ИНВ 2017000000012",
-                Quantity = 50
-            } };
-
-            List<Inventorization.Business.Model.Action> actions = new List<Inventorization.Business.Model.Action>()
+            Report3Generator generator = new Report3Generator(AppDomain.CurrentDomain.BaseDirectory + @"\Templates\Report3.XLSX");
+            Fixture itemsFixture = new Fixture();
+            List<Item> data = itemsFixture.CreateMany<Item>(500).ToList();
+            List<Inventorization.Business.Model.Action> actions = data.SelectMany(x =>
             {
-                new Inventorization.Business.Model.Action()
-                {
-                    Type = ActionType.FirstScan,
-                    BarCode = "5515138483153",
-                    Quantity = 20,
-                },
-                new Inventorization.Business.Model.Action()
-                {
-                    Type = ActionType.SecondScan,
-                    BarCode = "5515138483153",
-                    Quantity = 20,
-                }
+                var itemActions = itemsFixture.CreateMany<Inventorization.Business.Model.Action>(50).ToList();
+                return itemActions.Select(i => { i.BarCode = x.Code; return i; });
+            }).ToList();
 
-            };
-
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             using (MemoryStream stream = generator.Generate(data, actions))
             {
-                using (FileStream fs = File.Create(Guid.NewGuid().ToString() + ".xlsx"))
+                using (FileStream fs = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\" + Guid.NewGuid().ToString() + ".xlsx"))
                 {
                     fs.Write(stream.ToArray(), 0, (int)stream.Length);
                     fs.Close();
                 }
             }
+
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
+
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            Console.WriteLine("RunTime " + elapsedTime);
+
         }
     }
 }
