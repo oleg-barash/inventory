@@ -5,6 +5,8 @@ import React, { PropTypes, Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Add from 'material-ui/svg-icons/Content/add';
 import { green100 as green}  from 'material-ui/styles/colors';
+import { browserHistory } from 'react-router'
+
 class UserList extends Component{
     constructor(props) {
         super(props);

@@ -3,7 +3,7 @@
  */
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import ActionList from '../components/actionList'
+import List from '../components/action/list'
 import { fetchActions } from '../actions/actionActions'
 
 const mapStateToProps = (state) => {
@@ -23,7 +23,7 @@ class AllActionList extends Component {
     render() {
         return (
         <div>
-            <ActionList/>
+            <List/>
         </div>)
     }
 }

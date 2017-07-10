@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import ItemForm from './components/itemForm'
+import Form from './components/item/form'
 import AuthorizedComponent from './components/authorizedComponent'
 import { connect } from 'react-redux'
 import { loadCurrentItem } from './actions/itemActions'
@@ -29,7 +29,7 @@ class NewItemPage extends AuthorizedComponent {
     return (
           <div>
               <h2 style={styles.headline}>Редактирование товара</h2>
-              <ItemForm/>
+              <Form/>
           </div>
     )};
 }

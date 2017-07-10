@@ -5,6 +5,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 import TextField from 'material-ui/TextField';
+import CircularProgress from 'material-ui/CircularProgress';
+// import ProgressButton from 'react-progress-button'
 import { login as onLogin, loginChanged, passwordChanged, loginFinished, closeInventorizationDialog, openInventorizationDialog } from './actions/authorizationActions'
 
 const paperStyle = {
@@ -67,19 +69,25 @@ class LoginPage extends Component {
 
     return (<Paper style={paperStyle} zDepth={3} rounded={false}>
       <h2>Авторизация</h2>
-      <TextField
-        floatingLabelText="Имя пользователя"
-        onChange={loginChangedHandler}
-        value={this.props.login}
-      /><br />
-      <TextField
-        errorText={!!this.props.userInfo ? this.props.userInfo.Error : ''}
-        floatingLabelText="Пароль"
-        onChange={passwordChangedHandler}
-        value={this.props.password}
-        type="password"
-      /><br />
-      <RaisedButton label="Войти" onClick={loginHandler} style={loginButtonStyle} />
+              <TextField
+          floatingLabelText="Имя пользователя"
+          onChange={loginChangedHandler}
+          disabled={this.props.userInfo.InProcess}
+          value={this.props.login}
+        /><br />
+        <TextField
+          errorText={!!this.props.userInfo ? this.props.userInfo.Error : ''}
+          floatingLabelText="Пароль"
+          onChange={passwordChangedHandler}
+          disabled={this.props.userInfo.InProcess}
+          value={this.props.password}
+          type="password"
+        /><br />
+        <RaisedButton label="Войти" onClick={loginHandler} style={Object.assign({loginButtonStyle}, {display: this.props.userInfo.InProcess ? 'none' : 'block'})} display={!this.props.userInfo.InProcess} />
+        <div>
+        {/*<ProgressButton label="Войти" onClick={loginHandler} state={this.props.userInfo.InProcess}/>*/}
+        <CircularProgress size={50} style={{display: this.props.userInfo.InProcess ? 'inline-block' : 'none'}} thickness={5}/>
+        </div>
     </Paper>)
     }
 }

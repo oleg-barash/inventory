@@ -12,15 +12,15 @@ import {blue200 as blue}  from 'material-ui/styles/colors';
 import {green200 as green}  from 'material-ui/styles/colors';
 import {red200 as red}  from 'material-ui/styles/colors';
 import {fullWhite as white}  from 'material-ui/styles/colors';
-import { openZone, closeZone, clearZone } from '../actions/zoneActions';
-import { setCurrentAction } from '../actions/actionActions';
+import { openZone, closeZone, clearZone } from '../../actions/zoneActions';
+import { setCurrentAction } from '../../actions/actionActions';
 import Add from 'material-ui/svg-icons/Content/add';
 import { browserHistory } from 'react-router'
 import moment from 'moment';
-import { ZoneStatuses } from '../constants/zoneStatuses';
+import { ZoneStatuses } from '../../constants/zoneStatuses';
 moment.locale("ru-RU")
 
-class ZoneRow extends Component {
+class Row extends Component {
     constructor(props) {
         super(props);
     }
@@ -91,7 +91,7 @@ class ZoneRow extends Component {
     }
 }
 
-ZoneRow.propTypes = {
+Row.propTypes = {
     zone: PropTypes.shape({
         ZoneStatusId: PropTypes.string.isRequired,
     }).isRequired
@@ -104,4 +104,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(ZoneRow)
+export default connect(mapStateToProps)(Row)

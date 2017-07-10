@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import ActionForm from './components/actionForm'
+import ActionForm from './components/action/form'
 import AuthorizedComponent from './components/authorizedComponent'
 import { connect } from 'react-redux'
 import { loadCurrentAction } from './actions/actionActions'

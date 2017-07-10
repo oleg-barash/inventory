@@ -25,14 +25,13 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = "INSERT INTO public.\"Users\"(\"Id\", \"FirstName\", \"FamilyName\", \"MiddleName\", \"Login\", \"Password\", \"CreatedAt\", \"Level\") VALUES(:Id, :FirstName, :FamilyName, :MiddleName, :Login, :Password, :CreatedAt, :Level)";
+                    cmd.CommandText = "INSERT INTO public.\"Users\"(\"Id\", \"FirstName\", \"FamilyName\", \"Login\", \"Password\", \"CreatedAt\", \"Level\") VALUES(:Id, :FirstName, :FamilyName, :Login, :Password, :CreatedAt, :Level)";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", id));
                     cmd.Parameters.Add(new NpgsqlParameter("FirstName", user.FirstName));
                     cmd.Parameters.Add(new NpgsqlParameter("FamilyName", user.FamilyName));
-                    cmd.Parameters.Add(new NpgsqlParameter("MiddleName", user.MiddleName));
                     cmd.Parameters.Add(new NpgsqlParameter("Login", user.Login));
                     cmd.Parameters.Add(new NpgsqlParameter("Password", user.Password));
-                    cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", user.CreatedAt));
+                    cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", DateTime.UtcNow));
                     cmd.Parameters.Add(new NpgsqlParameter("Level", (int)user.Level));
                     cmd.ExecuteNonQuery();
 
@@ -62,7 +61,6 @@ namespace Inventorization.Data
                     cmd.CommandText = @"UPDATE public.""Users"" SET ""Id"" = @id,
                         ""FirstName"" = @FirstName, 
                         ""FamilyName"" =  @FamilyName, 
-                        ""MiddleName"" = @MiddleName, 
                         ""Login"" = @Login,
                         ""Password"" = @Password,
                         ""CreatedAt"" = @CreatedAt,
@@ -71,7 +69,6 @@ namespace Inventorization.Data
                     cmd.Parameters.Add(new NpgsqlParameter("Id", user.Id));
                     cmd.Parameters.Add(new NpgsqlParameter("FirstName", user.FirstName));
                     cmd.Parameters.Add(new NpgsqlParameter("FamilyName", user.FamilyName));
-                    cmd.Parameters.Add(new NpgsqlParameter("MiddleName", user.MiddleName));
                     cmd.Parameters.Add(new NpgsqlParameter("Login", user.Login));
                     cmd.Parameters.Add(new NpgsqlParameter("Password", user.Password));
                     cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", user.CreatedAt));
@@ -126,6 +123,27 @@ namespace Inventorization.Data
             return result;
         }
 
+        public bool UserExists(string login)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT * FROM public.\"Users\" WHERE \"Login\" = @Login";
+                    cmd.Parameters.Add(new NpgsqlParameter("Login", login));
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            }
+        }
         public User GetUserByLogin(string login)
         {
             using (var conn = new NpgsqlConnection(_connectionString))

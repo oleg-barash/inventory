@@ -5,6 +5,7 @@ using Inventorization.Data;
 using Inventorization.Data.Support;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Inventorization.Api.Controllers
     [RoutePrefix("api/user")]
     public class UserController : ApiController
     {
-
+        private static ILogger logger = LogManager.GetCurrentClassLogger();
         private ICompanyRepository _companyRepository;
         private UserRepository _userRepository;
         private ActionDomain actionDomain;
@@ -102,17 +103,29 @@ namespace Inventorization.Api.Controllers
         }
 
         [Route("info"), HttpPost, Authorize]
-        public HttpResponseMessage SaveUser([FromBody]Business.Model.User user)
+        public IHttpActionResult SaveUser([FromBody]Business.Model.User user)
         {
-            if (user.Id == default(Guid))
+            try
             {
-                _userRepository.CreateUser(user);
-                return Request.CreateResponse(HttpStatusCode.OK);
+                if (user.Id == default(Guid))
+                {
+                    if (_userRepository.UserExists(user.Login))
+                    {
+                        return Ok(new { status = "validation_error", fields = new { LoginError = "Пользователь с таким логином уже существует" } });
+                    }
+                    var createdUser = _userRepository.CreateUser(user);
+                    return Ok(new { status = "success", user = createdUser });
+                }
+                else
+                {
+                    _userRepository.UpdateUserData(user);
+                    return Ok(new { status = "success", user });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                _userRepository.UpdateUserData(user);
-                return Request.CreateResponse(HttpStatusCode.OK);
+                logger.Error(ex, "Saving user info failed");
+                return Ok(new { status = "failed", message = "Произошла ошибка при сохранении инфомации о пользователе" });
             }
         }
 
@@ -125,6 +138,21 @@ namespace Inventorization.Api.Controllers
             Guid userId = Guid.Parse(claims.Single(x => x.Type == ClaimTypes.Sid).Value);
             List<Business.Model.Action> userActions = actionDomain.GetUsersLastActions(userId, 6);
             return Request.CreateResponse(HttpStatusCode.OK, userActions);
+        }
+
+        [HttpDelete, Authorize]
+        public IHttpActionResult DeleteUser([FromBody]Business.Model.User user)
+        {
+            try
+            {
+                _userRepository.DeleteUser(user.Id);
+                return Ok(new { status = "success" });
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Deleting user failed");
+                return Ok(new { status = "failed", message = "Произошла ошибка при удалении пользователя" });
+            }
         }
 
     }

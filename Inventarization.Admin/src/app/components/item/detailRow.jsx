@@ -5,7 +5,7 @@ import React, { PropTypes } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import moment from 'moment';
 moment.locale("ru-RU")
-const ItemDetailRow = ({ action }) => (
+const DetailRow = ({ action }) => (
     <Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
@@ -22,11 +22,11 @@ const ItemDetailRow = ({ action }) => (
     </Table>  
 )
 
-ItemDetailRow.propTypes = {
+DetailRow.propTypes = {
     item: PropTypes.shape({
         BarCode: PropTypes.string.isRequired,
     }).isRequired
 }
 
 
-export default ItemDetailRow
+export default DetailRow

@@ -30,21 +30,6 @@ export function login(username, password){
         dispatch(loginInProcess())
         let userInfo = { Username: username, Password: /*hash(*/password/*)*/ };
 
-        // var XHR = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
-        // var xhr = new XHR();
-        // xhr.open('POST', process.env.API_URL + 'user/login', true);
-        // xhr.setRequestHeader("Accept", 'application/json');
-        // xhr.setRequestHeader("Content-Type", 'application/json');
-        // debugger
-        // xhr.onload = function() {
-        //     dispatch(loginFinished(JSON.parse(this.responseText)))
-        // }
-        // xhr.onerror = function() {
-        //     alert( 'Ошибка ' + this.status );
-        // }
-        
-        // xhr.send(JSON.stringify(userInfo));
-
         return fetch(process.env.API_URL + 'user/login', 
             {  
                 method: "POST",

@@ -3,7 +3,7 @@
  */
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import ZoneList from '../components/zoneList'
+import List from '../components/zone/list'
 import { fetchZones } from '../actions/zoneActions'
 
 const mapStateToProps = (state) => {
@@ -25,7 +25,7 @@ class Zones extends Component {
     render() {
         return (
         <div>
-            <ZoneList zones={this.props.zones}/>
+            <List zones={this.props.zones}/>
         </div>)
     }
 }

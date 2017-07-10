@@ -10,7 +10,7 @@ namespace Inventorization.Business.Reports
     {
         private string pathToTemplate;
         private List<IXLRow> dataRows;
-        private const int firstDataRowIndex = 5;
+        private const int firstDataRowIndex = 4;
         public Report3Generator(string pathToTemplate) : base()
         {
             if (string.IsNullOrWhiteSpace(pathToTemplate))
@@ -25,7 +25,7 @@ namespace Inventorization.Business.Reports
             this.pathToTemplate = pathToTemplate;
             dataRows = new List<IXLRow>();
         }
-        public override MemoryStream Generate(List<Item> items, List<Inventorization.Business.Model.Action> actions)
+        public override MemoryStream Generate(List<Item> items, List<Model.Action> actions)
         {
             using (XLWorkbook book = new XLWorkbook(pathToTemplate))
             {
@@ -34,80 +34,28 @@ namespace Inventorization.Business.Reports
                 dataRows.ForEach(dr => dr.Delete());
                 IXLRow currentDataRow = GetFirstDataRow(worksheet.Rows());
                 currentDataRow.InsertRowsBelow(items.Count);
-
-                var grouppedActions = actions.GroupBy(x => x.BarCode);
+                IEnumerable<IGrouping<string, Model.Action>> grouppedActions = actions.GroupBy(x => x.BarCode);
 
                 int counter = 1;
-
-                foreach (Item item in items)
+                var bunches = BuildBunches(items);
+                var lastBunch = bunches.Last();
+                foreach (var bunch in bunches)
                 {
-                    var numberCell = worksheet.Range(currentDataRow.Cell("A"), currentDataRow.Cell("B")).Merge(false);
-                    numberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                    var billCell = worksheet.Range(currentDataRow.Cell("C"), currentDataRow.Cell("E")).Merge(false);
-                    billCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                    var nameCell = currentDataRow.Cell("F");
-                    nameCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                    var itemNumberCell = worksheet.Range(currentDataRow.Cell("G"), currentDataRow.Cell("H")).Merge(false);
-                    itemNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                    currentDataRow.Cell("I").Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    worksheet.Range(currentDataRow.Cell("J"), currentDataRow.Cell("K")).Merge(false).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                    var priceCell = worksheet.Range(currentDataRow.Cell("L"), currentDataRow.Cell("M")).Merge(false);
-                    priceCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    priceCell.Style.NumberFormat.Format = "# ### ### ₽";
-                    priceCell.DataType = XLCellValues.Number;
-
-                    var inventNumberCell = currentDataRow.Cell("N");
-                    inventNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                    worksheet.Range(currentDataRow.Cell("O"), currentDataRow.Cell("P")).Merge(false).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                    var countFactCell = currentDataRow.Cell("Q");
-                    countFactCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-
-                    var sumFactCell = worksheet.Range(currentDataRow.Cell("R"), currentDataRow.Cell("S")).Merge(false);
-                    sumFactCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    sumFactCell.Style.NumberFormat.Format = "# ### ### ₽";
-                    sumFactCell.DataType = XLCellValues.Number;
-
-                    var countPlanCell = currentDataRow.Cell("T");
-                    countPlanCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    var sumPlanCell = worksheet.Range(currentDataRow.Cell("U"), currentDataRow.Cell("W")).Merge(false);
-                    sumPlanCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-                    sumPlanCell.Style.NumberFormat.Format = "# ### ### ₽";
-                    sumPlanCell.DataType = XLCellValues.Number;
-
-                    int? fact = grouppedActions.FirstOrDefault(x => x.Key == item.Code)?.Sum(x => x.Quantity);
-                    currentDataRow.Cell("A").Value = counter++;
-                    currentDataRow.Cell("F").Value = item.Name;
-                    currentDataRow.Cell("G").Value = item.ItemNumber;
-                    currentDataRow.Cell("L").Value = item.Price;
-                    currentDataRow.Cell("N").Value = item.Code;
-                    if (fact.HasValue)
+                    var firstRowInBunch = currentDataRow;
+                    foreach (Item item in bunch)
                     {
-                        currentDataRow.Cell("Q").Value = fact.Value;
-                        if (item.Price != default(decimal))
-                        {
-                            currentDataRow.Cell("R").Value = fact.Value * item.Price;
-                        }
+                        long? quantity = grouppedActions.FirstOrDefault(x => x.Key == item.Code)?.Sum(x => x.Quantity);
+                        SetRowData(worksheet, currentDataRow, item, quantity, counter++);
+                        currentDataRow = currentDataRow.RowBelow();
                     }
-                    if (item.Quantity.HasValue)
-                    {
-                        currentDataRow.Cell("T").Value = item.Quantity.Value;
-                        if (item.Price != default(decimal))
-                        {
-                            currentDataRow.Cell("U").Value = item.Quantity.Value * item.Price;
-                        }
+                    currentDataRow = SetSummary(worksheet, currentDataRow, bunch, grouppedActions);
+                    if (bunch != lastBunch) {
+                        currentDataRow.AddHorizontalPageBreak();
+                        currentDataRow = currentDataRow.RowBelow();
                     }
-
-                    currentDataRow = currentDataRow.RowBelow();
+                    worksheet.PageSetup.PrintAreas.Add(firstRowInBunch.Cell("A").Address, currentDataRow.Cell("X").Address);
                 }
-
-                SetSummaryRow(currentDataRow, items);
+                currentDataRow = SetSummary(worksheet, currentDataRow, items, grouppedActions);
                 MemoryStream result = new MemoryStream();
                 book.SaveAs(result);
                 result.Position = 0;
@@ -120,13 +68,116 @@ namespace Inventorization.Business.Reports
             return rows.First(x => x.RowNumber() == firstDataRowIndex);
         }
 
-        private void SetRowData(IXLRow row, Item item)
+        public IEnumerable<IEnumerable<Item>> BuildBunches(List<Item> items)
         {
+            var firstPageSize = 30;
+            var pageSize = 35;
+            yield return items.Take(firstPageSize);
+            if (items.Count() > firstPageSize)
+            {
+                var rest = items.Skip(firstPageSize);
+                for (int i = 0; i < rest.Count() / pageSize; i++)
+                {
+                    yield return rest.Skip(i * pageSize).Take(pageSize);
+                }
+            }
         }
 
-        private void SetSummaryRow(IXLRow row, List<Item> items)
+        private void SetRowData(IXLWorksheet worksheet, IXLRow row, Item item, long? quantity, int index)
         {
-            row.Cell(1).Value = items.Sum(x => x.Price);
+            var numberCell = worksheet.Range(row.Cell("A"), row.Cell("B")).Merge(false);
+            numberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var billCell = worksheet.Range(row.Cell("C"), row.Cell("E")).Merge(false);
+            billCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var nameCell = row.Cell("F");
+            nameCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var itemNumberCell = worksheet.Range(row.Cell("G"), row.Cell("H")).Merge(false);
+            itemNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            row.Cell("I").Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            worksheet.Range(row.Cell("J"), row.Cell("K")).Merge(false).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var priceCell = worksheet.Range(row.Cell("L"), row.Cell("M")).Merge(false);
+            priceCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            priceCell.DataType = XLCellValues.Number;
+
+            var inventNumberCell = row.Cell("N");
+            inventNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            worksheet.Range(row.Cell("O"), row.Cell("P")).Merge(false).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var countFactCell = row.Cell("Q");
+            countFactCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var sumFactCell = worksheet.Range(row.Cell("R"), row.Cell("S")).Merge(false);
+            sumFactCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            sumFactCell.Style.NumberFormat.Format = "# ### ### ₽";
+            sumFactCell.DataType = XLCellValues.Number;
+
+            var countPlanCell = row.Cell("T");
+            countPlanCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            var sumPlanCell = worksheet.Range(row.Cell("U"), row.Cell("W")).Merge(false);
+            sumPlanCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            sumPlanCell.Style.NumberFormat.Format = "# ### ### ₽";
+            sumPlanCell.DataType = XLCellValues.Number;
+
+            long? fact = quantity;
+            numberCell.Value = index++;
+            nameCell.Value = item.Name;
+            itemNumberCell.Value = item.ItemNumber;
+            if (item.Price > default(decimal))
+            {
+                priceCell.Style.NumberFormat.Format = "# ### ### ₽";
+                priceCell.Value = item.Price;
+            }
+            inventNumberCell.Value = item.Code;
+            if (fact.HasValue)
+            {
+                countFactCell.Value = fact.Value;
+                if (item.Price != default(decimal))
+                {
+                    sumFactCell.FormulaA1 = $"=Q{countFactCell.Address.RowNumber} * L{countFactCell.Address.RowNumber}";
+                }
+            }
+            if (item.Quantity.HasValue)
+            {
+                countPlanCell.Value = item.Quantity.Value;
+                if (item.Price != default(decimal))
+                {
+                    countPlanCell.FormulaA1 = $"=T{countPlanCell.Address.RowNumber} * L{countPlanCell.Address.RowNumber}";
+                }
+            }
+        }
+
+        private IXLRow SetSummary(IXLWorksheet worksheet, IXLRow row, IEnumerable<Item> items, IEnumerable<IGrouping<string, Model.Action>> actions)
+        {
+
+            var currentActions = actions.Where(x => items.Any(i => i.Code == x.Key)).SelectMany(x => x);
+
+            var totalLabelCell = row.Cell("O");
+            totalLabelCell.Value = "Итого";
+
+            var factNumberCell = row.Cell("Q");
+            factNumberCell.FormulaA1 = $"=SUM(Q{row.Cell("Q").Address.RowNumber - items.Count()}:Q{row.Cell("Q").Address.RowNumber - 1 })";
+            factNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var factSumCell = worksheet.Range(row.Cell("R"), row.Cell("S")).Merge(false);
+            factSumCell.FormulaA1 = $"=SUM(R{row.Cell("R").Address.RowNumber - items.Count()}:R{row.Cell("R").Address.RowNumber - 1 })";
+            factSumCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var planNumberCell = row.Cell("T");
+            planNumberCell.Value = items.Sum(x => x.Quantity);
+            planNumberCell.FormulaA1 = $"=SUM(T{row.Cell("T").Address.RowNumber - items.Count()}:T{row.Cell("T").Address.RowNumber - 1 })";
+            planNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            var planSumCell = worksheet.Range(row.Cell("U"), row.Cell("W")).Merge(false);
+            planSumCell.FormulaA1 = $"=SUM(U{row.Cell("U").Address.RowNumber - items.Count()}:U{row.Cell("U").Address.RowNumber - 1 })";
+            planSumCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+            return row.RowBelow(2);
         }
 
     }

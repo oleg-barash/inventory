@@ -4,9 +4,9 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
-import ZoneRow from '../components/zoneRow';
+import Row from '../../components/zone/row';
 
-class ZoneList extends Component {
+class List extends Component {
     constructor(props) {
         super(props);
     }
@@ -24,7 +24,7 @@ class ZoneList extends Component {
         </TableHeader>
         <TableBody>
             {zones.map(zone =>
-                <ZoneRow zone={zone} key={zone.ZoneStatusId}/>
+                <Row zone={zone} key={zone.ZoneStatusId}/>
             )}
         </TableBody>
     </Table>)
@@ -32,10 +32,10 @@ class ZoneList extends Component {
 }
 
 
-ZoneList.propTypes = {
+List.propTypes = {
     zones: PropTypes.arrayOf(PropTypes.shape({
         ZoneStatusId: PropTypes.string.isRequired
     }).isRequired).isRequired
 }
 
-export default ZoneList
+export default List

@@ -21,11 +21,11 @@ namespace Inventorisation.Tests.Business
         {
             Report3Generator generator = new Report3Generator(AppDomain.CurrentDomain.BaseDirectory + @"\Templates\Report3.XLSX");
             Fixture itemsFixture = new Fixture();
-            List<Item> data = itemsFixture.CreateMany<Item>(500).ToList();
+            List<Item> data = itemsFixture.CreateMany<Item>(10000).ToList();
             List<Inventorization.Business.Model.Action> actions = data.SelectMany(x =>
             {
                 var itemActions = itemsFixture.CreateMany<Inventorization.Business.Model.Action>(50).ToList();
-                return itemActions.Select(i => { i.BarCode = x.Code; return i; });
+                return itemActions.Select(i => { i.BarCode = x.Code; i.Quantity = 1; return i; });
             }).ToList();
 
             Stopwatch stopWatch = new Stopwatch();

@@ -14,8 +14,8 @@ import { yellow200 as yellow}  from 'material-ui/styles/colors';
 import { blue200 as blue}  from 'material-ui/styles/colors';
 import { red200 as red}  from 'material-ui/styles/colors';
 import { fullWhite as white}  from 'material-ui/styles/colors';
-import { deleteAction, setCurrentAction } from '../actions/actionActions';
-import { setCurrentItem } from '../actions/itemActions';
+import { deleteAction, setCurrentAction } from '../../actions/actionActions';
+import { setCurrentItem } from '../../actions/itemActions';
 import { Link, browserHistory } from 'react-router'
 moment.locale("ru-RU")
 function getTypeName(type){
@@ -27,7 +27,7 @@ function getTypeName(type){
     }
 }
 
-class ActionRow extends Component {
+class Row extends Component {
     constructor(props) {
         super(props);
     }
@@ -81,7 +81,7 @@ class ActionRow extends Component {
     }
 }
 
-ActionRow.propTypes = {
+Row.propTypes = {
     action: PropTypes.shape({
         Id: PropTypes.string.isRequired,
     }).isRequired
@@ -92,4 +92,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(ActionRow)
+export default connect(mapStateToProps)(Row)

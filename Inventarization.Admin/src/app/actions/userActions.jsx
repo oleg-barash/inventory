@@ -8,6 +8,8 @@ import {
     SET_CURRENT_USER,
     VALIDATE_USER 
 } from '../constants/actionTypes'
+import {toastr} from 'react-redux-toastr'
+import { browserHistory } from 'react-router'
 export function fetchUsers(userToken) {
     return function (dispatch) {
         dispatch({ type: FETCH_USERS });
@@ -19,14 +21,22 @@ export function fetchUsers(userToken) {
     }
 }
 
-export function deleteUser(user, token){
+export function deleteUser(user, userToken){
     return function (dispatch) {
         dispatch({ type: DELETE_USER, user: user });
         return fetch(process.env.API_URL + 'user', { method: 'DELETE', headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json => {
-                dispatch({ type: USER_DELETED, user: user})
+                if (json.status == "success"){
+                    toastr.error("Пользователь удален");
+                    dispatch({ type: USER_DELETED, user: user});
+                    browserHistory.back();
+                }
+                else{
+                    toastr.error("Ошибка при удалении пользователя: " + json.message);
+                }
             })
+            .failed(res => {toastr.error("Ошибка при удалении пользователя: " + res.message);})
     }
 }
 
@@ -49,13 +59,19 @@ export function saveUser(user, userToken){
                     body: JSON.stringify(user)})
                 .then(response => { return response.json()})
                 .then(response => {
-                    debugger;
-                    if (typeof response === "string" || response.ErrorMessage){
-                        toastr.error("Произошла ошибка при сохранении пользователя: " + response.ErrorMessage)
-                    }
-                    else{
-                        toastr.success("Информация о пользователе успешно сохранена")
-                        dispatch(userSaved(user))
+                    switch(response.status){
+                        case "validation_error":
+                            dispatch(setCurrentUser(Object.assign({}, user, response.fields)));
+                            break;
+                        case "failed":
+                            toastr.error("Произошла ошибка при сохранении пользователя: " + response.ErrorMessage);
+                            break;
+                        case "success":
+                            toastr.success("Информация о пользователе успешно сохранена");
+                            dispatch(userSaved(response.user));
+                            dispatch(setCurrentUser(response.user));
+                            browserHistory.push('/editUser?id=' + response.user.Id);
+                            break;
                     }
                 })
     }

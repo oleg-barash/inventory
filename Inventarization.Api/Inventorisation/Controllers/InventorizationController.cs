@@ -22,7 +22,6 @@ using System.Web.Http.Cors;
 
 namespace Inventorization.Api.Controllers
 {
-    //[Authorize]
     [EnableCors("*", "*", "*")]
     [RoutePrefix("api/inventorization")]
     [Authorize]

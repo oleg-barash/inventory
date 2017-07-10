@@ -7,6 +7,9 @@ import { Tabs, Tab } from 'material-ui/Tabs';
 import AuthorizedComponent from './components/authorizedComponent'
 import { fetchUsers } from './actions/userActions'
 import { fetchActions } from './actions/actionActions'
+import { loadINV3 } from './actions/reportActions'
+import RaisedButton from 'material-ui/RaisedButton';
+import Paper from 'material-ui/Paper';
 
 const styles = {
     headline: {
@@ -17,6 +20,15 @@ const styles = {
     }
 };
 
+const paperStyle = {
+  height: 100,
+  width: 300,
+  margin: 20,
+  padding: 20,
+  textAlign: 'center',
+  display: 'inline-block',
+};
+
 class ReportPage extends AuthorizedComponent {
     componentWillMount() {
         if (this.props.userInfo.IsInitialized()) {
@@ -25,11 +37,22 @@ class ReportPage extends AuthorizedComponent {
         }
     }
     render() {
-        let { users } = this.props;
+        let { users, userInfo, dispatch } = this.props;
+
+        let loadINV3Handler = function(){
+            debugger;
+            dispatch(loadINV3(userInfo.SelectedInventorization.Id, userInfo.Token));
+        }
+
         return (
             <div>
                 <h2 style={styles.headline}>Отчёты</h2>
                 <Tabs >
+                    <Tab label="ИНВ">
+                        <Paper style={paperStyle}>
+                            <RaisedButton label="ИНВ-3" onClick={loadINV3Handler}/>
+                        </Paper>
+                    </Tab>
                     <Tab label="Сотрудники">
                         <ul>
                             {

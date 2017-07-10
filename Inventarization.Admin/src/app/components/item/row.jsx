@@ -35,8 +35,8 @@ class ItemRow extends Component {
                     </Link>
                 }
                 )}</TableRowColumn>
-                <TableRowColumn>{item.QuantityFact}/{item.QuantityPlan}</TableRowColumn>
-                <TableRowColumn>{item.Price  * item.QuantityFact}/{item.Price * item.QuantityPlan}</TableRowColumn>
+                <TableRowColumn>{item.QuantityFact}/{item.QuantityPlan} ({ item.QuantityPlan - item.QuantityFact })</TableRowColumn>
+                <TableRowColumn>{item.Price  * item.QuantityFact}/{item.Price * item.QuantityPlan} ({ item.Price * (item.QuantityPlan - item.QuantityFact) })</TableRowColumn>
                 <TableRowColumn>
                     <FlatButton disabled={item.IsDeleting}
                         hoverColor={green}

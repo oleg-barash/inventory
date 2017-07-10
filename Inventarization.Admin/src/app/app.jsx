@@ -50,13 +50,18 @@ function authCookies({ getState }) {
         let state = getState();
         switch (action.type){
             case LOGIN_FINISHED:
-                action.userInfo.Token = "Basic " + btoa(action.userInfo.Username + ":" + action.userInfo.Password)
-                state.auth = action.userInfo
-                document.cookie = "UserData=" + JSON.stringify(action.userInfo)
-                browserHistory.push('/items');
+                if (action.userInfo.IsAuthorized){
+                    action.userInfo.Token = "Basic " + btoa(action.userInfo.Username + ":" + action.userInfo.Password)
+                    state.auth = action.userInfo
+                    document.cookie = "UserData=" + JSON.stringify(action.userInfo)
+                    browserHistory.push('/items');
+                }
+                else{
+                    delete document.cookie;
+                    browserHistory.push('/login');
+                }
                 break
             case INVENTORIZATION_SELECTED:
-                debugger
                 browserHistory.push('/items');
                 state.auth.SelectedInventorization = action.inventorization
                 document.cookie = "UserData=" + JSON.stringify(state.auth)

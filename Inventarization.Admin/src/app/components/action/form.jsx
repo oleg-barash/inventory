@@ -9,10 +9,10 @@ import { red100 as red}  from 'material-ui/styles/colors';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import { validateAction, saveAction, loadCurrentAction } from '../actions/actionActions'
-import { fetchItems } from '../actions/itemActions'
-import { fetchZones } from '../actions/zoneActions'
-import ZoneSelect from './zoneSelect'
+import { validateAction, saveAction, loadCurrentAction } from '../../actions/actionActions'
+import { fetchItems } from '../../actions/itemActions'
+import { fetchZones } from '../../actions/zoneActions'
+import ZoneSelect from '../zone/select'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 import { browserHistory } from 'react-router'
@@ -43,7 +43,7 @@ const itemNameDataSourceConfig = {
   value: 'Name',
 };
 
-class ActionForm extends Component {
+class Form extends Component {
     constructor(props) {
         super(props);
     }
@@ -51,7 +51,7 @@ class ActionForm extends Component {
     render() {
         let {action, dispatch, availabledItems, inventorization, userInfo} = this.props;
         if (!this.props.availabledItems || this.props.availabledItems.length == 0){
-             dispatch(fetchItems(inventorization.Id, userInfo.Token));
+             dispatch(fetchItems(inventorization.Id, {}, userInfo.Token));
         }
         if (!this.props.availabledZones || this.props.availabledZones.length == 0){
             dispatch(fetchZones(inventorization.Id, userInfo.Token));
@@ -132,4 +132,4 @@ class ActionForm extends Component {
     }
 }
 
-export default connect(mapStateToProps)(ActionForm)
+export default connect(mapStateToProps)(Form)

@@ -3,7 +3,7 @@
  */
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
-import ItemList from '../components/itemList'
+import List from '../components/item/list'
 import { 
     fetchItems, 
     applyItemsFilter, 
@@ -24,7 +24,7 @@ import { green100 as green}  from 'material-ui/styles/colors';
 import Dialog from 'material-ui/Dialog';
 import FileInput  from 'react-file-input';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
-import ZoneSelect from '../components/zoneSelect'
+import Select from '../components/zone/select'
 import AuthorizedComponent from '../components/authorizedComponent'
 import { openInventorizationDialog } from '../actions/authorizationActions'
 
@@ -217,7 +217,7 @@ class Items extends AuthorizedComponent {
                             style={styles.radioButton}
                         />
                     </RadioButtonGroup>
-                    <ZoneSelect zone={!!this.props ? this.props.filter.zone : {}} onZoneChange={onZoneChange}/>
+                    <Select zone={!!this.props ? this.props.filter.zone : {}} onZoneChange={onZoneChange}/>
                 </Paper>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
                     <TextField 
@@ -249,7 +249,7 @@ class Items extends AuthorizedComponent {
             <h2 style={{display: this.props.isFetching ? "block" : "none"}}>
                 Загрузка...
             </h2>
-            <ItemList items={this.props.items} filter={this.props.filter}/>
+            <List items={this.props.items} filter={this.props.filter}/>
             <FlatButton style={{display: this.props.isFetching ? "none" : "block"}} label="Загрузить ещё" hoverColor={green} onClick={handleLoadMore}/>
             <h2 style={{display: this.props.isFetching && this.props.items.length > 0 ? "block" : "none"}}>
                 Загрузка...

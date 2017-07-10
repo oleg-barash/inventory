@@ -11,7 +11,7 @@ export function auth(state = { IsAuthorized: false, InProcess: false, IsInitiali
         case LOGIN_IN_PROCESS:
             return Object.assign({}, state, { InProcess: true });
         case LOGIN_FINISHED:
-            return Object.assign({}, state, action.userInfo, { InProcess: false });    
+            return Object.assign({IsInitialized: isInitializedFunction}, action.userInfo, { InProcess: false });    
         case PASSWORD_CHANGED:
             return Object.assign({}, state, { password: action.password });    
         case LOGIN_CHANGED:

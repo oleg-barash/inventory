@@ -52,12 +52,11 @@ namespace Inventorization.Data
                 Id = reader.GetGuid(0),
                 FirstName = reader.GetString(1),
                 FamilyName = reader.GetString(2),
-                MiddleName = reader.GetString(3),
-                Login = reader.GetString(4),
-                Password = reader.GetString(5),
-                LastLoginAt = reader.IsDBNull(6) ? DateTime.MaxValue : reader.GetDateTime(6),
-                CreatedAt = reader.GetDateTime(7),
-                Level = (UserLevel)reader.GetInt32(8),
+                Login = reader.GetString(3),
+                Password = reader.GetString(4),
+                LastLoginAt = reader.IsDBNull(5) ? DateTime.MaxValue : reader.GetDateTime(5),
+                CreatedAt = reader.GetDateTime(6),
+                Level = (UserLevel)reader.GetInt32(7),
             };
         }
 

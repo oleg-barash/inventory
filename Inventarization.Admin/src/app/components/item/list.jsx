@@ -3,9 +3,9 @@
  */
 import React, { PropTypes } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
-import ItemRow from '../components/itemRow';
+import Row from './row';
 
-const ItemList = ({ items }) => {
+const List = ({ items }) => {
     return (
     <Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
@@ -20,7 +20,7 @@ const ItemList = ({ items }) => {
         </TableHeader>
         <TableBody>
             {items.map(item =>{
-                return <ItemRow item={item} key={item.BarCode}/>
+                return <Row item={item} key={item.BarCode}/>
             }
             )}
         </TableBody>
@@ -28,11 +28,11 @@ const ItemList = ({ items }) => {
 )}
 
 
-ItemList.propTypes = {
+List.propTypes = {
     items: PropTypes.arrayOf(PropTypes.shape({
         BarCode: PropTypes.string.isRequired
     }).isRequired).isRequired,
     filter: PropTypes.object,
 }
 
-export default ItemList
+export default List

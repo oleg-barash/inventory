@@ -3,10 +3,10 @@
  */
 import React, { PropTypes, Component } from 'react';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
-import ActionRow from '../components/actionRow';
+import Row from './row';
 import { connect } from 'react-redux'
 import TextField from 'material-ui/TextField';
-import { filterActions, updateActionsFilter } from '../actions/actionActions'
+import { filterActions, updateActionsFilter } from '../../actions/actionActions'
 
 const mapStateToProps = (state) => {
     return {
@@ -15,7 +15,7 @@ const mapStateToProps = (state) => {
     }
 }
 
-class ActionList extends Component {
+class List extends Component {
     constructor(props) {
         super(props)
     }
@@ -55,11 +55,11 @@ class ActionList extends Component {
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
-                        {actions.map(action => <ActionRow dispatch={dispatch} action={action} key={action.Id}/>)}
+                        {actions.map(action => <Row dispatch={dispatch} action={action} key={action.Id}/>)}
                     </TableBody>
                 </Table>
             </div>)
     }
 }
 
-export default connect(mapStateToProps)(ActionList)
+export default connect(mapStateToProps)(List)

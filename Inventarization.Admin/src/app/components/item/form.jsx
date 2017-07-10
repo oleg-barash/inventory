@@ -9,7 +9,7 @@ import { red100 as red}  from 'material-ui/styles/colors';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import { validateItem, saveItem } from '../actions/itemActions'
+import { validateItem, saveItem } from '../../actions/itemActions'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 import Divider from 'material-ui/Divider';
@@ -24,7 +24,7 @@ const mapStateToProps = (state) => {
     }
 }
 
-class ItemForm extends Component {
+class Form extends Component {
     constructor(props) {
         super(props);
     }
@@ -84,4 +84,4 @@ class ItemForm extends Component {
     }
 }
 
-export default connect(mapStateToProps)(ItemForm)
+export default connect(mapStateToProps)(Form)

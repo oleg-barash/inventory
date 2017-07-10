@@ -10,7 +10,7 @@ const zoneDataSourceConfig = {
   text: 'ZoneName',
   value: 'ZoneId',
 };
-class ZoneSelect extends Component {
+class Select extends Component {
     constructor(props) {
         super(props);
     }
@@ -28,7 +28,7 @@ class ZoneSelect extends Component {
         }
 }
 
-ZoneSelect.propTypes = {
+Select.propTypes = {
     zone: PropTypes.shape({
         Id: PropTypes.string.isRequired,
         ZoneName: PropTypes.string.isRequired,
@@ -36,4 +36,4 @@ ZoneSelect.propTypes = {
     errorText: PropTypes.string
 }
 
-export default connect(mapStateToProps)(ZoneSelect)
+export default connect(mapStateToProps)(Select)
