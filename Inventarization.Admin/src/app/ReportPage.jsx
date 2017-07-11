@@ -10,6 +10,7 @@ import { fetchActions } from './actions/actionActions'
 import { loadINV3 } from './actions/reportActions'
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
+import CircularProgress from 'material-ui/CircularProgress';
 
 const styles = {
     headline: {
@@ -37,10 +38,9 @@ class ReportPage extends AuthorizedComponent {
         }
     }
     render() {
-        let { users, userInfo, dispatch } = this.props;
+        let { users, userInfo, dispatch, report } = this.props;
 
         let loadINV3Handler = function(){
-            debugger;
             dispatch(loadINV3(userInfo.SelectedInventorization.Id, userInfo.Token));
         }
 
@@ -50,7 +50,8 @@ class ReportPage extends AuthorizedComponent {
                 <Tabs >
                     <Tab label="ИНВ">
                         <Paper style={paperStyle}>
-                            <RaisedButton label="ИНВ-3" onClick={loadINV3Handler}/>
+                            <CircularProgress size={50} style={{display: this.props.report.BuildInProcess ? 'inline-block' : 'none'}} thickness={5}/>
+                            <RaisedButton label="ИНВ-3" style={{display: this.props.report.BuildInProcess ? 'none' : 'block'}} onClick={loadINV3Handler}/>
                         </Paper>
                     </Tab>
                     <Tab label="Сотрудники">
@@ -72,7 +73,8 @@ const mapStateToProps = (state) => {
     return {
         userInfo: state.auth,
         dispatch: state.dispatch,
-        users: state.users.list
+        users: state.users.list,
+        report: state.report
     }
 }
 

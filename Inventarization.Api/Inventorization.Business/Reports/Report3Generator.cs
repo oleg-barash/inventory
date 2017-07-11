@@ -147,7 +147,7 @@ namespace Inventorization.Business.Reports
                 countPlanCell.Value = item.Quantity.Value;
                 if (item.Price != default(decimal))
                 {
-                    countPlanCell.FormulaA1 = $"=T{countPlanCell.Address.RowNumber} * L{countPlanCell.Address.RowNumber}";
+                    sumPlanCell.FormulaA1 = $"=T{countPlanCell.Address.RowNumber} * L{countPlanCell.Address.RowNumber}";
                 }
             }
         }

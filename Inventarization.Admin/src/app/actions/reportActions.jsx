@@ -6,9 +6,9 @@ export function loadINV3(inventarizationId, userToken){
         return fetch(process.env.API_URL + 'report/'+ inventarizationId + '/inv3', { headers: { "Authorization": userToken } })
             .then(response => response.blob())
             .then(blob => {
-                debugger;
                 dispatch(hideLoading())
-                var url = URL.createObjectURL(blob);
+                window.open( URL.createObjectURL(blob),'_blank');
+
             })
     }
 }

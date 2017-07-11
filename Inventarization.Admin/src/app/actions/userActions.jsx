@@ -25,7 +25,13 @@ export function deleteUser(user, userToken){
     return function (dispatch) {
         dispatch({ type: DELETE_USER, user: user });
         return fetch(process.env.API_URL + 'user', { method: 'DELETE', headers: { "Authorization": userToken } })
-            .then(response => response.json())
+            .then(response => { 
+                if (response.status != 200) {
+                    toastr.error("Ошибка при удалении пользователя: " + response.message);
+                    throw new Error("Bad response from server");
+                }
+                return response.json();
+            })
             .then(json => {
                 if (json.status == "success"){
                     toastr.error("Пользователь удален");
@@ -36,7 +42,6 @@ export function deleteUser(user, userToken){
                     toastr.error("Ошибка при удалении пользователя: " + json.message);
                 }
             })
-            .failed(res => {toastr.error("Ошибка при удалении пользователя: " + res.message);})
     }
 }
 
