@@ -56,8 +56,8 @@ class Row extends Component {
                 <TableRowColumn style={{width: '100px'}}><small>{getTypeName(action.Type)}</small></TableRowColumn>
                 {/*<TableRowColumn >{action.User}</TableRowColumn>*/}
                 <TableRowColumn style={{width: '100px'}}>{action.BarCode}</TableRowColumn>
-                <TableRowColumn style={{width: '50px'}}>{action.Zone.ZoneName}</TableRowColumn>
-                <TableRowColumn style={{width: '50px'}}>{action.Quantity}</TableRowColumn>
+                <TableRowColumn style={{width: '80px'}}>{action.Zone.ZoneName}</TableRowColumn>
+                <TableRowColumn style={{width: '40px'}}>{action.Quantity}</TableRowColumn>
                 <TableRowColumn >
                     <FlatButton disabled={action.IsDeleting}
                         hoverColor={green}

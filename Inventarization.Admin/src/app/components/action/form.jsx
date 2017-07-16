@@ -73,7 +73,9 @@ class Form extends Component {
             browserHistory.goBack();
         }
         let save = function() {
-            if (!!action.BarCode && !!action.Zone && !!action.Quantity){
+                debugger;
+            
+            if ((action.Type == 2 || !!action.BarCode) && !!action.Zone && !!action.Quantity){
                 dispatch(saveAction(action, inventorization.Id, userInfo.Token));
             }
             else{
@@ -90,11 +92,11 @@ class Form extends Component {
                     searchText={action.BarCode} 
                     floatingLabelText="Укажите код товара" 
                     dataSource={this.props.availabledItems}
-                    visible={action.Type == 0}
+                    style={action.Type == 2 ? {display:"none"} : {} }
                     onNewRequest={onItemChange} 
                     dataSourceConfig={itemDataSourceConfig}
                     filter={(searchText, key) => (key.startsWith(searchText))}
-                    errorText={action != null ? action.CodeError || '' : '' }
+                    errorText={action != null ? action.BarCodeError || '' : '' }
                     />
                 <AutoComplete 
                     fullWidth={true}
@@ -105,7 +107,7 @@ class Form extends Component {
                     floatingLabelText="Укажите наименование товара" 
                     dataSource={this.props.availabledItems}
                     onNewRequest={onItemChange} 
-                    visible={action.Type == 0}
+                    style={action.Type == 2 ? {display:"none"} : {} }
                     dataSourceConfig={itemNameDataSourceConfig}
                     filter={(searchText, key) => (key.indexOf(searchText) != -1)}
                     errorText={action != null ? action.NameError || '' : '' }
@@ -123,7 +125,8 @@ class Form extends Component {
                         onChange={onTypeChange}
                     >
                     <MenuItem value={0} primaryText="Первое сканирование" />
-                    <MenuItem value={1} primaryText="Слепой просчёт" />
+                    <MenuItem value={1} primaryText="Повторное сканирование" />
+                    <MenuItem value={2} primaryText="Слепой просчёт" />
                     </SelectField>
                 <Divider />
                 <FlatButton label="Назад" onClick={goBack} />

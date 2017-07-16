@@ -7,9 +7,12 @@ export function action(state = { Type: 0 }, action)
 {
     switch (action.type){
         case VALIDATE_ACTION:
+        debugger
             let actionItem = Object.assign({}, state, action.data)
-            actionItem.NameError = actionItem.Name !== '' ? '' : 'Наименование товара нужно выбрать из списка'
-            actionItem.CodeError = actionItem.Code !== '' ? '' : 'Код товара нужно выбрать из списка'
+            if (actionItem.Type != 2){
+                actionItem.NameError = actionItem.Name !== '' && actionItem.Name !=='Не найдена в номенклатуре' ? '' : 'Наименование товара нужно выбрать из списка'
+                actionItem.BarCodeError = actionItem.BarCode !== '' && actionItem.BarCode !== undefined ? '' : 'Код товара нужно выбрать из списка'
+            }
             actionItem.QuantityError = actionItem.Quantity !== '' ? '' : 'Количество нужно обязательно указать'
             actionItem.ZoneError = actionItem.Zone !== undefined ? '' : 'Зону нужно обязательно указать'
             if (!actionItem.Id){

@@ -49,8 +49,8 @@ class List extends Component {
                             <TableHeaderColumn style={{width: '100px'}}>Тип</TableHeaderColumn>
                             {/*<TableHeaderColumn >Пользователь</TableHeaderColumn>*/}
                             <TableHeaderColumn style={{width: '100px'}}>Код</TableHeaderColumn>
-                            <TableHeaderColumn style={{width: '50px'}}>Зона</TableHeaderColumn>
-                            <TableHeaderColumn style={{width: '50px'}}>Кол-во</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '80px'}}>Зона</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '40px'}}>Кол-во</TableHeaderColumn>
                             <TableHeaderColumn >Действия</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
