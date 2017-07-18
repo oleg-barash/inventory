@@ -327,7 +327,6 @@ namespace Inventorization.Api.Controllers
         {
             var item = inventorizationDomain.GetItem(id);
             ViewModels.Item res = new ViewModels.Item();
-            res.QuantityPlan = item.Quantity;
             res.BarCode = item.Code;
             res.Description = item.Description;
             res.Number = item.ItemNumber;
@@ -336,6 +335,10 @@ namespace Inventorization.Api.Controllers
             res.CreatedAt = item.CreatedAt;
             res.Price = item.Price;
             res.Readonly = item.Source == ItemSource.Import;
+
+            var rests = inventorizationDomain.GetRests(inventorizationId, item.Code);
+            res.QuantityPlan = rests?.Count;
+
 
             var actions = inventorizationDomain.GetActionsByCode(inventorizationId, item.Code);
             var zones = zoneDomain.GetZones(actions.Select(x => x.Zone).ToArray());
@@ -369,7 +372,9 @@ namespace Inventorization.Api.Controllers
             var result = items.Select(x =>
             {
                 ViewModels.Item res = new ViewModels.Item();
-                res.QuantityPlan = x.Quantity;
+
+                var rests = inventorizationDomain.GetRests(inventorizationId, x.Code);
+                res.QuantityPlan = rests?.Count;
                 res.BarCode = x.Code;
                 res.Description = x.Description;
                 res.Number = x.ItemNumber;

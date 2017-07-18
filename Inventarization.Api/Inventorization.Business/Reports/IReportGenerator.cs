@@ -7,6 +7,6 @@ namespace Inventorization.Business.Reports
 {
     public interface IReportGenerator
     {
-        MemoryStream Generate(List<Item> items, List<Inventorization.Business.Model.Action> actions);
+        MemoryStream Generate(List<Item> items, List<Action> actions, List<Rests> rests);
     }
 }

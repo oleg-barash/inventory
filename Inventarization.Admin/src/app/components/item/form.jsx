@@ -51,11 +51,11 @@ class Form extends Component {
             browserHistory.goBack();
         }
         let save = function() {
-            if (!!item.Name && !!item.BarCode && !!item.QuantityPlan){
+            if (!!item.Name && !!item.BarCode/* && !!item.QuantityPlan*/){
                 dispatch(saveItem(item, inventorization.Company, userInfo.Token));
             }
             else{
-                dispatch(validateItem({BarCode: item.BarCode || '', Name: item.Name || '', QuantityPlan: item.QuantityPlan || ''}));
+                dispatch(validateItem({BarCode: item.BarCode || '', Name: item.Name || ''/*, QuantityPlan: item.QuantityPlan || ''*/}));
             }
         }
         return (
@@ -76,8 +76,8 @@ class Form extends Component {
                 <Divider />
                 <TextField disabled={item.Readonly} id="Number" value={item.Number} onChange={onNumberChange} hintText="ИНВ-20141815052" floatingLabelText="Инвентарный номер товара"/>
                 <Divider />
-                <TextField disabled={item.Readonly} id="Quantity" hintText="0" value={item.QuantityPlan} onChange={onQuantityChange} floatingLabelText="Количество единиц товара" errorText={item != null ? item.QuantityError || '' : '' }/>
-                <Divider />
+                {/*<TextField disabled={item.Readonly} id="Quantity" hintText="0" value={item.QuantityPlan} onChange={onQuantityChange} floatingLabelText="Количество единиц товара" errorText={item != null ? item.QuantityError || '' : '' }/>
+                <Divider />*/}
                 <FlatButton label="Назад" onClick={goBack} />
                 <FlatButton disabled={item.Readonly} label="Сохранить" onClick={save} disabled={ !!item.CodeError || !!item.DescriptionError || !!item.QuantityError} />
             </Paper>)

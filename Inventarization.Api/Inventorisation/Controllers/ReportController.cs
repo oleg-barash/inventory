@@ -1,6 +1,8 @@
 ﻿using Inventorization.Business.Interfaces;
+using Inventorization.Business.Model;
 using Inventorization.Business.Reports;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -39,9 +41,12 @@ namespace Inventorization.Api.Controllers
             {
                 return NotFound();
             }
-            var items = companyRepository.GetItems(inventorization.Company).Take(1000);
-            var actions = actionRepository.GetActionsByInventorization(inventorizationId);
-            using (MemoryStream stream = generator.Generate(items.ToList(), actions))
+            List<Rests> rests = inventorizationRepository.GetRests(inventorizationId);
+            List<Business.Model.Action> actions = actionRepository.GetActionsByInventorization(inventorizationId);
+            string[] codes = rests.Select(x => x.Code).Union(actions.Select(x => x.BarCode)).Distinct().ToArray();
+            IEnumerable<Item> items = companyRepository.GetItems(inventorization.Company).Where(x => codes.Any(r => r == x.Code));
+
+            using (MemoryStream stream = generator.Generate(items.ToList(), actions, rests))
             {
                 var result = new HttpResponseMessage(HttpStatusCode.OK)
                 {

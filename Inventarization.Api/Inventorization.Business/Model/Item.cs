@@ -21,7 +21,7 @@ namespace Inventorization.Business.Model
         public string Code{ get; set; }
         public Guid CompanyId { get; set; }
         public string Description { get; set; }
-        public int? Quantity { get; set; }
+        //public int? Quantity { get; set; }
         public ItemSource Source { get; set; }
         public string Name { get; set; }
         public int Id { get; set; }

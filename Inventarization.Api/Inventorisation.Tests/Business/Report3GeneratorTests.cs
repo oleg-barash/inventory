@@ -21,16 +21,27 @@ namespace Inventorisation.Tests.Business
         {
             Report3Generator generator = new Report3Generator(AppDomain.CurrentDomain.BaseDirectory + @"\Templates\Report3.XLSX");
             Fixture itemsFixture = new Fixture();
-            List<Item> data = itemsFixture.CreateMany<Item>(10000).ToList();
+            List<Item> data = itemsFixture.CreateMany<Item>(100).ToList();
             List<Inventorization.Business.Model.Action> actions = data.SelectMany(x =>
             {
                 var itemActions = itemsFixture.CreateMany<Inventorization.Business.Model.Action>(50).ToList();
                 return itemActions.Select(i => { i.BarCode = x.Code; i.Quantity = 1; return i; });
             }).ToList();
+            Random rnd = new Random();
+            IEnumerable<Rests> rests = data.Select(x =>
+            {
+                var res = new Rests()
+                {
+                    Code = x.Code,
+                    Count = rnd.Next(1, 10),
+                    InventorizationId = Guid.NewGuid()
+                };
+                return res;
+            });
 
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            using (MemoryStream stream = generator.Generate(data, actions))
+            using (MemoryStream stream = generator.Generate(data, actions, rests.ToList()))
             {
                 using (FileStream fs = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\" + Guid.NewGuid().ToString() + ".xlsx"))
                 {

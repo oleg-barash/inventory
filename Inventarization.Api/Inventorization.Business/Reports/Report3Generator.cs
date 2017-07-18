@@ -25,7 +25,7 @@ namespace Inventorization.Business.Reports
             this.pathToTemplate = pathToTemplate;
             dataRows = new List<IXLRow>();
         }
-        public override MemoryStream Generate(List<Item> items, List<Model.Action> actions)
+        public override MemoryStream Generate(List<Item> items, List<Model.Action> actions, List<Rests> rests)
         {
             using (XLWorkbook book = new XLWorkbook(pathToTemplate))
             {
@@ -45,17 +45,19 @@ namespace Inventorization.Business.Reports
                     foreach (Item item in bunch)
                     {
                         long? quantity = grouppedActions.FirstOrDefault(x => x.Key == item.Code)?.Sum(x => x.Quantity);
-                        SetRowData(worksheet, currentDataRow, item, quantity, counter++);
+                        Rests itemRests = rests.FirstOrDefault(x => x.Code == item.Code);
+                        SetRowData(worksheet, currentDataRow, item, itemRests, quantity, counter++);
                         currentDataRow = currentDataRow.RowBelow();
                     }
-                    currentDataRow = SetSummary(worksheet, currentDataRow, bunch, grouppedActions);
+                    var restsInBunch = rests.Where(x => bunch.Any(b => b.Code == x.Code));
+                    currentDataRow = SetSummary(worksheet, currentDataRow, bunch, restsInBunch, grouppedActions);
                     if (bunch != lastBunch) {
                         currentDataRow.AddHorizontalPageBreak();
                         currentDataRow = currentDataRow.RowBelow();
                     }
                     worksheet.PageSetup.PrintAreas.Add(firstRowInBunch.Cell("A").Address, currentDataRow.Cell("X").Address);
                 }
-                currentDataRow = SetSummary(worksheet, currentDataRow, items, grouppedActions);
+                currentDataRow = SetSummary(worksheet, currentDataRow, items, rests, grouppedActions);
                 MemoryStream result = new MemoryStream();
                 book.SaveAs(result);
                 result.Position = 0;
@@ -83,7 +85,7 @@ namespace Inventorization.Business.Reports
             }
         }
 
-        private void SetRowData(IXLWorksheet worksheet, IXLRow row, Item item, long? quantity, int index)
+        private void SetRowData(IXLWorksheet worksheet, IXLRow row, Item item, Rests rests, long? quantity, int index)
         {
             var numberCell = worksheet.Range(row.Cell("A"), row.Cell("B")).Merge(false);
             numberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
@@ -142,17 +144,14 @@ namespace Inventorization.Business.Reports
                     sumFactCell.FormulaA1 = $"=Q{countFactCell.Address.RowNumber} * L{countFactCell.Address.RowNumber}";
                 }
             }
-            if (item.Quantity.HasValue)
+            countPlanCell.Value = rests?.Count;
+            if (rests.Price != default(decimal))
             {
-                countPlanCell.Value = item.Quantity.Value;
-                if (item.Price != default(decimal))
-                {
-                    sumPlanCell.FormulaA1 = $"=T{countPlanCell.Address.RowNumber} * L{countPlanCell.Address.RowNumber}";
-                }
+                sumPlanCell.FormulaA1 = $"=T{countPlanCell.Address.RowNumber} * L{countPlanCell.Address.RowNumber}";
             }
         }
 
-        private IXLRow SetSummary(IXLWorksheet worksheet, IXLRow row, IEnumerable<Item> items, IEnumerable<IGrouping<string, Model.Action>> actions)
+        private IXLRow SetSummary(IXLWorksheet worksheet, IXLRow row, IEnumerable<Item> items, IEnumerable<Rests> rests, IEnumerable<IGrouping<string, Model.Action>> actions)
         {
 
             var currentActions = actions.Where(x => items.Any(i => i.Code == x.Key)).SelectMany(x => x);
@@ -169,7 +168,7 @@ namespace Inventorization.Business.Reports
             factSumCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 
             var planNumberCell = row.Cell("T");
-            planNumberCell.Value = items.Sum(x => x.Quantity);
+            planNumberCell.Value = rests.Sum(x => x.Count);
             planNumberCell.FormulaA1 = $"=SUM(T{row.Cell("T").Address.RowNumber - items.Count()}:T{row.Cell("T").Address.RowNumber - 1 })";
             planNumberCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
 

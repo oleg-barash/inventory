@@ -65,6 +65,7 @@
     <Compile Include="Model\Company.cs" />
     <Compile Include="Model\Inventorization.cs" />
     <Compile Include="Model\Item.cs" />
+    <Compile Include="Model\Rests.cs" />
     <Compile Include="Model\Task.cs" />
     <Compile Include="Model\User.cs" />
     <Compile Include="Model\UserLevel.cs" />

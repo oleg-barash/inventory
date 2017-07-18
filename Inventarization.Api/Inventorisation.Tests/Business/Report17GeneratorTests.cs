@@ -21,7 +21,7 @@ namespace Inventorisation.Tests.Business
                 Code = "TEST_CODE",
                 Name = "TEST_NAME"
             } };
-            using (MemoryStream stream = generator.Generate(data, Enumerable.Empty<Inventorization.Business.Model.Action>().ToList()))
+            using (MemoryStream stream = generator.Generate(data, Enumerable.Empty<Inventorization.Business.Model.Action>().ToList(), Enumerable.Empty<Inventorization.Business.Model.Rests>().ToList()))
             {
                 using (FileStream fs = File.Create(Guid.NewGuid().ToString()))
                 {

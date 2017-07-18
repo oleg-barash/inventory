@@ -2,6 +2,7 @@
 using Inventorization.Business.Model;
 using Npgsql;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -278,6 +279,53 @@ namespace Inventorization.Data
                     cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", id));
                     cmd.ExecuteNonQuery();
 
+                }
+            }
+        }
+
+        private ConcurrentDictionary<Guid, List<Rests>> _rests = new ConcurrentDictionary<Guid, List<Rests>>();
+        public List<Rests> GetRests(Guid id)
+        {
+            return _rests.GetOrAdd(id, (key) =>
+            {
+                List<Rests> result = new List<Rests>();
+                using (var conn = new NpgsqlConnection(_connectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new NpgsqlCommand())
+                    {
+                        cmd.Connection = conn;
+                        cmd.CommandText = @"SELECT * FROM public.""Rests"" AS rests WHERE rests.""InventorizationId"" = @id";
+                        cmd.Parameters.Add(new NpgsqlParameter("id", key));
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                result.Add(reader.ToRests());
+                            }
+                        }
+                    }
+                }
+                return result;
+            });
+        }
+
+        public void AddRest(Rests rest)
+        {
+            Business.Model.Inventorization result = new Business.Model.Inventorization();
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    Guid id = Guid.NewGuid();
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"INSERT INTO public.""Rests""(""Code"", ""Count"", ""Price"", ""InventorizationId"") VALUES(:Code, :Count, :Price, :InventorizationId)";
+                    cmd.Parameters.Add(new NpgsqlParameter("Code", rest.Code));
+                    cmd.Parameters.Add(new NpgsqlParameter("Count", rest.Code));
+                    cmd.Parameters.Add(new NpgsqlParameter("Price", rest.Code));
+                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", rest.Code));
+                    cmd.ExecuteNonQuery();
                 }
             }
         }

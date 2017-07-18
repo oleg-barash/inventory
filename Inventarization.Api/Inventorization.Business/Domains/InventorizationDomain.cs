@@ -42,6 +42,11 @@ namespace Inventorization.Business.Domains
             return actionRepository.GetActionsByCode(inventorizationId, code);
         }
 
+        
+        public Model.Rests GetRests(Guid id, string code)
+        {
+            return inventorizationRepository.GetRests(id).FirstOrDefault(x => x.Code == code);
+        }
         public Model.Item GetItem(int itemId)
         {
             Model.Item item = companyRepository.GetItem(itemId);

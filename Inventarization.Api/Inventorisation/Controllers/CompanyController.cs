@@ -115,7 +115,7 @@ namespace Inventorization.Api.Controllers
             item.ItemNumber = itemVM.Number;
             item.Name = itemVM.Name;
             item.Description = itemVM.Description;
-            item.Quantity = itemVM.QuantityPlan ?? default(int);
+            //item.Quantity = itemVM.QuantityPlan ?? default(int);
             item.CompanyId = id;
             item.Source = ItemSource.Manual;
             item.CreatedAt = DateTime.UtcNow;
@@ -144,7 +144,6 @@ namespace Inventorization.Api.Controllers
                     itemModel.ItemNumber = item.Number;
                     itemModel.Name = item.Name;
                     itemModel.Description = item.Description;
-                    itemModel.Quantity = item.QuantityPlan ?? default(int);
                     itemModel.CompanyId = companyId;
                     var foundItem = foundItems.FirstOrDefault(x => x.Code == item.BarCode);
                     if (foundItem == null)

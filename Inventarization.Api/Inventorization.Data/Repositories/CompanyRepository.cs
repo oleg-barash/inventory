@@ -2,6 +2,7 @@
 using Inventorization.Business.Model;
 using Npgsql;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -132,51 +133,63 @@ namespace Inventorization.Data
             return items;
         }
 
+
+        private ConcurrentDictionary<Guid, List<Item>> _itemsCache = new ConcurrentDictionary<Guid, List<Item>>();
+
         public List<Item> GetItems(Guid companyId)
         {
-            List<Item> items = new List<Item>();
-            using (var conn = new NpgsqlConnection(_connectionString))
+            List<Item> cacheItems = _itemsCache.GetOrAdd(companyId, (id) =>
             {
-                conn.Open();
-                using (var cmd = new NpgsqlCommand())
+                List<Item> items = new List<Item>();
+                using (var conn = new NpgsqlConnection(_connectionString))
                 {
-                    cmd.Connection = conn;
-                    cmd.CommandText = @"SELECT items.* FROM public.""Companies"" AS companies
+                    conn.Open();
+                    using (var cmd = new NpgsqlCommand())
+                    {
+                        cmd.Connection = conn;
+                        cmd.CommandText = @"SELECT items.* FROM public.""Companies"" AS companies
                         JOIN public.""Item"" AS items ON items.""CompanyId"" = companies.""Id""
                         WHERE companies.""Id"" = @Id;";
-                    cmd.Parameters.Add(new NpgsqlParameter("Id", companyId));
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        cmd.Parameters.Add(new NpgsqlParameter("Id", id));
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            items.Add(reader.ToItem());
+                            while (reader.Read())
+                            {
+                                items.Add(reader.ToItem());
+                            }
                         }
                     }
                 }
-            }
-            return items;
+                return items;
+            });
+            return cacheItems;
         }
 
+        private ConcurrentDictionary<int, Item> _itemCache = new ConcurrentDictionary<int, Item>();
         public Item GetItem(int itemId)
         {
-            using (var conn = new NpgsqlConnection(_connectionString))
+            Item cacheItem = _itemCache.GetOrAdd(itemId, (id) =>
             {
-                conn.Open();
-                using (var cmd = new NpgsqlCommand())
+                using (var conn = new NpgsqlConnection(_connectionString))
                 {
-                    cmd.Connection = conn;
-                    cmd.CommandText = @"SELECT * FROM public.""Item""
-                        WHERE ""Id"" = @ItemId";
-                    cmd.Parameters.Add(new NpgsqlParameter("ItemId", itemId));
-                    using (var reader = cmd.ExecuteReader())
+                    conn.Open();
+                    using (var cmd = new NpgsqlCommand())
                     {
-                        while (reader.Read())
+                        cmd.Connection = conn;
+                        cmd.CommandText = @"SELECT * FROM public.""Item""
+                        WHERE ""Id"" = @ItemId";
+                        cmd.Parameters.Add(new NpgsqlParameter("ItemId", id));
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            return reader.ToItem();
+                            while (reader.Read())
+                            {
+                                return reader.ToItem();
+                            }
                         }
                     }
                 }
-            }
+                return null;
+            });
             return null;
         }
 
@@ -191,14 +204,14 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""Quantity"", ""CreatedAt"", ""Name"", ""Price"") VALUES(:Company, :Code, :Description, :Quantity, :CreatedAt, :Name, :Price)";
+                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""CreatedAt"", ""Name"", ""Price"", ""Source"") VALUES(:Company, :Code, :Description, :CreatedAt, :Name, :Price, :Source)";
                     cmd.Parameters.Add(new NpgsqlParameter("Company", companyId));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", item.Name));
                     cmd.Parameters.Add(new NpgsqlParameter("Code", item.Code));
                     cmd.Parameters.Add(new NpgsqlParameter("Description", string.IsNullOrWhiteSpace(item.Description) ? string.Empty : item.Description));
-                    cmd.Parameters.Add(new NpgsqlParameter("Quantity", item.Quantity));
                     cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", item.CreatedAt));
                     cmd.Parameters.Add(new NpgsqlParameter("Price", item.Price));
+                    cmd.Parameters.Add(new NpgsqlParameter("Source", (byte)item.Source));
 
                     cmd.ExecuteNonQuery();
 
@@ -216,12 +229,11 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = @"UPDATE public.""Item"" SET ""CompanyId""=@Company, ""Code""=@Code, ""Description""=@Description, ""Quantity"" = @Quantity, ""Name""=@Name, ""ItemNumber"" = @ItemNumber WHERE ""Id"" = @Id";
+                    cmd.CommandText = @"UPDATE public.""Item"" SET ""CompanyId""=@Company, ""Code""=@Code, ""Description""=@Description, ""Name""=@Name, ""ItemNumber"" = @ItemNumber WHERE ""Id"" = @Id";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", item.Id));
                     cmd.Parameters.Add(new NpgsqlParameter("Company", item.CompanyId));
                     cmd.Parameters.Add(new NpgsqlParameter("Code", item.Code));
                     cmd.Parameters.Add(new NpgsqlParameter("Description", string.IsNullOrWhiteSpace(item.Description) ? string.Empty : item.Description));
-                    cmd.Parameters.Add(new NpgsqlParameter("Quantity", item.Quantity));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", item.Name));
                     cmd.Parameters.Add(new NpgsqlParameter("ItemNumber", string.IsNullOrWhiteSpace(item.ItemNumber) ? string.Empty : item.ItemNumber));
 
