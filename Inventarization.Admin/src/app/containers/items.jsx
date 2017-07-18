@@ -57,19 +57,19 @@ class Items extends AuthorizedComponent {
         else{
             this.props.dispatch(openInventorizationDialog());
         }
+        if (!this.props.availabledZones || this.props.availabledZones.length == 0){
+            this.props.dispatch(fetchZones(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token));
+        }
     }
 
     render() {
         let objectClosure = this;
         let itemsToUpload = [];
 
-        let {dispatch, userInfo, availabledZones, filter} = this.props;
+        let {dispatch, userInfo, filter} = this.props;
 
         if (!userInfo.SelectedInventorization){
             return null;
-        }
-        if (!availabledZones || availabledZones.length == 0){
-            dispatch(fetchZones(userInfo.SelectedInventorization.Id, userInfo.Token));
         }
 
         function handleFilterChange(event, value) {
