@@ -57,6 +57,7 @@ class LoginPage extends Component {
       }
 
       if (!!userInfo && userInfo.IsAuthorized){
+        debugger;
         if (userInfo.SelectedInventorization !== undefined){
           if (browserHistory){ //TODO: надо подумать, как сделать работу с browserHistory на стороне сервера
             browserHistory.push('/items')

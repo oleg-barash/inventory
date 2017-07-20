@@ -42,7 +42,10 @@ namespace Inventorization.Business.Domains
             return actionRepository.GetActionsByCode(inventorizationId, code);
         }
 
-        
+        public IEnumerable<Model.Rests> GetAllRests(Guid id)
+        {
+            return inventorizationRepository.GetRests(id);
+        }
         public Model.Rests GetRests(Guid id, string code)
         {
             return inventorizationRepository.GetRests(id).FirstOrDefault(x => x.Code == code);

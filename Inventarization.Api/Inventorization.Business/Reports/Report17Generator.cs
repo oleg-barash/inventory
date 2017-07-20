@@ -39,7 +39,7 @@ namespace Inventorization.Business.Reports
                     currentDataRow = currentDataRow.RowBelow();
                 }
 
-                SetSummaryRow(currentDataRow, items);
+                SetSummaryRow(currentDataRow, rests);
                 MemoryStream result = new MemoryStream();
                 book.SaveAs(result);
                 result.Position = 0;
@@ -58,9 +58,9 @@ namespace Inventorization.Business.Reports
             row.Cell(2).Value = item.Name;
         }
 
-        private void SetSummaryRow(IXLRow row, List<Item> items)
+        private void SetSummaryRow(IXLRow row, List<Rests> rests)
         {
-            row.Cell(1).Value = items.Sum(x => x.Price);
+            row.Cell(1).Value = rests.Sum(x => x.Price);
         }
 
     }

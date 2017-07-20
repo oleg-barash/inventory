@@ -103,7 +103,6 @@ namespace Inventorization.Data
         {
             return new Item()
             {
-                //Id = reader.GetGuid(0),
                 ItemNumber = reader.IsDBNull(0) ? default(string) : reader.GetString(0),
                 Code = reader.GetString(1),
                 CompanyId = reader.GetGuid(2),
@@ -111,8 +110,7 @@ namespace Inventorization.Data
                 Id = reader.IsDBNull(4) ? default(int) : reader.GetInt32(4),
                 Source = reader.IsDBNull(5) ? ItemSource.Undefined : (ItemSource)reader.GetInt32(5),
                 Name = reader.GetString(6),
-                CreatedAt = reader.IsDBNull(7) ? default(DateTime) : reader.GetDateTime(7),
-                Price = reader.IsDBNull(8) ? default(decimal) : reader.GetDecimal(8)
+                CreatedAt = reader.IsDBNull(7) ? default(DateTime) : reader.GetDateTime(7)
             };
         }
         public static Rests ToRests(this NpgsqlDataReader reader)

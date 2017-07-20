@@ -190,7 +190,7 @@ namespace Inventorization.Data
                 }
                 return null;
             });
-            return null;
+            return cacheItem;
         }
 
 
@@ -210,7 +210,6 @@ namespace Inventorization.Data
                     cmd.Parameters.Add(new NpgsqlParameter("Code", item.Code));
                     cmd.Parameters.Add(new NpgsqlParameter("Description", string.IsNullOrWhiteSpace(item.Description) ? string.Empty : item.Description));
                     cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", item.CreatedAt));
-                    cmd.Parameters.Add(new NpgsqlParameter("Price", item.Price));
                     cmd.Parameters.Add(new NpgsqlParameter("Source", (byte)item.Source));
 
                     cmd.ExecuteNonQuery();

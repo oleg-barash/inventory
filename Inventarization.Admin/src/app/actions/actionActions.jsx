@@ -60,7 +60,6 @@ export function saveAction(action, inventorization, userToken){
                     body: JSON.stringify(Object.assign({}, action, { Zone: action.Zone.ZoneId}))})
                 .then(response => { return response.json()})
                 .then(response => {
-                    debugger;
                     if (typeof response === "string" || response.ErrorMessage){
                         toastr.error("Произошла ошибка при создании действия: " + response.ErrorMessage)
                     }

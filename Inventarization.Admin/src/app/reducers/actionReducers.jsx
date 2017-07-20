@@ -7,7 +7,6 @@ export function action(state = { Type: 0 }, action)
 {
     switch (action.type){
         case VALIDATE_ACTION:
-        debugger
             let actionItem = Object.assign({}, state, action.data)
             if (actionItem.Type != 2){
                 actionItem.NameError = actionItem.Name !== '' && actionItem.Name !=='Не найдена в номенклатуре' ? '' : 'Наименование товара нужно выбрать из списка'

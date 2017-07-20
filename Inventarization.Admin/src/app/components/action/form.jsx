@@ -73,8 +73,6 @@ class Form extends Component {
             browserHistory.goBack();
         }
         let save = function() {
-                debugger;
-            
             if ((action.Type == 2 || !!action.BarCode) && !!action.Zone && !!action.Quantity){
                 dispatch(saveAction(action, inventorization.Id, userInfo.Token));
             }

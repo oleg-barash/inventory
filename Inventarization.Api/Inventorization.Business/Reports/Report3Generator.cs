@@ -130,24 +130,27 @@ namespace Inventorization.Business.Reports
             numberCell.Value = index++;
             nameCell.Value = item.Name;
             itemNumberCell.Value = item.ItemNumber;
-            if (item.Price > default(decimal))
+            if (rests != null)
             {
-                priceCell.Style.NumberFormat.Format = "# ### ### ₽";
-                priceCell.Value = item.Price;
-            }
-            inventNumberCell.Value = item.Code;
-            if (fact.HasValue)
-            {
-                countFactCell.Value = fact.Value;
-                if (item.Price != default(decimal))
+                if (rests.Price > default(decimal))
                 {
-                    sumFactCell.FormulaA1 = $"=Q{countFactCell.Address.RowNumber} * L{countFactCell.Address.RowNumber}";
+                    priceCell.Style.NumberFormat.Format = "# ### ### ₽";
+                    priceCell.Value = rests.Price;
                 }
-            }
-            countPlanCell.Value = rests?.Count;
-            if (rests.Price != default(decimal))
-            {
-                sumPlanCell.FormulaA1 = $"=T{countPlanCell.Address.RowNumber} * L{countPlanCell.Address.RowNumber}";
+                inventNumberCell.Value = item.Code;
+                if (fact.HasValue)
+                {
+                    countFactCell.Value = fact.Value;
+                    if (rests.Price != default(decimal))
+                    {
+                        sumFactCell.FormulaA1 = $"=Q{countFactCell.Address.RowNumber} * L{countFactCell.Address.RowNumber}";
+                    }
+                }
+                countPlanCell.Value = rests?.Count;
+                if (rests.Price != default(decimal))
+                {
+                    sumPlanCell.FormulaA1 = $"=T{countPlanCell.Address.RowNumber} * L{countPlanCell.Address.RowNumber}";
+                }
             }
         }
 

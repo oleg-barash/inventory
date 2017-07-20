@@ -11,12 +11,14 @@ using Newtonsoft.Json;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -117,7 +119,8 @@ namespace Inventorization.Api.Controllers
                 IEnumerable<Claim> claims = user.Claims;
                 List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorization).Where(x => x.ZoneId != Guid.Empty).ToList();
                 List<ZoneModel> zones = _zoneRepository.GetAllZones().OrderBy(x => x.Name).ToList();
-                return Request.CreateResponse(HttpStatusCode.OK, zones.Select(x => {
+                return Request.CreateResponse(HttpStatusCode.OK, zones.Select(x =>
+                {
                     List<Business.Model.Action> actions = inventorizationDomain.GetActions(inventorization).Where(i => i.Zone == x.Id).ToList();
                     var state = states.FirstOrDefault(s => x.Id == s.ZoneId);
                     return new ZoneViewModel()
@@ -257,7 +260,7 @@ namespace Inventorization.Api.Controllers
                 actionDomain.UpsertAction(action);
 
                 if (actionVM.Type == ActionType.FirstScan)
-                { 
+                {
                     var inventarization = _inventorizationRepository.GetInventorization(inventorization);
                     List<Business.Model.Item> items = _companyRepository.GetItems(inventarization.Company);
                     Business.Model.Item foundItem = items.FirstOrDefault(x => x.Code == action.BarCode);
@@ -287,11 +290,12 @@ namespace Inventorization.Api.Controllers
             var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
             var items = _companyRepository.GetItems(inventorization.Company, actions.Select(x => x.BarCode).ToArray());
             List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorizationId).Where(x => x.ZoneId != Guid.Empty).ToList();
-            var result = actions.Select(x => {
+            var result = actions.Select(x =>
+            {
                 var foundItem = items.FirstOrDefault(i => i.Code == x.BarCode);
                 var foundZone = zones.First(z => z.Id == x.Zone);
                 var foundState = states.FirstOrDefault(z => z.ZoneId == foundZone.Id);
-                
+
                 var zoneVm = new ZoneViewModel()
                 {
                     ZoneId = foundZone.Id,
@@ -314,7 +318,7 @@ namespace Inventorization.Api.Controllers
                     BarCode = x.BarCode,
                     FoundInItems = foundItem != null,
                     Name = foundItem != null ? foundItem.Name : "Не найдена в номенклатуре",
-                    Description = foundItem != null ? foundItem.Description: "Не найдена в номенклатуре",
+                    Description = foundItem != null ? foundItem.Description : "Не найдена в номенклатуре",
                 };
                 return res;
             });
@@ -333,7 +337,6 @@ namespace Inventorization.Api.Controllers
             res.Name = item.Name;
             res.Id = item.Id;
             res.CreatedAt = item.CreatedAt;
-            res.Price = item.Price;
             res.Readonly = item.Source == ItemSource.Import;
 
             var rests = inventorizationDomain.GetRests(inventorizationId, item.Code);
@@ -366,23 +369,19 @@ namespace Inventorization.Api.Controllers
         {
             var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
             var items = _companyRepository.GetItems(inventorization.Company);
+            //string code = Convert.ToBase64String(Encoding.Unicode.GetBytes(items.GetHashCode().ToString()));
+            //var requestedETag = Request.Headers.IfNoneMatch.ToString();
+            //if (requestedETag == code)
+            //    return Request.CreateResponse(HttpStatusCode.NotModified);
+
             var actions = inventorizationDomain.GetActions(inventorizationId);
             var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
-
-            var result = items.Select(x =>
+            var rests = inventorizationDomain.GetAllRests(inventorizationId);
+            IEnumerable<ViewModels.Item> viewModels = rests.Select(r =>
             {
                 ViewModels.Item res = new ViewModels.Item();
-
-                var rests = inventorizationDomain.GetRests(inventorizationId, x.Code);
-                res.QuantityPlan = rests?.Count;
-                res.BarCode = x.Code;
-                res.Description = x.Description;
-                res.Number = x.ItemNumber;
-                res.Name = x.Name;
-                res.Id = x.Id;
-                res.CreatedAt = x.CreatedAt;
-                res.Price = x.Price;
-
+                res.QuantityPlan = r?.Count;
+                res.BarCode = r.Code;
                 var actionsByType = actions.Where(a => a.BarCode == res.BarCode).GroupBy(a => a.Type);
                 res.Actions = new List<ItemDetails>();
                 foreach (var action in actionsByType)
@@ -398,9 +397,30 @@ namespace Inventorization.Api.Controllers
 
                     });
                 }
+
+                Business.Model.Item item = items.FirstOrDefault(x => x.Code == r.Code);
+                if (item != null)
+                {
+
+                    res.Description = item.Description;
+                    res.Number = item.ItemNumber;
+                    res.Name = item.Name;
+                    res.Id = item.Id;
+                    res.CreatedAt = item.CreatedAt;
+                }
+                else
+                {
+                    res.Description = "Не найден в справочнике";
+                    res.Number = "Не найден в справочнике";
+                    res.Name = "Не найден в справочнике";
+                }
                 return res;
             });
-            return Request.CreateResponse(HttpStatusCode.OK, result.OrderByDescending(x => x.CreatedAt));
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, viewModels.OrderByDescending(x => x.CreatedAt));
+            //response.Headers.ETag = new EntityTagHeaderValue(string.Format($"\"${code}\""));
+            response.Headers.CacheControl = new CacheControlHeaderValue() { MaxAge = new TimeSpan(10, 0, 0) };
+            //response.Headers. Vary = new HttpHeaderValueCollection<string>("origin");
+            return response;
         }
 
 

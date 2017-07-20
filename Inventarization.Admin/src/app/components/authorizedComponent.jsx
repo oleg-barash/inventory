@@ -10,14 +10,6 @@ import { Cookies } from 'react-cookie';
 class AuthorizedComponent extends Component {
   componentWillMount() {
     const { userInfo, dispatch, cookies } = this.props;
-    // if (document != undefined)
-    // {
-    //   let userData = JSON.parse(document.cookie);
-    //   if (userData == null){
-    //     return null;
-    //   }
-    // }
-    // else{
       if (userInfo.Token == undefined){
         let cookieUserData = cookies.get("UserData");
         if (cookieUserData == undefined || cookieUserData.Token == undefined){
@@ -35,19 +27,6 @@ class AuthorizedComponent extends Component {
           }
         }
       }
-    //}
-
-    // get all roles available for this route
-    // const routeRoles = _.chain(routes)
-    //   .filter(item => item.authorize) // access to custom attribute
-    //   .map(item => item.authorize)
-    //   .flattenDeep()
-    //   .value();
- 
-    // // compare routes with user data
-    // if (_.intersection(routeRoles, user.roles).length === 0) {
-    //   router.push('/not-authorized');
-    // }
   }
 }
 AuthorizedComponent.propTypes = {
