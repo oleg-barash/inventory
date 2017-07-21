@@ -142,8 +142,8 @@ class Items extends AuthorizedComponent {
             itemsToUpload = rows.map((row) => {
                 let columns = row.split(",")
                 return {
-                    Name: columns[0],
-                    BarCode: columns[1]
+                    BarCode: columns[0],
+                    Name: columns[1]
                 }
             });
         }
