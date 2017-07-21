@@ -250,7 +250,7 @@ namespace Inventorization.Api.Controllers
                 {
                     Id = actionVM.Id.GetValueOrDefault(),
                     BarCode = actionVM.BarCode == null ? string.Empty : actionVM.BarCode,
-                    DateTime = actionVM.DateTime.GetValueOrDefault(),
+                    DateTime = actionVM.DateTime.GetValueOrDefault(DateTime.UtcNow),
                     Inventorization = inventorization,
                     Quantity = actionVM.Quantity,
                     Type = actionVM.Type,
@@ -364,8 +364,8 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{inventorizationId}/items")]
-        public HttpResponseMessage GetItems(Guid inventorizationId, [FromUri]ActionType type = ActionType.FirstScan)
+        [Route("{inventorizationId}/rests")]
+        public HttpResponseMessage GetRests(Guid inventorizationId, [FromUri]ActionType type = ActionType.FirstScan)
         {
             var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
             var items = _companyRepository.GetItems(inventorization.Company);
@@ -377,52 +377,26 @@ namespace Inventorization.Api.Controllers
             var actions = inventorizationDomain.GetActions(inventorizationId);
             var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
             var rests = inventorizationDomain.GetAllRests(inventorizationId);
-            IEnumerable<ViewModels.Item> viewModels = rests.Select(r =>
-            {
-                ViewModels.Item res = new ViewModels.Item();
-                res.QuantityPlan = r?.Count;
-                res.BarCode = r.Code;
-                var actionsByType = actions.Where(a => a.BarCode == res.BarCode).GroupBy(a => a.Type);
-                res.Actions = new List<ItemDetails>();
-                foreach (var action in actionsByType)
-                {
-                    res.Actions.Add(new ItemDetails()
-                    {
-                        Type = action.Key,
-                        ZoneDetails = action.GroupBy(z => z.Zone).Select(a => new ActionZoneDetails()
-                        {
-                            Quantity = a.Sum(y => y.Quantity),
-                            Zone = zones.FirstOrDefault(z => z.Id == a.Key).Name
-                        }).ToList()
 
-                    });
-                }
-
-                Business.Model.Item item = items.FirstOrDefault(x => x.Code == r.Code);
-                if (item != null)
-                {
-
-                    res.Description = item.Description;
-                    res.Number = item.ItemNumber;
-                    res.Name = item.Name;
-                    res.Id = item.Id;
-                    res.CreatedAt = item.CreatedAt;
-                }
-                else
-                {
-                    res.Description = "Не найден в справочнике";
-                    res.Number = "Не найден в справочнике";
-                    res.Name = "Не найден в справочнике";
-                }
-                return res;
-            });
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, viewModels.OrderByDescending(x => x.CreatedAt));
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, rests);
             //response.Headers.ETag = new EntityTagHeaderValue(string.Format($"\"${code}\""));
-            response.Headers.CacheControl = new CacheControlHeaderValue() { MaxAge = new TimeSpan(10, 0, 0) };
+            //response.Headers.CacheControl = new CacheControlHeaderValue() { MaxAge = new TimeSpan(10, 0, 0) };
             //response.Headers. Vary = new HttpHeaderValueCollection<string>("origin");
             return response;
         }
 
+        [HttpGet]
+        [Route("{inventorizationId}/items")]
+        public HttpResponseMessage GetItems(Guid inventorizationId)
+        {
+            var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
+            var items = _companyRepository.GetItems(inventorization.Company);
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, items.OrderByDescending(x => x.CreatedAt));
+            //response.Headers.ETag = new EntityTagHeaderValue(string.Format($"\"${code}\""));
+            //response.Headers.CacheControl = new CacheControlHeaderValue() { MaxAge = new TimeSpan(10, 0, 0) };
+            //response.Headers. Vary = new HttpHeaderValueCollection<string>("origin");
+            return response;
+        }
 
     }
 }

@@ -34,8 +34,8 @@ const mapStateToProps = (state) => {
 }
 
 const itemDataSourceConfig = {
-  text: 'BarCode',
-  value: 'BarCode',
+  text: 'Code',
+  value: 'Code',
 };
 
 const itemNameDataSourceConfig = {
@@ -57,7 +57,7 @@ class Form extends Component {
             dispatch(fetchZones(inventorization.Id, userInfo.Token));
         }
         let onItemChange = function(value) {
-            dispatch(validateAction({Name: value.Name, BarCode: value.BarCode}));
+            dispatch(validateAction({Name: value.Name, BarCode: value.Code}));
         }
         
         let onZoneChange = function(value) {
@@ -128,7 +128,7 @@ class Form extends Component {
                     </SelectField>
                 <Divider />
                 <FlatButton label="Назад" onClick={goBack} />
-                <FlatButton label="Сохранить" onClick={save} disabled={ !!action.CodeError || !!action.ZoneError || !!action.QuantityError} />
+                <FlatButton label="Сохранить" onClick={save} disabled={ !!action.BarCodeError || !!action.ZoneError || !!action.QuantityError} />
             </Paper>)
     }
 }

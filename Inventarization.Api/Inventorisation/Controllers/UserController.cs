@@ -39,13 +39,13 @@ namespace Inventorization.Api.Controllers
 
         [Route("login")]
         [HttpPost]
-        public HttpResponseMessage Login([FromBody] LoginModel loginInfo)
+        public IHttpActionResult Login([FromBody] LoginModel loginInfo)
         {
             UserInfo info = new UserInfo();
             if (string.IsNullOrWhiteSpace(loginInfo.Password) || string.IsNullOrWhiteSpace(loginInfo.Username))
             {
                 info.Error = "Необходимо указать логин и пароль";
-                return Request.CreateResponse(HttpStatusCode.OK, info);
+                return Ok(info);
             }
             try
             {
@@ -67,7 +67,7 @@ namespace Inventorization.Api.Controllers
                     };
 
                     Request.GetOwinContext().Authentication.SignIn(new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie));
-                    return Request.CreateResponse(HttpStatusCode.OK, info);
+                    return Ok(info);
                 }
                 info.Error = "Неверно указан логин или пароль";
             }
@@ -79,27 +79,27 @@ namespace Inventorization.Api.Controllers
             {
                 info.Error = $"Произошла непредвиденная ошибка. {ex.Message}";
             }
-            return Request.CreateResponse(HttpStatusCode.OK, info);
+            return Ok(info);
         }
 
         [Route("logout")]
         [HttpPost]
-        public HttpResponseMessage Logout()
+        public IHttpActionResult Logout()
         {
             Request.GetOwinContext().Authentication.SignOut();
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return Ok();
         }
 
         [Route("list"), HttpGet, Authorize]
-        public HttpResponseMessage List()
+        public IHttpActionResult List()
         {
-            return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUsers());
+            return Ok(_userRepository.GetUsers());
         }
 
         [Route("info"), HttpGet, Authorize]
-        public HttpResponseMessage GetUser([FromUri]Guid id)
+        public IHttpActionResult GetUser([FromUri]Guid id)
         {
-            return Request.CreateResponse(HttpStatusCode.OK, _userRepository.GetUser(id));
+            return Ok(_userRepository.GetUser(id));
         }
 
         [Route("info"), HttpPost, Authorize]
@@ -130,17 +130,17 @@ namespace Inventorization.Api.Controllers
         }
 
         [Route("lastActions"), HttpGet, Authorize]
-        public HttpResponseMessage LastActions()
+        public IHttpActionResult LastActions()
         {
             IOwinContext ctx = Request.GetOwinContext();
             ClaimsPrincipal user = ctx.Authentication.User;
             IEnumerable<Claim> claims = user.Claims;
             Guid userId = Guid.Parse(claims.Single(x => x.Type == ClaimTypes.Sid).Value);
             List<Business.Model.Action> userActions = actionDomain.GetUsersLastActions(userId, 6);
-            return Request.CreateResponse(HttpStatusCode.OK, userActions);
+            return Ok(userActions);
         }
 
-        [HttpDelete, Authorize]
+        [Route("delete"), HttpPost, Authorize]
         public IHttpActionResult DeleteUser([FromBody]Business.Model.User user)
         {
             try

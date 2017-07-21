@@ -119,7 +119,8 @@ namespace Inventorization.Data
             {
                 Code = reader.GetString(0),
                 Count = reader.GetInt32(1),
-                Price = reader.IsDBNull(2) ? default(decimal) : reader.GetDecimal(2)
+                Price = reader.IsDBNull(2) ? default(decimal) : reader.GetDecimal(2),
+                InventorizationId = reader.GetGuid(3)
             };
         }
 

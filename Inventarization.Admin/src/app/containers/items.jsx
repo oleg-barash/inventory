@@ -15,7 +15,9 @@ import {
     requestItems,
     importItems
 } from '../actions/itemActions'
-import {fetchZones} from '../actions/zoneActions';
+import { fetchRests } from '../actions/restsActions'
+import { fetchActions } from '../actions/actionActions'
+import { fetchZones } from '../actions/zoneActions';
 import TextField from 'material-ui/TextField';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import Paper from 'material-ui/Paper';
@@ -53,11 +55,13 @@ class Items extends AuthorizedComponent {
     componentWillMount() {
         if (this.props.userInfo.Token != undefined && this.props.userInfo.SelectedInventorization !== undefined){
             this.props.dispatch(fetchItems(this.props.userInfo.SelectedInventorization.Id, {}, this.props.userInfo.Token))
+            this.props.dispatch(fetchRests(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token))
+            this.props.dispatch(fetchActions(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token))
         }
         else{
             this.props.dispatch(openInventorizationDialog());
         }
-        if (!this.props.availabledZones || this.props.availabledZones.length == 0){
+        if ((!this.props.availabledZones || this.props.availabledZones.length == 0) && this.props.userInfo.SelectedInventorization != undefined){
             this.props.dispatch(fetchZones(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token));
         }
     }
@@ -65,8 +69,8 @@ class Items extends AuthorizedComponent {
     render() {
         let objectClosure = this;
         let itemsToUpload = [];
-
-        let {dispatch, userInfo, filter} = this.props;
+ 
+        let { dispatch, userInfo, filter, actions } = this.props;
 
         if (!userInfo.SelectedInventorization){
             return null;
@@ -169,7 +173,7 @@ class Items extends AuthorizedComponent {
             }
         };
 
-        const actions = [
+        const actionButtons = [
             <FlatButton style={{display: this.props.importInProgress ? "none" : "inlineBlock"}} label="Выбрать" keyboardFocused={true}>
                 <FileInput name="dictionaryFile"
                    accept=".csv"
@@ -238,7 +242,7 @@ class Items extends AuthorizedComponent {
                     <FlatButton label="Импорт" hoverColor={green} onClick={handleOpen}/>
                     <Dialog
                         title="Загрузка справочника товаров"
-                        actions={actions}
+                        actions={actionButtons}
                         modal={false}
                         open={this.props.isDialogOpened}
                         onRequestClose={handleClose}>
@@ -249,7 +253,7 @@ class Items extends AuthorizedComponent {
             <h2 style={{display: this.props.isFetching ? "block" : "none"}}>
                 Загрузка...
             </h2>
-            <List items={this.props.items} filter={this.props.filter}/>
+            <List items={this.props.items} filter={this.props.filter} rests={this.props.rests} actions={this.props.actions}/>
             <FlatButton style={{display: this.props.isFetching ? "none" : "block"}} label="Загрузить ещё" hoverColor={green} onClick={handleLoadMore}/>
             <h2 style={{display: this.props.isFetching && this.props.items.length > 0 ? "block" : "none"}}>
                 Загрузка...
@@ -272,7 +276,9 @@ const mapStateToProps = (state) => {
         filter: state.items.filter,
         dispatch: state.dispatch,
         userInfo: state.auth,
-        availabledZones: state.zones.items
+        availabledZones: state.zones.items,
+        rests: state.rests.items,
+        actions: state.actions.filtredActions
     }
 }
 

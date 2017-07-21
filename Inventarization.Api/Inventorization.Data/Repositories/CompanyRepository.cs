@@ -204,7 +204,7 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""CreatedAt"", ""Name"", ""Price"", ""Source"") VALUES(:Company, :Code, :Description, :CreatedAt, :Name, :Price, :Source)";
+                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""CreatedAt"", ""Name"", ""Source"") VALUES(:Company, :Code, :Description, :CreatedAt, :Name, :Source)";
                     cmd.Parameters.Add(new NpgsqlParameter("Company", companyId));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", item.Name));
                     cmd.Parameters.Add(new NpgsqlParameter("Code", item.Code));

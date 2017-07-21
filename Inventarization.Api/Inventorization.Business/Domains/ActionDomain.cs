@@ -23,6 +23,7 @@ namespace Inventorization.Business.Domains
 
         public void InsertAction(Model.Action action) {
             CheckZoneAccess(action);
+            action.Id = Guid.NewGuid();
             actionRepository.CreateAction(action);
         }
 

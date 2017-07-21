@@ -18,7 +18,10 @@ class AllActionList extends Component {
     }
     componentDidMount() {
         const { dispatch, inventorization, userInfo } = this.props
-        dispatch(fetchActions(userInfo.SelectedInventorization.Id, userInfo.Token))
+        if (this.props.userInfo.SelectedInventorization != undefined)
+        {
+            dispatch(fetchActions(userInfo.SelectedInventorization.Id, userInfo.Token))
+        }
     }
     render() {
         return (

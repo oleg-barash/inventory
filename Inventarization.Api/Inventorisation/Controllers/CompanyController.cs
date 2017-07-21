@@ -1,5 +1,6 @@
 ﻿using Inventorization.Api.Models;
 using Inventorization.Api.ViewModels;
+using Inventorization.Business.Interfaces;
 using Inventorization.Business.Model;
 using Inventorization.Data;
 using System;
@@ -19,11 +20,11 @@ namespace Inventorization.Api.Controllers
     [RoutePrefix("api/company")]
     public class CompanyController : ApiController
     {
-        private CompanyRepository _companyRepository;
-        private InventorizationRepository _inventorizationRepository;
-        private ActionRepository _actionRepository;
+        private ICompanyRepository _companyRepository;
+        private IInventorizationRepository _inventorizationRepository;
+        private IActionRepository _actionRepository;
         
-        public CompanyController(CompanyRepository companyRepository, InventorizationRepository inventorizationRepository, ActionRepository actionRepository)
+        public CompanyController(ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository, IActionRepository actionRepository)
         {
             _companyRepository = companyRepository;
             _inventorizationRepository = inventorizationRepository;

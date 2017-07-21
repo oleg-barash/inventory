@@ -17,7 +17,7 @@ class ItemRow extends Component {
     }
 
     render() {
-        let item = this.props.item;
+        let { item, rests, actions } = this.props;
         let rowStyle = {
             backgroundColor: item.QuantityFact === 0 ? red : item.QuantityFact < item.QuantityPlan ? yellow : green
         }
@@ -25,18 +25,24 @@ class ItemRow extends Component {
         let editItem = function() {
             browserHistory.push('/editItem?id=' + item.Id);
         }
-        let details = item.Actions.reduce( (previousValue, currentValue) => previousValue.concat(currentValue.ZoneDetails), []);
+        let zones = actions.reduce( (previousValue, currentValue) => previousValue.concat(currentValue.Zone), []);
+        let totalFact = _.sumBy(actions, (a) => a.Quantity);
+
+        let quantityValue = rests != undefined ? totalFact + '/' + rests.Count + '(' + (totalFact - rests.Count) + ')' : '-';
+        let priceValue = rests != undefined ? rests.Price*totalFact + '/' + rests.Price*rests.Count + '(' + rests.Price * (totalFact - rests.Count) + ')' : '-';
+
         return (
             <TableRow style={rowStyle}>
                 <TableRowColumn style={{width: '280px'}}>{item.Name}</TableRowColumn>
-                <TableRowColumn>{item.BarCode}</TableRowColumn>
-                <TableRowColumn>{details.map((info) => {
-                    return <Link key={info.Zone} to={{pathname: "/actions", query: { ZoneName: info.Zone, Code: item.BarCode} }}>{info.Zone}({info.Quantity})<br/>
+                <TableRowColumn>{item.Code}</TableRowColumn>
+                <TableRowColumn>{_.uniq(zones).map((zone) => {
+                    debugger;
+                    return <Link key={zone} to={{pathname: "/actions", query: { ZoneName: zone.ZoneName, Code: item.Code} }}>{zone.ZoneName}({_.sumBy(_.filter(actions, (a) => a.Zone.ZoneId == zone.ZoneId), (a) => a.Quantity)})<br/>
                     </Link>
                 }
                 )}</TableRowColumn>
-                <TableRowColumn>{item.QuantityFact}/{item.QuantityPlan} ({ item.QuantityFact - item.QuantityPlan })</TableRowColumn>
-                <TableRowColumn>{item.Price  * item.QuantityFact}/{item.Price * item.QuantityPlan} ({ item.Price * (item.QuantityFact - item.QuantityPlan) })</TableRowColumn>
+                <TableRowColumn>{ quantityValue }</TableRowColumn>
+                <TableRowColumn>{ priceValue }</TableRowColumn>
                 <TableRowColumn>
                     <FlatButton disabled={item.IsDeleting}
                         hoverColor={green}
@@ -50,8 +56,9 @@ class ItemRow extends Component {
 
 ItemRow.propTypes = {
     item: PropTypes.shape({
-        BarCode: PropTypes.string.isRequired,
-    }).isRequired
+        Code: PropTypes.string.isRequired,
+    }).isRequired,
+    rests: PropTypes.object
 }
 
 
