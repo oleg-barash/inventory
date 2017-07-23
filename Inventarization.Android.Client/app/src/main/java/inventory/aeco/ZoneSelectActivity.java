@@ -52,8 +52,11 @@ public class ZoneSelectActivity extends Activity {
     private Button okButton;
     private Button createButton;
     private Button findButton;
+    private Button goBackButton;
     private EditText showScanResult;
     private TextView resultTextView;
+    private TextView actionType;
+
     private Zone zone;
     private static final String TAG = "ZoneSelectActivity";
     private String baseInventorizationUrl;
@@ -85,6 +88,8 @@ public class ZoneSelectActivity extends Activity {
             }
         });
         resultTextView = (TextView) findViewById(R.id.resultTextView);
+        actionType = (TextView) findViewById(R.id.actionType);
+
         createButton = (Button) findViewById(R.id.createButton);
         createButton.setOnClickListener(new View.OnClickListener() {
                                             @Override
@@ -124,6 +129,17 @@ public class ZoneSelectActivity extends Activity {
                 }
             }
         });
+
+        goBackButton = (Button) findViewById(R.id.goBack);
+        goBackButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                GoToActionSelect();
+            }
+        });
+
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
@@ -303,6 +319,11 @@ public class ZoneSelectActivity extends Activity {
         }
     }
 
+    private void GoToActionSelect(){
+        Intent intent = new Intent(ZoneSelectActivity.this, WorkflowSelection.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
@@ -324,7 +345,7 @@ public class ZoneSelectActivity extends Activity {
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
-        initScan();
+        //initScan();
         showScanResult.setText("");
         IntentFilter filter = new IntentFilter();
         filter.addAction(SCAN_ACTION);
@@ -333,12 +354,16 @@ public class ZoneSelectActivity extends Activity {
 
 
     private void initScan() {
-        // TODO Auto-generated method stub
-        mScanManager = new ScanManager();
-        mScanManager.openScanner();
-        mScanManager.switchOutputMode( 0);
-        soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
-        soundid = soundpool.load("/etc/Scan_new.ogg", 1);
+        try {
+            mScanManager = new ScanManager();
+            mScanManager.openScanner();
+            mScanManager.switchOutputMode(0);
+            soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
+            soundid = soundpool.load("/etc/Scan_new.ogg", 1);
+        }
+        catch (Exception ex){
+            showToast("Scanner device init error:" + ex.getMessage());
+        }
     }
 
     @Override
@@ -380,10 +405,25 @@ public class ZoneSelectActivity extends Activity {
         Intent intent = getIntent();
         currentActionType = ActionType.valueOf(intent.getStringExtra(ACTION_TYPE_MESSAGE));
 
+        switch(currentActionType){
+            case FirstScan:
+                actionType.setText("Первое сканирование");
+                break;
+            case SecondScan:
+                actionType.setText("Повторное сканирование");
+                break;
+            case BlindScan:
+                actionType.setText("Слепой пересчёт");
+                break;
+            default: actionType.setText("Внимание, тип действия не определён. Пожалуйста, вернитесь на шаг выборе действия");
+        }
+
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
         token = settings.getString("token", "undefined");
         inventorization = UUID.fromString(settings.getString("inventorization", "undefined"));
         baseInventorizationUrl = Configuration.BaseUrl + "inventorization/" + inventorization.toString() + "/";
+
+
 
     }
 

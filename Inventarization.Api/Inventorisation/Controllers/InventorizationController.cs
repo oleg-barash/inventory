@@ -259,14 +259,14 @@ namespace Inventorization.Api.Controllers
                 };
                 actionDomain.UpsertAction(action);
 
-                if (actionVM.Type == ActionType.FirstScan)
+                if (actionVM.Type != ActionType.BlindScan)
                 {
                     var inventarization = _inventorizationRepository.GetInventorization(inventorization);
                     List<Business.Model.Item> items = _companyRepository.GetItems(inventarization.Company);
                     Business.Model.Item foundItem = items.FirstOrDefault(x => x.Code == action.BarCode);
                     return Request.CreateResponse(HttpStatusCode.OK, new { foundItem });
                 }
-                if (actionVM.Type == ActionType.BlindScan)
+                else
                 {
                     return Request.CreateResponse(HttpStatusCode.OK, new { ok = true });
                 }

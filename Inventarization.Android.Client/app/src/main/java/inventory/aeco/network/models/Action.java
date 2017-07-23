@@ -12,7 +12,7 @@ import inventory.aeco.ActionType;
 
 public class Action {
     public String Id;
-    public Date DateTime;
+    public String DateTime;
     public ActionType Type;
     public String UserId;
     public String BarCode;

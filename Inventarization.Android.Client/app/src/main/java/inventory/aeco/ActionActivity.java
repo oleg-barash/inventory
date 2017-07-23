@@ -72,7 +72,7 @@ public class ActionActivity extends Activity {
     private EditText quantity;
     private TextView zone_title;
 
-    private Button findButton;
+    private Button addButton;
     private Button okButton;
     private TextView description;
 
@@ -83,7 +83,7 @@ public class ActionActivity extends Activity {
     private int errorSoundid;
     private String currentZone;
     private ActionType currentActionType;
-    Action newAction;
+    Action currentAction;
     private static LinkedList<String> actionList = new LinkedList<>();
 
     ArrayAdapter<String> adapter;
@@ -117,20 +117,26 @@ public class ActionActivity extends Activity {
     };
 
     private void addAction(String code){
-        newAction = new Action();
-        newAction.BarCode = code;
-        showScanResult.setText(newAction.BarCode);
-        newAction.Id = randomUUID().toString();
-        newAction.Quantity = 1;
-        newAction.Type = currentActionType;
-        newAction.Zone = currentZone;
+        currentAction = new Action();
+        currentAction.BarCode = code;
+        showScanResult.setText(currentAction.BarCode);
+        currentAction.Id = randomUUID().toString();
+        try {
+            currentAction.Quantity = Integer.parseInt(quantity.getText().toString());
+        }
+        catch (Exception ex){
+            currentAction.Quantity = 1;
+            quantity.setText("1");
+        }
+        currentAction.Type = currentActionType;
+        currentAction.Zone = currentZone;
         HashMap<String, String> params = new HashMap<>();
-        params.put("id", newAction.Id);
-        params.put("quantity", newAction.Quantity.toString());
-        params.put("type", newAction.Type.toString());
-        params.put("barCode", newAction.BarCode);
-        params.put("inventorization", newAction.Inventorization);
-        params.put("zone", newAction.Zone);
+        params.put("id", currentAction.Id);
+        params.put("quantity", currentAction.Quantity.toString());
+        params.put("type", currentAction.Type.toString());
+        params.put("barCode", currentAction.BarCode);
+        params.put("inventorization", currentAction.Inventorization);
+        params.put("zone", currentAction.Zone);
         SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
         formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
         params.put("dateTime", formatUTC.format(new Date()));
@@ -145,13 +151,14 @@ public class ActionActivity extends Activity {
                             ObjectMapper mapper = new ObjectMapper();
                             ItemSaveResult item = mapper.readValue(response.toString(), ItemSaveResult.class);
                             if (item.foundItem != null) {
-                                description.setText(item.foundItem.Description);
+                                description.setText(item.foundItem.Name);
                                 description.setBackgroundColor(Color.argb(128, 0, 0, 64));
-                                newAction.Status = ActionStatus.Sent;
-                                actionList.addFirst(newAction.BarCode + " зафиксирован");
+                                currentAction.Status = ActionStatus.Sent;
+                                actionList.addFirst(currentAction.BarCode + " зафиксирован");
+                                quantity.setText("1");
                             }
                             else{
-                                newAction.Status = ActionStatus.Error;
+                                currentAction.Status = ActionStatus.Error;
                                 soundpool.play(errorSoundid, 1, 1, 0, 0, 1);
                                 description.setText(" Товар не найден.");
                                 description.setBackgroundColor(Color.RED);
@@ -163,9 +170,7 @@ public class ActionActivity extends Activity {
                         }
                         catch (IOException exception){
                             Log.e(TAG, "Error parsing item: " + response.toString());
-                        }
-                        catch (Exception exception){
-                            Log.e(TAG, "Error : " + response.toString());
+                            showToast("Ошибка: " + response.toString());
                         }
 
 
@@ -174,8 +179,8 @@ public class ActionActivity extends Activity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 showScanResult.setText("");
-                newAction.Status = ActionStatus.Error;
-                String text = newAction.BarCode;
+                currentAction.Status = ActionStatus.Error;
+                String text = currentAction.BarCode;
                 if (error.networkResponse != null){
                     if (error.networkResponse.statusCode == 403){
                         showToast("Зона уже закрыта. Выберите другую зону.");
@@ -256,7 +261,7 @@ public class ActionActivity extends Activity {
         };
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
-
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     private void initScan() {
@@ -273,7 +278,8 @@ public class ActionActivity extends Activity {
     private void setupView() {
         // TODO Auto-generated method stub
         showScanResult = (EditText) findViewById(R.id.scan_result);
-        showScanResult.setInputType(InputType.TYPE_NULL);
+        //showScanResult.setInputType(InputType.TYPE_NULL);
+        showScanResult.setText("4601835000706");
         showScanResult.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -288,10 +294,10 @@ public class ActionActivity extends Activity {
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
                 if(s.length() != 0) {
-                    findButton.setEnabled(true);
+                    addButton.setEnabled(true);
                 }
                 else {
-                    findButton.setEnabled(false);
+                    addButton.setEnabled(false);
                 }
             }
         });
@@ -309,12 +315,22 @@ public class ActionActivity extends Activity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                okButton.setEnabled(!quantity.getText().toString().isEmpty());
+                if (!quantity.getText().toString().isEmpty() && currentAction != null) {
+                    try {
+                        int quantityValue = Integer.parseInt(quantity.getText().toString());
+                        okButton.setEnabled( quantityValue != currentAction.Quantity);
+                    } catch (Exception ex) {
+                        okButton.setEnabled(false);
+                    }
+                }
+                else{
+                    okButton.setEnabled(false);
+                }
             }
         };
 
         quantity.addTextChangedListener(fieldValidatorTextWatcher);
-        quantity.setInputType(InputType.TYPE_NULL);
+        //quantity.setInputType(InputType.TYPE_NULL);
 
         okButton = (Button) findViewById(R.id.okButton);
         okButton.setOnClickListener(new OnClickListener() {
@@ -367,7 +383,14 @@ public class ActionActivity extends Activity {
                                                 showToast("Ошибка при закрытии зоны. Текст ошибки " + error.getMessage());
                                             }
                                         }
-                                    });
+                                    }){
+                                        @Override
+                                        public Map<String, String> getHeaders(){
+                                            Map<String, String> headers = new HashMap<>();
+                                            headers.put("Authorization", token);
+                                            return headers;
+                                        }
+                                    };
                                     queue.add(request);
                                 }
                                 catch (Exception ex){
@@ -381,8 +404,8 @@ public class ActionActivity extends Activity {
             }
         });
 
-        findButton = (Button) findViewById(R.id.findButton);
-        findButton.setOnClickListener(new OnClickListener() {
+        addButton = (Button) findViewById(R.id.addButton);
+        addButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
                 addAction(showScanResult.getText().toString());
@@ -418,7 +441,7 @@ public class ActionActivity extends Activity {
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
-        initScan();
+        //initScan();
         showScanResult.setText("");
         IntentFilter filter = new IntentFilter();
         filter.addAction(SCAN_ACTION);
@@ -433,6 +456,11 @@ public class ActionActivity extends Activity {
     }
 
     @Override
+    public void onBackPressed() {
+        // do nothing
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // TODO Auto-generated method stub
         return super.onKeyDown(keyCode, event);
@@ -440,22 +468,20 @@ public class ActionActivity extends Activity {
 
     private void updateQuantity(){
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        newAction.Quantity = Integer.parseInt(quantity.getText().toString());
+        currentAction.Quantity = Integer.parseInt(quantity.getText().toString());
         HashMap<String, String> params = new HashMap<>();
-        params.put("quantity", newAction.Quantity.toString());
-        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseActionUrl + newAction.Id, new JSONObject(params),
+        params.put("quantity", currentAction.Quantity.toString());
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(baseActionUrl + currentAction.Id , new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        //newAction.Status = ActionStatus.Sent;
-                        newAction = new Action();
-                        showScanResult.setText("");
+                        quantity.setText(currentAction.Quantity.toString());
                         showToast("Изменение количества товара успешно зафиксировано.");
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                newAction.Status = ActionStatus.Error;
+                currentAction.Status = ActionStatus.Error;
                 if (error.networkResponse != null) {
                     showToast("Ошибка изменении количества товара. Код " + error.networkResponse.statusCode);
                 }
@@ -485,8 +511,10 @@ public class ActionActivity extends Activity {
                             ObjectMapper mapper = new ObjectMapper();
                             List<Action> lastActions = mapper.readValue(response, new TypeReference<List<Action>>(){});
                             actionList.clear();
-                            for (int i = 0; i <= actionList.size(); i++) {
-                                actionList.addFirst(lastActions.get(i).BarCode);
+                            if (actionList.size() > 0){
+                                for (int i = 0; i <= actionList.size(); i++) {
+                                    actionList.addFirst(lastActions.get(i).BarCode);
+                                }
                             }
                             adapter.notifyDataSetChanged();
                         }catch (IOException ex){

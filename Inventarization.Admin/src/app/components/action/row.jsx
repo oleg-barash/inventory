@@ -69,7 +69,7 @@ class Row extends Component {
                         icon={<DeleteAndroid/>}
                         onClick={deleteFunc}
                     />
-                    <FlatButton disabled={action.FoundInItems || action.IsDeleting}
+                    <FlatButton disabled={action.FoundInItems || action.IsDeleting || action.Type == 2}
                         hoverColor={blue}
                         icon={<Add/>}
                         onClick={newItem}

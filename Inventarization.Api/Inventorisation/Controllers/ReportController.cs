@@ -44,7 +44,7 @@ namespace Inventorization.Api.Controllers
             List<Rests> rests = inventorizationRepository.GetRests(inventorizationId);
             List<Business.Model.Action> actions = actionRepository.GetActionsByInventorization(inventorizationId);
             string[] codes = rests.Select(x => x.Code).Union(actions.Select(x => x.BarCode)).Distinct().ToArray();
-            IEnumerable<Item> items = companyRepository.GetItems(inventorization.Company).Where(x => codes.Any(r => r == x.Code));
+            IEnumerable<Item> items = companyRepository.GetItems(inventorization.Company).Where(x => x.Source == ItemSource.Import && codes.Any(r => r == x.Code));
 
             using (MemoryStream stream = generator.Generate(items.ToList(), actions, rests))
             {

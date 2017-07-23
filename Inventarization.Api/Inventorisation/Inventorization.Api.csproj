@@ -261,6 +261,7 @@
     <Compile Include="ViewModels\Item.cs" />
     <Compile Include="ViewModels\Action.cs" />
     <Compile Include="ViewModels\LoginModel.cs" />
+    <Compile Include="ViewModels\SetQuantityVM.cs" />
     <Compile Include="ViewModels\UserInfo.cs" />
     <Compile Include="ViewModels\Zone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

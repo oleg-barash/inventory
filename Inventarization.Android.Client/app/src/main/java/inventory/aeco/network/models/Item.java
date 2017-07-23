@@ -12,9 +12,7 @@ public class Item {
     public String Code;
     public String CompanyId;
     public String Description;
-    public int Quantity;
     public int Source;
     public String Id;
-    public Date CreatedAt;
-    public float Price;
+    public String CreatedAt;
 }

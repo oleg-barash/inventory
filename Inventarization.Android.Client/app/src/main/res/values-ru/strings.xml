@@ -46,4 +46,10 @@
     <string name="prompt_email">Почта</string>
     <string name="title_activity_login">Авторизация</string>
     <string name="title_activity_workflow_selection">Выбор типа действия</string>
+    <string name="action_sign_in">Войти</string>
+    <string name="Add">Добавить</string>
+    <string name="title_activity_blind_scan">Слепой пересчёт</string>
+    <string name="action_sign_in_short">Вход</string>
+    <string name="error_field_required">Обязательное поле</string>
+    <string name="error_invalid_email">Неверный адрес</string>
 </resources>

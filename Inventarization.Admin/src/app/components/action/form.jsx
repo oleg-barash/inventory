@@ -80,10 +80,12 @@ class Form extends Component {
                 dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone, Quantity: action.Quantity || ''}));
             }
         }
+        debugger
         return (
             <Paper>
                 <AutoComplete 
                     fullWidth={true}
+                    disabled={action.Id != undefined}
                     maxSearchResults={20}
                     id="BarCode"
                     hintText="1234567890" 
@@ -99,6 +101,7 @@ class Form extends Component {
                 <AutoComplete 
                     fullWidth={true}
                     maxSearchResults={20}
+                    disabled={action.Id != undefined}
                     id="Name"
                     hintText="Велотренажер" 
                     searchText={action.Name} 

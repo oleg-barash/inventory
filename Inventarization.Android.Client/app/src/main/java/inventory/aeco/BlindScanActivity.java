@@ -1,6 +1,8 @@
 package inventory.aeco;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -51,6 +53,7 @@ public class BlindScanActivity extends Activity {
     private static final String TAG = "BlindScanActivity";
     private String baseUrl;
     private TextView zone_title;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +111,77 @@ public class BlindScanActivity extends Activity {
         };
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
+        setupView();
+    }
 
+    @Override
+    public void onBackPressed() {
+        // do nothing
+    }
+
+    private void setupView() {
+        Button closeButton = (Button) findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                new AlertDialog.Builder(BlindScanActivity.this)
+                        .setTitle("Закрытие зоны")
+                        .setMessage("После закрытия зоны добавление товара в зону будет запрещено. Для повторного открытия нужно будет обратиться к менеджеру. Закрыть зону?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(R.string.close_zone, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                try {
+                                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                                    HashMap<String, String> params = new HashMap<>();
+                                    params.put("zoneId", currentZone);
+                                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, baseUrl + "zone/close"
+                                            , new JSONObject(params),
+                                            new Response.Listener<JSONObject>() {
+                                                @Override
+                                                public void onResponse(JSONObject response) {
+                                                    showToast("Зона закрыта");
+                                                    Intent intent = new Intent(BlindScanActivity.this, ZoneSelectActivity.class);
+                                                    Bundle extras = new Bundle();
+                                                    extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());
+                                                    intent.putExtras(extras);
+                                                    startActivity(intent);
+                                                }
+                                            }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            if (error.networkResponse != null) {
+                                                if (error.networkResponse.statusCode == 403) {
+                                                    showToast("Зона уже закрыта");
+                                                    Intent intent = new Intent(BlindScanActivity.this, ZoneSelectActivity.class);
+                                                    startActivity(intent);
+                                                } else {
+                                                    showToast("Ошибка при закрытии зоны. Код " + error.networkResponse.statusCode);
+                                                }
+                                            } else {
+                                                showToast("Ошибка при закрытии зоны. Текст ошибки " + error.getMessage());
+                                            }
+                                        }
+                                    }) {
+                                        @Override
+                                        public Map<String, String> getHeaders() {
+                                            Map<String, String> headers = new HashMap<>();
+                                            headers.put("Authorization", token);
+                                            return headers;
+                                        }
+                                    };
+                                    queue.add(request);
+                                } catch (Exception ex) {
+                                    showToast("Ошибка при закрытии зоны.");
+                                    Log.e(TAG, ex.getMessage());
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.no, null).show();
+
+
+            }
+        });
     }
 
     public void setQuantity(){

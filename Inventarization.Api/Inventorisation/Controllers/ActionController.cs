@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
 namespace Inventorization.Api.Controllers
 {
     [EnableCors("*", "*", "*")]
-    [Route("api/action")]
+    [RoutePrefix("api/action")]
     [Authorize]
     public class ActionController : ApiController
     {
@@ -30,6 +31,7 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpGet]
+        [Route("{id}")]
         public HttpResponseMessage Get(Guid id)
         {
             var action = _actionRepository.GetAction(id);
@@ -66,18 +68,22 @@ namespace Inventorization.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, res);
         }
 
+
         [HttpPost]
         [Route("{id}")]
         public HttpResponseMessage Update(Guid id, [FromBody]Business.Model.Action action)
         {
-            _actionRepository.UpdateAction(id, action.UserId, action.Quantity);
-            return Request.CreateResponse(HttpStatusCode.OK, action);
+            var userClaims = Request.GetOwinContext().Authentication.User;
+            var userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
+            _actionRepository.UpdateAction(id, userId, action.Quantity);
+            return Request.CreateResponse(HttpStatusCode.OK, _actionRepository.GetAction(id));
         }
 
         [HttpDelete]
-        public HttpResponseMessage Delete([FromBody]DeleteModel model)
+        [Route("{id}")]
+        public HttpResponseMessage Delete(Guid id)
         {
-            _actionRepository.DeleteAction(model.Id);
+            _actionRepository.DeleteAction(id);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 

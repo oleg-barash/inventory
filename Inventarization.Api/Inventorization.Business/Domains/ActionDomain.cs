@@ -23,7 +23,10 @@ namespace Inventorization.Business.Domains
 
         public void InsertAction(Model.Action action) {
             CheckZoneAccess(action);
-            action.Id = Guid.NewGuid();
+            if (action.Id == null || action.Id == Guid.Empty)
+            {
+                action.Id = Guid.NewGuid();
+            }
             actionRepository.CreateAction(action);
         }
 
@@ -50,7 +53,6 @@ namespace Inventorization.Business.Domains
             bool actionExists = ActionExists(action.Id);
             if (actionExists)
             {
-                action.Id = action.Id;
                 UpdateAction(action);
             }
             else
