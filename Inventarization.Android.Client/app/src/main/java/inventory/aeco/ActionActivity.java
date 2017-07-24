@@ -162,6 +162,7 @@ public class ActionActivity extends Activity {
                                 soundpool.play(errorSoundid, 1, 1, 0, 0, 1);
                                 description.setText(" Товар не найден.");
                                 description.setBackgroundColor(Color.RED);
+                                actionList.addFirst(currentAction.BarCode + " зафиксирован");
                             }
                             if (actionList.size() > 4){
                                 actionList.removeLast();
@@ -266,10 +267,10 @@ public class ActionActivity extends Activity {
 
     private void initScan() {
         // TODO Auto-generated method stub
-        mScanManager = new ScanManager();
-        mScanManager.openScanner(); 
+        //mScanManager = new ScanManager();
+        //mScanManager.openScanner();
       
-        mScanManager.switchOutputMode( 0);
+        //mScanManager.switchOutputMode( 0);
         soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
         soundid = soundpool.load("/etc/Scan_new.ogg", 1);
         errorSoundid = soundpool.load("/etc/Scan_new.ogg", 1);
@@ -441,7 +442,7 @@ public class ActionActivity extends Activity {
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
-        //initScan();
+        initScan();
         showScanResult.setText("");
         IntentFilter filter = new IntentFilter();
         filter.addAction(SCAN_ACTION);

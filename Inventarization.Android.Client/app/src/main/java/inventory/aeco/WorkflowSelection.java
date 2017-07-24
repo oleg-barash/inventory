@@ -35,6 +35,24 @@ public class WorkflowSelection extends Activity {
         intent.putExtra(ZoneSelectActivity.ACTION_TYPE_MESSAGE, selectedActionType.toString());
         startActivity(intent);
     }
+
+    public void onTypeButtonClicked(View view){
+        Intent intent = new Intent(WorkflowSelection.this, ZoneSelectActivity.class);
+        switch(view.getId()) {
+            case R.id.firstScan:
+                intent.putExtra(ZoneSelectActivity.ACTION_TYPE_MESSAGE, ActionType.FirstScan.toString());
+                break;
+            case R.id.secondScan:
+                intent.putExtra(ZoneSelectActivity.ACTION_TYPE_MESSAGE, ActionType.SecondScan.toString());
+                break;
+            case R.id.blindScan:
+                intent.putExtra(ZoneSelectActivity.ACTION_TYPE_MESSAGE, ActionType.BlindScan.toString());
+                break;
+        }
+
+        startActivity(intent);
+    }
+
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
 

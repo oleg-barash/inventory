@@ -23,8 +23,7 @@
         android:id="@+id/actionType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:layout_weight="0.10" />
+        android:textAlignment="center" />
 
     <EditText
         android:id="@+id/scan_result"
@@ -33,10 +32,9 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/zoneText"
         android:layout_marginTop="19dp"
-        android:layout_weight="1"
         android:gravity="center"
         android:hint="@string/scanner_hint"
-        android:inputType="none"
+        android:inputType="number"
         android:maxLines="1" />
 
     <TextView
@@ -45,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/linearLayout"
         android:layout_alignParentLeft="true"
-        android:layout_weight="0.98"
+        android:layout_weight="0.20"
         android:text="Название зоны"
         android:textAlignment="center" />
 

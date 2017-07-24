@@ -58,4 +58,7 @@
     <string name="error_invalid_login">The login is invalid</string>
     <string name="title_activity_blind_scan">BlindScanActivity</string>
     <string name="Add">Add</string>
+    <string name="first_scan">First scan</string>
+    <string name="second_scan">Second scan</string>
+    <string name="blind_scan">Blind scan</string>
 </resources>

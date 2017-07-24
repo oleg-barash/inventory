@@ -67,7 +67,7 @@ public class ZoneSelectActivity extends Activity {
 
     private void setupView() {
         showScanResult = (EditText) findViewById(R.id.scan_result);
-        showScanResult.setInputType(InputType.TYPE_NULL);
+        //showScanResult.setInputType(InputType.TYPE_NULL);
         showScanResult.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -171,7 +171,9 @@ public class ZoneSelectActivity extends Activity {
             public void onErrorResponse(VolleyError error) {
                 setState(ZoneActivityStates.Initial);
                 if (error.networkResponse.statusCode == 403) {
-                    showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
+                    String message = "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру или выберите другую зону";
+                    resultTextView.setText(message);
+                    showToast(message);
                 }
                 else {
                     showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
@@ -345,7 +347,7 @@ public class ZoneSelectActivity extends Activity {
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
-        //initScan();
+        initScan();
         showScanResult.setText("");
         IntentFilter filter = new IntentFilter();
         filter.addAction(SCAN_ACTION);
@@ -355,9 +357,9 @@ public class ZoneSelectActivity extends Activity {
 
     private void initScan() {
         try {
-            mScanManager = new ScanManager();
-            mScanManager.openScanner();
-            mScanManager.switchOutputMode(0);
+            //mScanManager = new ScanManager();
+            //mScanManager.openScanner();
+            //mScanManager.switchOutputMode(0);
             soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100); // MODE_RINGTONE
             soundid = soundpool.load("/etc/Scan_new.ogg", 1);
         }

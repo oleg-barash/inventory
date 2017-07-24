@@ -68,7 +68,7 @@ public class BlindScanActivity extends Activity {
         currentActionType = ActionType.valueOf(extras.getString(ZoneSelectActivity.ACTION_TYPE_MESSAGE));
 
         quantity = (EditText) findViewById(R.id.quantity);
-        quantity.setInputType(InputType.TYPE_NULL);
+        //quantity.setInputType(InputType.TYPE_NULL);
 
         okButton = (Button) findViewById(R.id.apply);
         okButton.setOnClickListener(new View.OnClickListener() {

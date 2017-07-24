@@ -11,7 +11,7 @@
     <string name="scanner_beep_summary">Проигрывать звук в случае успешного сканирования</string>
     <string name="scanner_enter">Additional enter key</string>
     <string name="scanner_enter_summary">Additional enter key after the scan results</string>
-    <string name="scanner_hint">Для сканирования кода нажмите соответствующую клавишу на устройстве</string>
+    <string name="scanner_hint">Укажите зону</string>
     <string name="scanner_keyboard_mode">Режим клавиатуры</string>
     <string name="scanner_keyboard_output">Вывод в режиме клавиатуры</string>
     <string name="scanner_keyboard_output_summary">Выводи результата в выделенное поле ввода</string>
@@ -52,4 +52,7 @@
     <string name="action_sign_in_short">Вход</string>
     <string name="error_field_required">Обязательное поле</string>
     <string name="error_invalid_email">Неверный адрес</string>
+    <string name="first_scan">Первое сканирование</string>
+    <string name="second_scan">Повторное сканирование</string>
+    <string name="blind_scan">Слепой пересчёт</string>
 </resources>
