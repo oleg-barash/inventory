@@ -242,8 +242,26 @@ namespace Inventorization.Data
             }
         }
 
+        public void Update(Guid userId, Company company)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    Guid id = Guid.NewGuid();
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"UPDATE public.""Companies"" SET ""Name""=@Name, ""LastUpdatedAt""=@LastUpdatedAt, ""LastUpdatedBy""=@LastUpdatedBy WHERE ""Id"" = @Id";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", company.Id));
+                    cmd.Parameters.Add(new NpgsqlParameter("Name", company.Name));
+                    cmd.Parameters.Add(new NpgsqlParameter("LastUpdatedAt", DateTime.UtcNow));
+                    cmd.Parameters.Add(new NpgsqlParameter("LastUpdatedBy", userId));
 
+                    cmd.ExecuteNonQuery();
 
+                }
+            }
+        }
 
     }
 }

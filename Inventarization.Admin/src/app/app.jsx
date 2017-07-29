@@ -26,6 +26,7 @@ import users from './reducers/userListReducers'
 import user from './reducers/userReducers'
 import report from './reducers/reportReducers'
 import rests from './reducers/restReducers'
+import company from './reducers/companyReducers'
 
 
 import AuthStatus from './components/user/authStatus'
@@ -83,7 +84,7 @@ injectTapEventPlugin();
 const loggerMiddleware = createLogger()
 const middleware = [thunkMiddleware,loggerMiddleware,throttleMiddleware, authCookies];
 let store = createStore(
-    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action, auth, global, users, user, report, rests  }),
+    combineReducers({ actions: actionList, items: itemList, zones: zoneList, toastr: toastrReducer, item, action, auth, global, users, user, report, rests, company  }),
     applyMiddleware(...middleware));
 
 

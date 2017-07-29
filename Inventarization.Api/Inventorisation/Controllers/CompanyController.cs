@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -18,6 +19,7 @@ namespace Inventorization.Api.Controllers
 {
     [EnableCors("*", "*", "*")]
     [RoutePrefix("api/company")]
+    [Authorize]
     public class CompanyController : ApiController
     {
         private ICompanyRepository _companyRepository;
@@ -31,7 +33,7 @@ namespace Inventorization.Api.Controllers
             _actionRepository = actionRepository;
         }
 
-        [HttpGet]
+        [HttpGet, Route("list")]
         public HttpResponseMessage Get()
         {
             var companies = _companyRepository.GetCompanies();
@@ -50,16 +52,45 @@ namespace Inventorization.Api.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, _companyRepository.GetCompany(id));
         }
 
-        [HttpPost]
-        public HttpResponseMessage CreateCompany([FromBody]string name)
+        [HttpPut]
+        public HttpResponseMessage CreateCompany(Company company)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(company.Name))
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.ReasonPhrase = "Parameter 'name' is required!";
                 return response;
             }
-            return Request.CreateResponse(HttpStatusCode.Created, _companyRepository.CreateCompany(name));
+            var userClaims = Request.GetOwinContext().Authentication.User;
+            var userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
+            var foundCompany = _companyRepository.GetCompany(company.Id);
+            if (foundCompany != null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            return Request.CreateResponse(HttpStatusCode.Created, _companyRepository.CreateCompany(company.Name));
+        }
+
+        [HttpPost, Route("save")]
+        public HttpResponseMessage UpdateCompany(Company company)
+        {
+            if (company == null)
+            {
+                var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                response.ReasonPhrase = "Parameter 'company' is required!";
+                return response;
+            }
+            var userClaims = Request.GetOwinContext().Authentication.User;
+            var userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
+            if (company.Id == Guid.Empty)
+            {
+                return Request.CreateResponse(HttpStatusCode.Created, _companyRepository.CreateCompany(company.Name));
+            }
+            else
+            {
+                _companyRepository.Update(userId, company);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
         }
 
         [HttpDelete]

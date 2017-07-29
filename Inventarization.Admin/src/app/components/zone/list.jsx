@@ -2,7 +2,6 @@
  * Created by Барашики on 26.03.2017.
  */
 import React, { PropTypes, Component } from 'react';
-import { connect } from 'react-redux'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow } from 'material-ui/Table';
 import Row from '../../components/zone/row';
 
