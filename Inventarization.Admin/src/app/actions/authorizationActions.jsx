@@ -58,9 +58,7 @@ export function logout(){
     return function (dispatch){
         return fetch(process.env.API_URL + 'user/logout', { method: 'POST'})
             .then(json => {
-                return {
-                    type: LOGOUT
-                }
+                dispatch({ type: LOGOUT })
             })
     }
 }

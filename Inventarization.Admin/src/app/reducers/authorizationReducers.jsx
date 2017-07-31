@@ -17,7 +17,7 @@ export function auth(state = { IsAuthorized: false, InProcess: false, IsInitiali
         case LOGIN_CHANGED:
             return Object.assign({}, state, { login: action.login });    
         case LOGOUT:
-            return { IsAuthorized: false };
+            return Object.assign({}, state, { IsAuthorized: false });
         case OPEN_INVENTORIZATION_DIALOG: 
             return Object.assign({}, state, { isInventorizationDialogOpened: true });
         case CLOSE_INVENTORIZATION_DIALOG:

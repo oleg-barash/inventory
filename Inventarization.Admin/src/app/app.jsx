@@ -70,7 +70,7 @@ function authCookies({ getState }) {
                 document.cookie = "UserData=" + JSON.stringify(state.auth)
                 break
             case LOGOUT:
-                document.cookie = ""
+                document.cookie = "UserData="
                 browserHistory.push('/login');
                 break
         }

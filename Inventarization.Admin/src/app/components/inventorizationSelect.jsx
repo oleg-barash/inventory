@@ -25,7 +25,7 @@ class InventorizationSelect extends AuthorizedComponent {
             onInventorizationChanged, 
             errorText 
         } = this.props;
-        let items = this.props.availabledInventorizations.map(item => <MenuItem key={item.Id} value={item} primaryText={item.Id} />);
+        let items = this.props.availabledInventorizations.map(item => <MenuItem key={item.Id} value={item} primaryText={item.Name} />);
         return (
             <SelectField floatingLabelText="Инвентаризация" value={inventorization} onChange={onInventorizationChanged}>
                 {items}

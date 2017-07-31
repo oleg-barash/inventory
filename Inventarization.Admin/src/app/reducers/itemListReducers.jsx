@@ -1,7 +1,7 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { FILTER_ITEMS, REQUEST_ITEMS, RECEIVE_ITEMS, OPEN_IMPORT_DIALOG, CLOSE_IMPORT_DIALOG, UPDATE_ITEMS_FILTER, START_IMPORT, STOP_IMPORT  } from '../constants/actionTypes'
+import { FILTER_ITEMS, REQUEST_ITEMS, RECEIVE_ITEMS, UPDATE_ITEMS_FILTER  } from '../constants/actionTypes'
 import _ from 'lodash'
 
 function _applyFilter(items, filter){
@@ -56,7 +56,7 @@ function _applyFilter(items, filter){
             return _.take(result, filter.pageSize * filter.currentPage);
 }
 
-export function itemList(state = { isFetching: false, items: [], displayItems:[], filter: { currentPage : 1, pageSize : 100, text: undefined, type: undefined}, isImportDialogOpened: false }, action)
+export function itemList(state = { isFetching: false, items: [], displayItems:[], filter: { currentPage : 1, pageSize : 100, text: undefined, type: undefined} }, action)
 {
     switch (action.type){
         case FILTER_ITEMS:
@@ -69,14 +69,6 @@ export function itemList(state = { isFetching: false, items: [], displayItems:[]
         case REQUEST_ITEMS:
             return Object.assign({}, state, {
                 isFetching: true
-            })
-        case START_IMPORT:
-            return Object.assign({}, state, {
-                importInProgress: true
-            })
-        case STOP_IMPORT:
-            return Object.assign({}, state, {
-                importInProgress: false
             })
         case RECEIVE_ITEMS:
             var totalPages = Math.floor(action.items.length / state.filter.pageSize);
@@ -94,10 +86,7 @@ export function itemList(state = { isFetching: false, items: [], displayItems:[]
                     return x;
                 })
             })
-        case OPEN_IMPORT_DIALOG:
-            return Object.assign({}, state, { isImportDialogOpened: true })
-        case CLOSE_IMPORT_DIALOG:
-            return Object.assign({}, state, { isImportDialogOpened: false })
+
         case UPDATE_ITEMS_FILTER:
             return Object.assign({}, state, { isFetching: true, filter: Object.assign({}, state.filter,action.filter) })
         default:
