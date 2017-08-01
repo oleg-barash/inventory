@@ -117,7 +117,6 @@ class Form extends Component {
                 keyboardFocused={true}
                 onTouchTap={handleClose}
             />];
-
         return (
             <div>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>

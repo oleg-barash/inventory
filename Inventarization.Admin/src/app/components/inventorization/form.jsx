@@ -13,6 +13,7 @@ import Dialog from 'material-ui/Dialog';
 import FileInput  from 'react-file-input';
 
 import { saveInventorization, validateInventorization, importRests } from '../../actions/inventorizationActions'
+import { loadCompanies } from '../../actions/companyActions'
 
 const paperStyle = {
     margin: 20,
@@ -24,8 +25,14 @@ const paperStyle = {
 
 
 class Form extends Component {
+    componentDidMount(){
+        let { company, dispatch, userInfo } = this.props;
+        if (!company.list){
+            dispatch(loadCompanies(userInfo.Token))
+        }
+    }
     render() {
-        let { inventorization, userInfo, dispatch } = this.props;
+        let { inventorization, userInfo, dispatch, company } = this.props;
         let onNameChange = function (event, value) {
             dispatch(validateInventorization({ Name: value }));
         }
@@ -107,11 +114,12 @@ class Form extends Component {
                 keyboardFocused={true}
                 onTouchTap={handleClose}
             />];
-
+        let currentCompany = _.find(company.list, x => x.Id === inventorization.Company);
         return (
+            !!currentCompany ?
             <div>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
-                    <TextField hintText="Компания" disabled={true} floatingLabelText="Название компании" value={company.Name} onChange={onNameChange} errorText={company != null ? company.NameError || '' : ''} />
+                    <TextField hintText="Компания" disabled={true} floatingLabelText="Название компании" value={currentCompany.Name} />
                     <Divider />
                     <TextField id="Name" hintText="Название" floatingLabelText="Название инвентаризации" value={inventorization.Name} onChange={onNameChange} errorText={inventorization != null ? inventorization.NameError || '' : ''} />
                     <Divider />
@@ -133,13 +141,14 @@ class Form extends Component {
                         {!!this.props.dataForImport ? 'Распознано ' + this.props.dataForImport.length + ' товаров' : ''}
                     </Dialog>
                 </Paper>*/}
-            </div>)
+            </div> : null)
     }
 }
 
 const mapStateToProps = (state) => {
     return {
-        userInfo: state.auth
+        userInfo: state.auth,
+        company: state.company
     }
 }
 

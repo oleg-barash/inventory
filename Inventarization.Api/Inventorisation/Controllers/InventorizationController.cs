@@ -53,6 +53,7 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpGet]
+        [Route("{id}")]
         public HttpResponseMessage Get(string id)
         {
             Guid _id;
@@ -67,13 +68,15 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpPost]
+        [Route("save")]
         public HttpResponseMessage Save([FromBody]Business.Model.Inventorization inventorization)
         {
             _inventorizationRepository.UpdateInventorization(inventorization);
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpDelete]
+        [Route("{id}")]
         public HttpResponseMessage Delete([FromBody]string id)
         {
             Guid _id;

@@ -11,6 +11,7 @@ import {
     INVENTORIZATION_SAVING,
     START_RESTS_IMPORT,
     STOP_RESTS_IMPORT,
+    HIDE_INVENTORIZATION_LOADING,
     RESTS_DATA_IMPORTED
 } from '../constants/actionTypes'
 import { toastr } from 'react-redux-toastr'
@@ -95,7 +96,7 @@ export function saveInventorization(inventorization, token) {
                     throw Error(response.statusText);
                 }
                 toastr.success("Информация об инверторизации сохранена")
-                dispatch({ type: INVENTORIZATION_SAVED })
+                dispatch({ type: INVENTORIZATION_SAVED, inventorization})
             })
             .catch(function () {
                 toastr.error("Произошла ошибка при сохранении информации об инверторизации")

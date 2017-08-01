@@ -17,12 +17,15 @@ import {
     RESTS_DATA_IMPORTED
 } from '../constants/actionTypes';
 
-export default function inventorization(state = { isLoading: false, isListLoading: false, isImportDialogOpened: false, importInProgress: false }, action) {
+const def = { isLoading: false, isListLoading: false, isImportDialogOpened: false, importInProgress: false }
+export default function inventorization(state = def, action) {
+
     switch (action.type) {
         case INVENTORIZATION_LOADING:
         case INVENTORIZATION_SAVING:
-        case INVENTORIZATION_SAVED:
             return Object.assign({}, state, { isLoading: true })
+        case INVENTORIZATION_SAVED:
+            return Object.assign({}, state, { isLoading: false, list: _.map(state.list, item =>{ item.Id == action.inventorization.Id ? action.inventorization : item}) })
         case INVENTORIZATION_LOADED:
             return Object.assign({}, state, { isLoading: false, inventorization: action.inventorization })
         case HIDE_INVENTORIZATION_LOADING:
