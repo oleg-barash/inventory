@@ -1,6 +1,7 @@
 ﻿using Inventorization.Business.Interfaces;
 using Inventorization.Business.Model;
 using Npgsql;
+using NpgsqlTypes;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -237,7 +238,6 @@ namespace Inventorization.Data
             }
         }
 
-
         public void OpenZone(Guid id, Guid zoneId, Guid userId)
         {
             var zoneState = GetZoneState(id, zoneId);
@@ -284,6 +284,7 @@ namespace Inventorization.Data
         }
 
         private ConcurrentDictionary<Guid, List<Rests>> _rests = new ConcurrentDictionary<Guid, List<Rests>>();
+
         public List<Rests> GetRests(Guid id)
         {
             return _rests.GetOrAdd(id, (key) =>
@@ -312,23 +313,82 @@ namespace Inventorization.Data
 
         public void AddRest(Rests rest)
         {
-            Business.Model.Inventorization result = new Business.Model.Inventorization();
             using (var conn = new NpgsqlConnection(_connectionString))
             {
                 conn.Open();
                 using (var cmd = new NpgsqlCommand())
                 {
-                    Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
                     cmd.CommandText = @"INSERT INTO public.""Rests""(""Code"", ""Count"", ""Price"", ""InventorizationId"") VALUES(:Code, :Count, :Price, :InventorizationId)";
                     cmd.Parameters.Add(new NpgsqlParameter("Code", rest.Code));
-                    cmd.Parameters.Add(new NpgsqlParameter("Count", rest.Code));
-                    cmd.Parameters.Add(new NpgsqlParameter("Price", rest.Code));
-                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", rest.Code));
+                    cmd.Parameters.Add(new NpgsqlParameter("Count", rest.Count));
+                    cmd.Parameters.Add(new NpgsqlParameter("Price", rest.Price));
+                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", rest.InventorizationId));
                     cmd.ExecuteNonQuery();
                 }
             }
+            _rests.Clear();
         }
+
+        public void AddRests(IEnumerable<Rests> rests)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    /*для оптимизации как вариант: https://stackoverflow.com/questions/14758680/idbcommand-parameters-for-multi-line-insert*/
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"INSERT INTO public.""Rests""(""Code"", ""Count"", ""Price"", ""InventorizationId"") VALUES(:Code, :Count, :Price, :InventorizationId)";
+                    cmd.Parameters.Add(new NpgsqlParameter("Code", NpgsqlDbType.Varchar));
+                    cmd.Parameters.Add(new NpgsqlParameter("Count", NpgsqlDbType.Integer));
+                    cmd.Parameters.Add(new NpgsqlParameter("Price", NpgsqlDbType.Double));
+                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", NpgsqlDbType.Uuid));
+                    foreach (var rest in rests)
+                    {
+                        cmd.Parameters.Clear();
+                        cmd.Parameters["Code"] = new NpgsqlParameter("Code", rest.Code);
+                        cmd.Parameters["Count"] = new NpgsqlParameter("Count", rest.Count);
+                        cmd.Parameters["Price"] = new NpgsqlParameter("Price", rest.Price);
+                        cmd.Parameters["InventorizationId"] = new NpgsqlParameter("InventorizationId", rest.InventorizationId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            _rests.Clear();
+        }
+
+        public void UpdateRests(IEnumerable<Rests> rests)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    /*для оптимизации как вариант: https://stackoverflow.com/questions/14758680/idbcommand-parameters-for-multi-line-insert*/
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"UPDATE public.""Rests"" 
+                        SET Count = @Count, 
+                            Price = @Price,
+                        WHERE ""Code"" = @Code AND ""InventorizationId"" = @InventorizationId'";
+                    cmd.Parameters.Add(new NpgsqlParameter("Code", NpgsqlDbType.Varchar));
+                    cmd.Parameters.Add(new NpgsqlParameter("Count", NpgsqlDbType.Integer));
+                    cmd.Parameters.Add(new NpgsqlParameter("Price", NpgsqlDbType.Double));
+                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", NpgsqlDbType.Uuid));
+                    foreach (var rest in rests)
+                    {
+                        cmd.Parameters.Clear();
+                        cmd.Parameters["Code"] = new NpgsqlParameter("Code", rest.Code);
+                        cmd.Parameters["Count"] = new NpgsqlParameter("Count", rest.Count);
+                        cmd.Parameters["Price"] = new NpgsqlParameter("Price", rest.Price);
+                        cmd.Parameters["InventorizationId"] = new NpgsqlParameter("InventorizationId", rest.InventorizationId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            _rests.Clear();
+        }
+
 
     }
 }

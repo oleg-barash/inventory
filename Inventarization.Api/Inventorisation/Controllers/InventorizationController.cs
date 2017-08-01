@@ -385,6 +385,15 @@ namespace Inventorization.Api.Controllers
             return response;
         }
 
+        [HttpPost]
+        [Route("{inventorizationId}/rests")]
+        public HttpResponseMessage UploadRests(Guid inventorizationId, [FromBody]List<Rests> rests)
+        {
+            var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
+            inventorizationDomain.UpdateRests(inventorizationId, rests);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         [HttpGet]
         [Route("{inventorizationId}/items")]
         public HttpResponseMessage GetItems(Guid inventorizationId)

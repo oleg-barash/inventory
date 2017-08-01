@@ -13,6 +13,7 @@ import LoginPage from './LoginPage';
 import ActionPage from './ActionPage';
 import UsersPage from './UsersPage';
 import CompanyPage from './CompanyPage';
+import InventorizationPage from './InventorizationPage';
 import CompanyListPage from './CompanyListPage';
 import UserForm from './components/user/userForm';
 export default (<Route path="/" component={App}>
@@ -30,5 +31,6 @@ export default (<Route path="/" component={App}>
         <Route path="newUser" component={UserForm}/>
         <Route path="companies" component={CompanyListPage}/>
         <Route path="editCompany" component={CompanyPage}/>
+        <Route path="editInventorization" component={InventorizationPage}/>
     </div>
 </Route>);

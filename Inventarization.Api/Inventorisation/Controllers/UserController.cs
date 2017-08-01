@@ -59,7 +59,7 @@ namespace Inventorization.Api.Controllers
                     info.Token = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Login + ":" +user.Password));
                     info.Inventorizations = _inventorizationRepository.GetInventorizations();
                     info.Companies = _companyRepository.GetCompanies();
-                    info.DefaultInventorization = info.Inventorizations.First();
+                    info.DefaultInventorization = info.Inventorizations.Last();
 
                     var claims = new List<Claim> {
                         new Claim(ClaimTypes.Sid, user.Id.ToString()),
