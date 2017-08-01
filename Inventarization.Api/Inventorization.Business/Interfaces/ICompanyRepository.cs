@@ -15,5 +15,6 @@ namespace Inventorization.Business.Interfaces
         List<Item> GetItems(Guid companyId);
         List<Item> GetItems(Guid company, string[] codes);
         void UpdateItem(Item item);
+        void Update(Guid userId, Company company);
     }
 }

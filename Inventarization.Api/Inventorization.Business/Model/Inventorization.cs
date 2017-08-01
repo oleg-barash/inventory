@@ -12,5 +12,6 @@ namespace Inventorization.Business.Model
         public DateTime CreatedAt { get; set; }
         public DateTime ClosedAt { get; set; }
         public DateTime Date { get; set; }
+        public string Name{ get; set; }
     }
 }

@@ -11,10 +11,12 @@ namespace Inventorization.Api.ViewModels
         public string Token;
         public string Error;
         public string FullName;
-        public List<Business.Model.Inventorization> Inventorizations;
         public bool IsAuthorized;
         public string Username;
         public string Password;
+        public List<Business.Model.Inventorization> Inventorizations;
         public Business.Model.Inventorization DefaultInventorization;
+        public List<Business.Model.Company> Companies;
+        public Business.Model.Company Company;
     }
 }

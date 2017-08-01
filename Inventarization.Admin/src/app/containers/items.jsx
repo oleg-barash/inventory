@@ -12,8 +12,7 @@ import {
     closeImportDialog,
     loadMoreItems,
     updateItemsFilter,
-    requestItems,
-    importItems
+    requestItems
 } from '../actions/itemActions'
 import { fetchRests } from '../actions/restsActions'
 import { fetchActions } from '../actions/actionActions'
@@ -23,8 +22,6 @@ import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import { green100 as green}  from 'material-ui/styles/colors';
-import Dialog from 'material-ui/Dialog';
-import FileInput  from 'react-file-input';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import Select from '../components/zone/select'
 import AuthorizedComponent from '../components/authorizedComponent'
@@ -68,7 +65,6 @@ class Items extends AuthorizedComponent {
 
     render() {
         let objectClosure = this;
-        let itemsToUpload = [];
  
         let { dispatch, userInfo, filter, actions } = this.props;
 
@@ -84,18 +80,9 @@ class Items extends AuthorizedComponent {
             dispatch(updateItemsFilter({ type: value }))
             dispatch(filterItems({ type: value }))
         };
-
-        function handleOpen () {
-            dispatch(openImportDialog())
-        };
-
         function handleLoadMore () {
             dispatch(requestItems())
             dispatch(filterItems({currentPage: filter.currentPage + 1}))
-        };
-
-        function handleClose () {
-            dispatch(closeImportDialog())
         };
 
         function handleDeviationChange(event, value) {
@@ -120,49 +107,6 @@ class Items extends AuthorizedComponent {
             }
         }
 
-        function onImport () {
-            dispatch(importItems(itemsToUpload, userInfo.SelectedInventorization.Company, userInfo.Token))
-        };
-
-        function updateProgress(evt) {
-            if (evt.lengthComputable) {
-                // evt.loaded and evt.total are ProgressEvent properties
-                var loaded = (evt.loaded / evt.total);
-                if (loaded < 1) {
-                    // Increase the prog bar length
-                    // style.width = (loaded * 200) + "px";
-                }
-            }
-        }
-
-        function loaded(evt) {  
-            debugger
-            let fileString = evt.target.result;
-            let rows = fileString.split("\n");
-            itemsToUpload = rows.map((row) => {
-                let columns = row.split(",")
-                return {
-                    BarCode: columns[0],
-                    Name: columns[1]
-                }
-            });
-        }
-
-        function errorHandler(evt) {
-            if(evt.target.error.name == "NotReadableError") {
-                // The file could not be read
-            }
-        }
-
-        function handleChange(event) {
-            console.log('Selected file:', event.target.files[0]);
-            var reader = new FileReader();
-            reader.readAsText(event.target.files[0], "UTF-8");
-            reader.onprogress = updateProgress;
-            reader.onload = loaded;
-            reader.onerror = errorHandler;
-        };
-
         const style = {
             container: {
                 position: 'relative',
@@ -173,26 +117,7 @@ class Items extends AuthorizedComponent {
             }
         };
 
-        const actionButtons = [
-            <FlatButton style={{display: this.props.importInProgress ? "none" : "inlineBlock"}} label="Выбрать" keyboardFocused={true}>
-                <FileInput name="dictionaryFile"
-                   accept=".csv"
-                   placeholder="Выбрать"
-                   className="inputClass"
-                   onChange={handleChange} />
-            </FlatButton>,
-            <FlatButton
-                label="Загрузить"
-                primary={true}
-                keyboardFocused={true}
-                onTouchTap={onImport}
-            />,
-            <FlatButton
-                label="Закрыть"
-                primary={true}
-                keyboardFocused={true}
-                onTouchTap={handleClose}
-            />];
+
         return (
         <div>  
             <Paper style={paperStyle} zDepth={3} rounded={false}>  
@@ -238,17 +163,6 @@ class Items extends AuthorizedComponent {
                         floatingLabelText="Расхождения по сумме"
                         type="number"/>
                 </Paper>
-                <Paper style={paperStyle} zDepth={3} rounded={false}>
-                    <FlatButton label="Импорт" hoverColor={green} onClick={handleOpen}/>
-                    <Dialog
-                        title="Загрузка справочника товаров"
-                        actions={actionButtons}
-                        modal={false}
-                        open={this.props.isDialogOpened}
-                        onRequestClose={handleClose}>
-                        Для загрузки справочника выберите файл и нажмите "Загрузить"
-                    </Dialog>
-                </Paper>
             </Paper>
             <h2 style={{display: this.props.isFetching ? "block" : "none"}}>
                 Загрузка...
@@ -272,7 +186,6 @@ const mapStateToProps = (state) => {
     return {
         items: state.items.items,
         isFetching: state.items.isFetching,
-        isDialogOpened: state.items.isImportDialogOpened,
         filter: state.items.filter,
         dispatch: state.dispatch,
         userInfo: state.auth,

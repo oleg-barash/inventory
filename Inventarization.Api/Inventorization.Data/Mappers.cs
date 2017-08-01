@@ -32,7 +32,8 @@ namespace Inventorization.Data
                 Company = reader.GetGuid(1),
                 CreatedAt = reader.GetDateTime(2),
                 ClosedAt = reader.IsDBNull(3) ? DateTime.MaxValue : reader.GetDateTime(3),
-                Date = reader.GetDateTime(4)
+                Date = reader.GetDateTime(4),
+                Name = reader.IsDBNull(5) ? "NoName" : reader.GetString(5)
             };
         }
 

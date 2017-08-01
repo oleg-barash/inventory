@@ -11,8 +11,10 @@ import ZonesPage from './ZonesPage';
 import ActionListPage from './ActionListPage';
 import LoginPage from './LoginPage';
 import ActionPage from './ActionPage';
-import UsersPage from './UsersPage'
-import UserForm from './components/user/userForm'
+import UsersPage from './UsersPage';
+import CompanyPage from './CompanyPage';
+import CompanyListPage from './CompanyListPage';
+import UserForm from './components/user/userForm';
 export default (<Route path="/" component={App}>
     <div>
         <IndexRoute  component={LoginPage}/>
@@ -26,5 +28,7 @@ export default (<Route path="/" component={App}>
         <Route path="users" component={UsersPage}/>
         <Route path="editUser" component={UserForm}/>
         <Route path="newUser" component={UserForm}/>
+        <Route path="companies" component={CompanyListPage}/>
+        <Route path="editCompany" component={CompanyPage}/>
     </div>
 </Route>);
