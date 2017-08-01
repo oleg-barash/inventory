@@ -27,10 +27,9 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
 {
     switch (action.type){
         case ACTION_DELETED:
-            return Object.assign({}, state, {
-                isFetching: false,
-                items: state.items.filter((actionItem) => actionItem.Id !== action.id)
-            })
+            var items = state.items.filter((actionItem) => actionItem.Id !== action.id);
+            var filtredActions = filterActions(items, state.filter);
+            return Object.assign({}, state, { isFetching: false, items, filtredActions })
         case DELETING_ACTION:
             return Object.assign({}, state, {
                 isFetching: false,

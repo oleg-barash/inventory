@@ -34,7 +34,7 @@ class ReportPage extends AuthorizedComponent {
     componentWillMount() {
         if (this.props.userInfo.IsInitialized()) {
             this.props.dispatch(fetchUsers(this.props.userInfo.Token))
-            this.props.dispatch(fetchActions(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token))
+            this.props.dispatch(fetchActions(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token, this.props.actions.lastUpdated))
         }
     }
     render() {
@@ -74,7 +74,8 @@ const mapStateToProps = (state) => {
         userInfo: state.auth,
         dispatch: state.dispatch,
         users: state.users.list,
-        report: state.report
+        report: state.report,
+        actions: state.actions
     }
 }
 

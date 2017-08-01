@@ -56,7 +56,7 @@ class Items extends AuthorizedComponent {
         if (this.props.userInfo.Token != undefined && this.props.userInfo.SelectedInventorization !== undefined){
             this.props.dispatch(fetchItems(this.props.userInfo.SelectedInventorization.Id, {}, this.props.userInfo.Token))
             this.props.dispatch(fetchRests(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token))
-            this.props.dispatch(fetchActions(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token))
+            this.props.dispatch(fetchActions(this.props.userInfo.SelectedInventorization.Id, this.props.userInfo.Token, this.props.actionsUpdateDate))
         }
         else{
             this.props.dispatch(openInventorizationDialog());
@@ -270,7 +270,7 @@ Items.propTypes = {
 
 const mapStateToProps = (state) => {
     return {
-        items: state.items.displayItems,
+        items: state.items.items,
         isFetching: state.items.isFetching,
         isDialogOpened: state.items.isImportDialogOpened,
         filter: state.items.filter,
@@ -278,7 +278,8 @@ const mapStateToProps = (state) => {
         userInfo: state.auth,
         availabledZones: state.zones.items,
         rests: state.rests.items,
-        actions: state.actions.filtredActions
+        actions: state.actions.filtredActions,
+        actionsUpdateDate: state.actions.lastUpdated
     }
 }
 
