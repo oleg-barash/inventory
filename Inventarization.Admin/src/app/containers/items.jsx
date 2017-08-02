@@ -171,7 +171,7 @@ class Items extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        items: state.items.items,
+        items: state.items.displayItems,
         isFetching: state.items.isFetching,
         filter: state.items.filter,
         dispatch: state.dispatch,

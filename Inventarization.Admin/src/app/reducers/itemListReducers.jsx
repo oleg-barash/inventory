@@ -40,8 +40,8 @@ function _applyFilter(items, filter) {
 
     if (filter.zone !== undefined) {
         result = _.filter(result, (item) => {
-            let details = item.Actions.reduce((previousValue, currentValue) => previousValue.concat(currentValue.ZoneDetails), [])
-            return details.some(x => x.Zone === filter.zone.ZoneName);
+            let details = item.Actions.reduce((previousValue, currentValue) => previousValue.concat(currentValue.Zone), [])
+            return details.some(x => x.ZoneName === filter.zone.ZoneName);
         })
     }
     if (filter.devation !== undefined) {
