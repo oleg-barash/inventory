@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch'
 import { FILTER_ACTION,
     REQUEST_ACTION,
-    RECEIVE_ACTION,
+    RECEIVE_ACTIONS,
     ACTION_DELETED,
     DELETING_ACTION,
     SET_CURRENT_ACTION,
@@ -91,10 +91,15 @@ function hideLoading(){
     }
 }
 
-export function fetchActions(inventorization, userToken){
+export function fetchActions(inventorization, userToken, from){
     return function (dispatch){
         dispatch(requestActions(inventorization))
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/actions', { headers: { "Authorization": userToken } })
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/actions?from=' + from, 
+        { 
+            headers: { 
+                "Authorization": userToken 
+            } 
+        })
             .then(response => response.json())
             .then(json =>
                 dispatch(receiveActions(json))
@@ -113,7 +118,7 @@ export function deleteAction(action, userToken){
             }})
             .then(response => {
                 dispatch(actionDeleted(action))
-                dispatch(fetchActions(action.Inventorization, userToken))
+                //dispatch(fetchActions(action.Inventorization, userToken))
             })
     }
 }
@@ -134,7 +139,7 @@ function actionDeleted(action){
 
 function receiveActions(data){
     return {
-        type: RECEIVE_ACTION,
+        type: RECEIVE_ACTIONS,
         items: data,
         receivedAt: Date.now()
     }

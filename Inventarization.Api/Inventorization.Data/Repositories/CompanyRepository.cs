@@ -216,6 +216,7 @@ namespace Inventorization.Data
 
                 }
             }
+            _itemsCache.Clear();
         }
 
         public void UpdateItem(Item item)
@@ -240,6 +241,7 @@ namespace Inventorization.Data
 
                 }
             }
+            _itemsCache.Clear();
         }
 
         public void Update(Guid userId, Company company)

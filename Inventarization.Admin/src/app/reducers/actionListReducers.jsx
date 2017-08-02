@@ -1,7 +1,7 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { FILTER_ACTION, REQUEST_ACTION, RECEIVE_ACTION, DELETING_ACTION, ACTION_DELETED, SHOW_LOADING, HIDE_LOADING, UPDATE_ACTIONS_FILTER } from '../constants/actionTypes'
+import { FILTER_ACTION, REQUEST_ACTION, RECEIVE_ACTIONS, DELETING_ACTION, ACTION_DELETED, SHOW_LOADING, HIDE_LOADING, UPDATE_ACTIONS_FILTER } from '../constants/actionTypes'
 
 const filterActions = (items, filter) => {
     if (items == undefined){
@@ -27,10 +27,9 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
 {
     switch (action.type){
         case ACTION_DELETED:
-            return Object.assign({}, state, {
-                isFetching: false,
-                items: state.items.filter((actionItem) => actionItem.Id !== action.id)
-            })
+            var items = state.items.filter((actionItem) => actionItem.Id !== action.id);
+            var filtredActions = filterActions(items, state.filter);
+            return Object.assign({}, state, { isFetching: false, items, filtredActions })
         case DELETING_ACTION:
             return Object.assign({}, state, {
                 isFetching: false,
@@ -56,7 +55,7 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
             return Object.assign({}, state, {
                 isFetching: true
             })
-        case RECEIVE_ACTION:
+        case RECEIVE_ACTIONS:
             var items = filterActions(action.items, state.filter)
             return Object.assign({}, state, {
                     isFetching: false,

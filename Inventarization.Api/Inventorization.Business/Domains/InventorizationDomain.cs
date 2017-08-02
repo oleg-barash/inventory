@@ -1,4 +1,5 @@
 ﻿using Inventorization.Business.Interfaces;
+using Inventorization.Business.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,10 +43,20 @@ namespace Inventorization.Business.Domains
             return actionRepository.GetActionsByCode(inventorizationId, code);
         }
 
-        public IEnumerable<Model.Rests> GetAllRests(Guid id)
+        public void UpdateRests(Guid inventorizationId, List<Rests> rests)
+        {
+            IEnumerable<Rests> oldRests = inventorizationRepository.GetRests(inventorizationId);
+            IEnumerable<Rests> existedRests = rests.Where(x => oldRests.Any(r => r.Code == x.Code));
+            IEnumerable<Rests> newRests = rests.Except(existedRests);
+            inventorizationRepository.UpdateRests(existedRests);
+            inventorizationRepository.AddRests(newRests);
+        }
+
+        public IEnumerable<Rests> GetAllRests(Guid id)
         {
             return inventorizationRepository.GetRests(id);
         }
+
         public Model.Rests GetRests(Guid id, string code)
         {
             return inventorizationRepository.GetRests(id).FirstOrDefault(x => x.Code == code);

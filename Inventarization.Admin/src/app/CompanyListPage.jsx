@@ -23,7 +23,7 @@ class CompanyListPage extends AuthorizedComponent {
     constructor(props) {
         super(props);
     }
-    componentDidMount(){
+    componentWillMount(){
         let { dispatch, userInfo, companies } = this.props;
         dispatch(loadCompanies(userInfo.Token))
     }

@@ -16,7 +16,7 @@ namespace Inventorization.Api.ViewModels
         public ActionType Type { get; set; }
         public List<ActionZoneDetails> ZoneDetails { get; set; }
     }
-    public class Item
+    public class ActiveItem
     {
         public string Description { get; set; }
         public string Number { get; set; }

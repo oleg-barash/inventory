@@ -60,10 +60,10 @@ export function setCurrentItem(item){
     }
 }
 
-export function loadCurrentItem(id, inventorization, userToken){
+export function loadCurrentItem(id, userToken){
     return function (dispatch){
         dispatch(showLoading())
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/item?id=' + id, { headers: { "Authorization": userToken } })
+        return fetch(process.env.API_URL + 'company/item?id=' + id, { headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json => {
                 dispatch(hideLoading())
@@ -84,7 +84,7 @@ export function saveItem(item, company, userToken){
                     body: JSON.stringify(item)})
                 .then(response => {
                     if (!response.ok){
-                        toastr.error("Произошла ошибка при создании действия ")
+                        toastr.error("Произошла ошибка при сохранении товара ")
                     }
                     else{
                         toastr.success("Товар успешно сохранён")
@@ -94,10 +94,10 @@ export function saveItem(item, company, userToken){
     }
 }
 
-export function fetchItems(inventorization, filter, userToken){
+export function fetchItems(company, filter, userToken){
     return function (dispatch){
         dispatch(requestItems())
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/items', { headers: { "Authorization": userToken } })
+        return fetch(process.env.API_URL + 'company/' + company + '/items', { headers: { "Authorization": userToken } })
             .then(response => response.json())
             .then(json =>
                 dispatch(receiveItems(json, filter))

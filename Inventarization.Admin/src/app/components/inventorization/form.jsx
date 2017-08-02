@@ -9,32 +9,11 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import { browserHistory } from 'react-router'
 import Divider from 'material-ui/Divider';
-import {
-    validateCompany,
-    saveCompany,
-    openImportDialog,
-    closeImportDialog,
-    importItems
-} from '../../actions/companyActions'
-
-import {
-    fetchItems,
-    applyItemsFilter,
-    filterItems,
-    loadMoreItems,
-    updateItemsFilter,
-    requestItems
-} from '../../actions/dictionaryActions'
-
 import Dialog from 'material-ui/Dialog';
-import FileInput from 'react-file-input';
-import {
-    PARSE_DATA,
-} from '../../constants/actionTypes'
-import Inventorizations from '../inventorization/list'
-import DictionaryList from '../dictionary/list'
+import FileInput  from 'react-file-input';
 
-moment.locale("ru-RU")
+import { saveInventorization, validateInventorization, importRests } from '../../actions/inventorizationActions'
+import { loadCompanies } from '../../actions/companyActions'
 
 const paperStyle = {
     margin: 20,
@@ -46,35 +25,33 @@ const paperStyle = {
 
 
 class Form extends Component {
-    componentWillMount() {
-        if (this.props.userInfo.Token != undefined) {
-            this.props.dispatch(fetchItems(this.props.company.Id, {}, this.props.userInfo.Token))
-        }
-        else {
-            this.props.dispatch(openInventorizationDialog());
+    componentDidMount(){
+        let { company, dispatch, userInfo } = this.props;
+        if (!company.list){
+            dispatch(loadCompanies(userInfo.Token))
         }
     }
     render() {
-        let { company, userInfo, dispatch, dataForImport, filter } = this.props;
+        let { inventorization, userInfo, dispatch, company } = this.props;
         let onNameChange = function (event, value) {
-            dispatch(validateCompany({ Name: value }));
+            dispatch(validateInventorization({ Name: value }));
         }
 
         let goBack = function () {
-            browserHistory.push('/companies');
+            browserHistory.goBack();
         }
         let save = function () {
-            if (!!company.Name) {
-                dispatch(saveCompany(company, userInfo.Token));
+            if (!!inventorization.Name) {
+                dispatch(saveInventorization(inventorization, userInfo.Token));
             }
             else {
-                dispatch(validateCompany(company));
+                dispatch(validateInventorization(inventorization));
             }
         }
 
 
         function onImport() {
-            dispatch(importItems(dataForImport, company.Id, userInfo.Token))
+            dispatch(importRests(itemsToUpload, inventorization.Id, userInfo.Token))
         };
 
         function updateProgress(evt) {
@@ -107,22 +84,12 @@ class Form extends Component {
             reader.onerror = errorHandler;
         };
 
-        function handleOpen() {
+        function handleOpen () {
             dispatch(openImportDialog())
         };
-
-        function handleClose() {
+        
+        function handleClose () {
             dispatch(closeImportDialog())
-        };
-
-        function handleFilterChange(event, value) {
-            dispatch(updateItemsFilter({ text: value }))
-            dispatch(filterItems({ text: value }))
-        };
-
-        function handleLoadMore() {
-            dispatch(requestItems())
-            dispatch(filterItems({ currentPage: filter.currentPage + 1 }))
         };
 
         const actionButtons = [
@@ -147,20 +114,21 @@ class Form extends Component {
                 keyboardFocused={true}
                 onTouchTap={handleClose}
             />];
+        let currentCompany = _.find(company.list, x => x.Id === inventorization.Company);
         return (
+            !!currentCompany ?
             <div>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
-                    <TextField id="Name" hintText="Наименование" floatingLabelText="Название компании" value={company.Name} onChange={onNameChange} errorText={company != null ? company.NameError || '' : ''} />
+                    <TextField hintText="Компания" disabled={true} floatingLabelText="Название компании" value={currentCompany.Name} />
+                    <Divider />
+                    <TextField id="Name" hintText="Название" floatingLabelText="Название инвентаризации" value={inventorization.Name} onChange={onNameChange} errorText={inventorization != null ? inventorization.NameError || '' : ''} />
                     <Divider />
                     <FlatButton label="Назад" onClick={goBack} />
-                    <FlatButton disabled={company.Readonly} label="Сохранить" onClick={save} disabled={!!company.NameError} />
+                    <FlatButton disabled={inventorization.Readonly} label="Сохранить" onClick={save} disabled={!!inventorization.NameError} />
                 </Paper>
-                <Paper style={paperStyle} zDepth={3} rounded={false}>
-                    <label>Инвенторизации</label>
-                    <Inventorizations inventorizations={_.filter(userInfo.Inventorizations, x => x.Company === company.Id)} />
-                </Paper>
-                <Paper style={paperStyle} zDepth={3} rounded={false}>
-                    <FlatButton label="Импорт справочника" hoverColor={green} onClick={handleOpen} />
+                {/*<Paper style={paperStyle} zDepth={3} rounded={false}>
+
+                    <FlatButton label="Импорт справочника" hoverColor={green} onClick={handleOpen}/>
                     <Dialog
                         title="Загрузка справочника товаров"
                         actions={actionButtons}
@@ -169,41 +137,18 @@ class Form extends Component {
                         open={this.props.isDialogOpened}
                         onRequestClose={handleClose}>
                         {this.props.importInProgress ? 'Идёт загрузка...' : 'Для загрузки справочника выберите файл и нажмите "Загрузить"'}
-                        <br />
+                        <br/>
                         {!!this.props.dataForImport ? 'Распознано ' + this.props.dataForImport.length + ' товаров' : ''}
                     </Dialog>
-
-                    <h2 style={{ display: "block" }}>Фильтр</h2>
-                    <Paper style={paperStyle} zDepth={3} rounded={false}>
-                        <TextField
-                            id="text-filter"
-                            floatingLabelText="Текстовый поиск"
-                            value={this.props.filter.text}
-                            onChange={handleFilterChange} />
-                        <Divider />
-                    </Paper>
-                    <h2 style={{ display: this.props.isFetching ? "block" : "none" }}>
-                        Загрузка...
-                    </h2>
-                    <DictionaryList items={this.props.items} />
-                    <FlatButton style={{ display: this.props.isFetching ? "none" : "block" }} label="Загрузить ещё" hoverColor={green} onClick={handleLoadMore} />
-                    <h2 style={{ display: this.props.isFetching && this.props.items.length > 0 ? "block" : "none" }}>
-                        Загрузка...
-            </h2>
-                </Paper>
-            </div>)
+                </Paper>*/}
+            </div> : null)
     }
 }
 
 const mapStateToProps = (state) => {
     return {
         userInfo: state.auth,
-        isDialogOpened: state.company.isImportDialogOpened,
-        importInProgress: state.company.importInProgress,
-        dataForImport: state.company.dataForImport,
-        isFetching: state.dictionary.isFetching,
-        filter: state.dictionary.filter,
-        items: state.dictionary.displayItems
+        company: state.company
     }
 }
 

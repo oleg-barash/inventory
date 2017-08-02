@@ -53,6 +53,7 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpGet]
+        [Route("{id}")]
         public HttpResponseMessage Get(string id)
         {
             Guid _id;
@@ -67,13 +68,15 @@ namespace Inventorization.Api.Controllers
         }
 
         [HttpPost]
+        [Route("save")]
         public HttpResponseMessage Save([FromBody]Business.Model.Inventorization inventorization)
         {
             _inventorizationRepository.UpdateInventorization(inventorization);
-            return Request.CreateResponse(HttpStatusCode.Created);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpDelete]
+        [Route("{id}")]
         public HttpResponseMessage Delete([FromBody]string id)
         {
             Guid _id;
@@ -277,7 +280,6 @@ namespace Inventorization.Api.Controllers
                 _logger.Error(ex, message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpGet]
@@ -330,7 +332,7 @@ namespace Inventorization.Api.Controllers
         public HttpResponseMessage GetItem(Guid inventorizationId, [FromUri]int id)
         {
             var item = inventorizationDomain.GetItem(id);
-            ViewModels.Item res = new ViewModels.Item();
+            ViewModels.ActiveItem res = new ViewModels.ActiveItem();
             res.BarCode = item.Code;
             res.Description = item.Description;
             res.Number = item.ItemNumber;
@@ -385,18 +387,13 @@ namespace Inventorization.Api.Controllers
             return response;
         }
 
-        [HttpGet]
-        [Route("{inventorizationId}/items")]
-        public HttpResponseMessage GetItems(Guid inventorizationId)
+        [HttpPost]
+        [Route("{inventorizationId}/rests")]
+        public HttpResponseMessage UploadRests(Guid inventorizationId, [FromBody]List<Rests> rests)
         {
             var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
-            var items = _companyRepository.GetItems(inventorization.Company);
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, items.OrderByDescending(x => x.CreatedAt));
-            //response.Headers.ETag = new EntityTagHeaderValue(string.Format($"\"${code}\""));
-            //response.Headers.CacheControl = new CacheControlHeaderValue() { MaxAge = new TimeSpan(10, 0, 0) };
-            //response.Headers. Vary = new HttpHeaderValueCollection<string>("origin");
-            return response;
+            inventorizationDomain.UpdateRests(inventorizationId, rests);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
-
     }
 }
