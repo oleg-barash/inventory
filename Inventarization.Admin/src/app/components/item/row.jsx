@@ -17,7 +17,8 @@ class ItemRow extends Component {
     }
 
     render() {
-        let { item, rests, actions } = this.props;
+        let { item } = this.props;
+        let actions = item.Actions;
         let rowStyle = {
             backgroundColor: item.QuantityFact === 0 ? red : item.QuantityFact < item.QuantityPlan ? yellow : green
         }
@@ -28,8 +29,8 @@ class ItemRow extends Component {
         let zones = actions.reduce( (previousValue, currentValue) => previousValue.concat(currentValue.Zone), []);
         let totalFact = _.sumBy(actions, (a) => a.Quantity);
 
-        let quantityValue = rests != undefined ? totalFact + '/' + rests.Count + '(' + (totalFact - rests.Count) + ')' : '-';
-        let priceValue = rests != undefined ? rests.Price*totalFact + '/' + rests.Price*rests.Count + '(' + rests.Price * (totalFact - rests.Count) + ')' : '-';
+        let quantityValue = item.Count != undefined ? totalFact + '/' + item.Count + '(' + (totalFact - item.Count) + ')' : '-';
+        let priceValue = item.Price != undefined ? item.Price*totalFact + '/' + item.Price*item.Count + '(' + reitemsts.Price * (totalFact - item.Count) + ')' : '-';
 
         return (
             <TableRow style={rowStyle}>
@@ -58,7 +59,6 @@ ItemRow.propTypes = {
     item: PropTypes.shape({
         Code: PropTypes.string.isRequired,
     }).isRequired,
-    rests: PropTypes.object
 }
 
 

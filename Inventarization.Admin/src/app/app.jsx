@@ -28,7 +28,7 @@ import report from './reducers/reportReducers'
 import rests from './reducers/restReducers'
 import company from './reducers/companyReducers'
 import inventorization from './reducers/inventorizationReducers'
-
+import dictionary from './reducers/dictionaryReducers'
 
 import AuthStatus from './components/user/authStatus'
 import LeftMenu from './components/user/leftMenu'
@@ -98,7 +98,8 @@ let store = createStore(
         report, 
         rests, 
         company, 
-        inventorization  }),
+        inventorization,
+        dictionary  }),
     applyMiddleware(...middleware));
 
 

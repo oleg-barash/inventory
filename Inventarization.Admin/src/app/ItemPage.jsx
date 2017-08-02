@@ -19,10 +19,10 @@ class NewItemPage extends AuthorizedComponent {
         super(props);
     }
    componentDidMount() {
-        const { dispatch, inventorization, userInfo } = this.props
+        const { dispatch, userInfo } = this.props
         const { id } = this.props.location.query
         if (id != undefined){
-            dispatch(loadCurrentItem(id, inventorization.Id, userInfo.Token));
+            dispatch(loadCurrentItem(id, userInfo.Token));
         }
   }
   render() {
@@ -38,7 +38,6 @@ class NewItemPage extends AuthorizedComponent {
 const mapStateToProps = (state) => {
     return {
         item : state.item,
-        inventorization: state.auth.SelectedInventorization,
         userInfo: state.auth,
     }
 }

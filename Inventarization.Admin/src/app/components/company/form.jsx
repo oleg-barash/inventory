@@ -16,12 +16,24 @@ import {
     closeImportDialog,
     importItems
 } from '../../actions/companyActions'
+
+import {
+    fetchItems,
+    applyItemsFilter,
+    filterItems,
+    loadMoreItems,
+    updateItemsFilter,
+    requestItems
+} from '../../actions/dictionaryActions'
+
 import Dialog from 'material-ui/Dialog';
 import FileInput from 'react-file-input';
 import {
     PARSE_DATA,
 } from '../../constants/actionTypes'
-import List from '../inventorization/list'
+import Inventorizations from '../inventorization/list'
+import DictionaryList from '../dictionary/list'
+
 moment.locale("ru-RU")
 
 const paperStyle = {
@@ -34,8 +46,16 @@ const paperStyle = {
 
 
 class Form extends Component {
+    componentWillMount() {
+        if (this.props.userInfo.Token != undefined) {
+            this.props.dispatch(fetchItems(this.props.company.Id, {}, this.props.userInfo.Token))
+        }
+        else {
+            this.props.dispatch(openInventorizationDialog());
+        }
+    }
     render() {
-        let { company, userInfo, dispatch, dataForImport } = this.props;
+        let { company, userInfo, dispatch, dataForImport, filter } = this.props;
         let onNameChange = function (event, value) {
             dispatch(validateCompany({ Name: value }));
         }
@@ -95,6 +115,16 @@ class Form extends Component {
             dispatch(closeImportDialog())
         };
 
+        function handleFilterChange(event, value) {
+            dispatch(updateItemsFilter({ text: value }))
+            dispatch(filterItems({ text: value }))
+        };
+
+        function handleLoadMore() {
+            dispatch(requestItems())
+            dispatch(filterItems({ currentPage: filter.currentPage + 1 }))
+        };
+
         const actionButtons = [
             <FlatButton style={{ display: this.props.importInProgress ? "none" : "inlineBlock" }} label="Выбрать" keyboardFocused={true}>
                 <FileInput name="dictionaryFile"
@@ -127,7 +157,7 @@ class Form extends Component {
                 </Paper>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
                     <label>Инвенторизации</label>
-                    <List inventorizations={_.filter(userInfo.Inventorizations, x => x.Company === company.Id)}/>
+                    <Inventorizations inventorizations={_.filter(userInfo.Inventorizations, x => x.Company === company.Id)} />
                 </Paper>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
                     <FlatButton label="Импорт справочника" hoverColor={green} onClick={handleOpen} />
@@ -142,6 +172,24 @@ class Form extends Component {
                         <br />
                         {!!this.props.dataForImport ? 'Распознано ' + this.props.dataForImport.length + ' товаров' : ''}
                     </Dialog>
+
+                    <h2 style={{ display: "block" }}>Фильтр</h2>
+                    <Paper style={paperStyle} zDepth={3} rounded={false}>
+                        <TextField
+                            id="text-filter"
+                            floatingLabelText="Текстовый поиск"
+                            value={this.props.filter.text}
+                            onChange={handleFilterChange} />
+                        <Divider />
+                    </Paper>
+                    <h2 style={{ display: this.props.isFetching ? "block" : "none" }}>
+                        Загрузка...
+                    </h2>
+                    <DictionaryList items={this.props.items} />
+                    <FlatButton style={{ display: this.props.isFetching ? "none" : "block" }} label="Загрузить ещё" hoverColor={green} onClick={handleLoadMore} />
+                    <h2 style={{ display: this.props.isFetching && this.props.items.length > 0 ? "block" : "none" }}>
+                        Загрузка...
+            </h2>
                 </Paper>
             </div>)
     }
@@ -152,7 +200,10 @@ const mapStateToProps = (state) => {
         userInfo: state.auth,
         isDialogOpened: state.company.isImportDialogOpened,
         importInProgress: state.company.importInProgress,
-        dataForImport: state.company.dataForImport
+        dataForImport: state.company.dataForImport,
+        isFetching: state.dictionary.isFetching,
+        filter: state.dictionary.filter,
+        items: state.dictionary.displayItems
     }
 }
 

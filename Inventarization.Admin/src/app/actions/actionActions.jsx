@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch'
 import { FILTER_ACTION,
     REQUEST_ACTION,
-    RECEIVE_ACTION,
+    RECEIVE_ACTIONS,
     ACTION_DELETED,
     DELETING_ACTION,
     SET_CURRENT_ACTION,
@@ -139,7 +139,7 @@ function actionDeleted(action){
 
 function receiveActions(data){
     return {
-        type: RECEIVE_ACTION,
+        type: RECEIVE_ACTIONS,
         items: data,
         receivedAt: Date.now()
     }

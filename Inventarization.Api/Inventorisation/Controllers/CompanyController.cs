@@ -129,12 +129,35 @@ namespace Inventorization.Api.Controllers
 
         [HttpPost]
         [Route("{id}/inventorization")]
-
         public HttpResponseMessage CreateInventorization(Guid id, [FromBody]DateTime? date)
         {
             return Request.CreateResponse(HttpStatusCode.Created, _inventorizationRepository.CreateInventorization(id, date ?? DateTime.UtcNow));
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        public HttpResponseMessage GetItem(Guid id, [FromUri]int itemid)
+        {
+            var item = _companyRepository.GetItem(itemid);
+            ViewModels.ActiveItem res = new ViewModels.ActiveItem();
+            res.BarCode = item.Code;
+            res.Description = item.Description;
+            res.Number = item.ItemNumber;
+            res.Name = item.Name;
+            res.Id = item.Id;
+            res.CreatedAt = item.CreatedAt;
+            res.Readonly = item.Source == ItemSource.Import;
+            return Request.CreateResponse(HttpStatusCode.OK, res);
+        }
+
+        [HttpGet]
+        [Route("{id}/items")]
+        public HttpResponseMessage GetItems(Guid id)
+        {
+            var items = _companyRepository.GetItems(id);
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, items.OrderByDescending(x => x.CreatedAt));
+            return response;
+        }
 
         [HttpPost]
         [Route("{id}/item")]
