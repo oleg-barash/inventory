@@ -13,4 +13,5 @@ public class Inventorization
     public String CreatedAt;
     public String ClosedAt;
     public String Date;
+    public String Name;
 }

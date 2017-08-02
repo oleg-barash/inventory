@@ -1,8 +1,5 @@
 package inventory.aeco.network.models;
 
-
-import java.util.UUID;
-
 /**
  * Created by Барашики on 10.06.2017.
  */
@@ -18,5 +15,7 @@ public class UserInfo
     public boolean IsAuthorized;
     public String Username;
     public String Password;
+    public Company[] Companies;
+    public Company Company;
     public Inventorization DefaultInventorization;
 }

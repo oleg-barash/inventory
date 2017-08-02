@@ -3,11 +3,13 @@ import { connect } from 'react-redux'
 import AuthorizedComponent from './authorizedComponent'
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import _ from 'lodash';
 const mapStateToProps = (state) => {
     return {
         userInfo: state.auth,
         inventorization: state.auth.SelectedInventorization,
-        availabledInventorizations: state.auth.Inventorizations !== undefined ? state.auth.Inventorizations : []
+        availabledInventorizations: state.auth.Inventorizations !== undefined ? state.auth.Inventorizations : [],
+        companies: state.auth.Companies !== undefined ? state.auth.Companies : []
     }
 }
 
@@ -23,9 +25,14 @@ class InventorizationSelect extends AuthorizedComponent {
     render() {
         let { inventorization, 
             onInventorizationChanged, 
-            errorText 
+            errorText,
+            companies
         } = this.props;
-        let items = this.props.availabledInventorizations.map(item => <MenuItem key={item.Id} value={item} primaryText={item.Name} />);
+        
+        let items = this.props.availabledInventorizations.map(item => {
+            let name = item.Name + " (" + _.find(companies, x => x.Id === item.Company).Name + ")";
+            return <MenuItem key={item.Id} value={item} primaryText={name} />
+        });
         return (
             <SelectField floatingLabelText="Инвентаризация" value={inventorization} onChange={onInventorizationChanged}>
                 {items}

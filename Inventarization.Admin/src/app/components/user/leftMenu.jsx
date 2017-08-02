@@ -13,12 +13,12 @@ class LeftMenu extends Component{
         let { opened, dispatch } = this.props;
         return (
             <Drawer open={opened} docked={false} onRequestChange={(open) => dispatch({ type: CLOSE_DRAWER })}>
-                <MenuItem><Link to="/items">Товары</Link></MenuItem>
-                <MenuItem><Link to="/actions">Действия</Link></MenuItem>
-                <MenuItem><Link to="/zones">Зоны</Link></MenuItem>
-                <MenuItem><Link to="/users">Пользователи</Link></MenuItem>
-                <MenuItem><Link to="/reports">Отчёты</Link></MenuItem>
-                <MenuItem><Link to="/companies">Компании</Link></MenuItem>
+                <MenuItem><Link to="/items" onClick={(open) => dispatch({ type: CLOSE_DRAWER })}>Товары</Link></MenuItem>
+                <MenuItem><Link to="/actions" onClick={(open) => dispatch({ type: CLOSE_DRAWER })}>Действия</Link></MenuItem>
+                <MenuItem><Link to="/zones" onClick={(open) => dispatch({ type: CLOSE_DRAWER })}>Зоны</Link></MenuItem>
+                <MenuItem><Link to="/users" onClick={(open) => dispatch({ type: CLOSE_DRAWER })}>Пользователи</Link></MenuItem>
+                <MenuItem><Link to="/reports" onClick={(open) => dispatch({ type: CLOSE_DRAWER })}>Отчёты</Link></MenuItem>
+                <MenuItem><Link to="/companies" onClick={(open) => dispatch({ type: CLOSE_DRAWER })}>Компании</Link></MenuItem>
             </Drawer>)
     }
 }
