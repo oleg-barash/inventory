@@ -48,8 +48,8 @@ namespace Inventorization.Business.Domains
             IEnumerable<Rests> oldRests = inventorizationRepository.GetRests(inventorizationId);
             IEnumerable<Rests> existedRests = rests.Where(x => oldRests.Any(r => r.Code == x.Code));
             IEnumerable<Rests> newRests = rests.Except(existedRests);
-            inventorizationRepository.UpdateRests(existedRests);
-            inventorizationRepository.AddRests(newRests);
+            inventorizationRepository.UpdateRests(inventorizationId, existedRests);
+            inventorizationRepository.AddRests(inventorizationId, newRests);
         }
 
         public IEnumerable<Rests> GetAllRests(Guid id)

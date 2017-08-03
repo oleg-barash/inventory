@@ -313,7 +313,7 @@ namespace Inventorization.Data
             });
         }
 
-        public void AddRest(Rests rest)
+        public void AddRest(Guid inventorizationId, Rests rest)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -325,14 +325,14 @@ namespace Inventorization.Data
                     cmd.Parameters.Add(new NpgsqlParameter("Code", rest.Code));
                     cmd.Parameters.Add(new NpgsqlParameter("Count", rest.Count));
                     cmd.Parameters.Add(new NpgsqlParameter("Price", rest.Price));
-                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", rest.InventorizationId));
+                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", inventorizationId));
                     cmd.ExecuteNonQuery();
                 }
             }
             _rests.Clear();
         }
 
-        public void AddRests(IEnumerable<Rests> rests)
+        public void AddRests(Guid inventorizationId, IEnumerable<Rests> rests)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -342,17 +342,13 @@ namespace Inventorization.Data
                     /*для оптимизации как вариант: https://stackoverflow.com/questions/14758680/idbcommand-parameters-for-multi-line-insert*/
                     cmd.Connection = conn;
                     cmd.CommandText = @"INSERT INTO public.""Rests""(""Code"", ""Count"", ""Price"", ""InventorizationId"") VALUES(:Code, :Count, :Price, :InventorizationId)";
-                    cmd.Parameters.Add(new NpgsqlParameter("Code", NpgsqlDbType.Varchar));
-                    cmd.Parameters.Add(new NpgsqlParameter("Count", NpgsqlDbType.Integer));
-                    cmd.Parameters.Add(new NpgsqlParameter("Price", NpgsqlDbType.Double));
-                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", NpgsqlDbType.Uuid));
                     foreach (var rest in rests)
                     {
                         cmd.Parameters.Clear();
-                        cmd.Parameters["Code"] = new NpgsqlParameter("Code", rest.Code);
-                        cmd.Parameters["Count"] = new NpgsqlParameter("Count", rest.Count);
-                        cmd.Parameters["Price"] = new NpgsqlParameter("Price", rest.Price);
-                        cmd.Parameters["InventorizationId"] = new NpgsqlParameter("InventorizationId", rest.InventorizationId);
+                        cmd.Parameters.Add(new NpgsqlParameter("Code", rest.Code));
+                        cmd.Parameters.Add(new NpgsqlParameter("Count", rest.Count));
+                        cmd.Parameters.Add(new NpgsqlParameter("Price", rest.Price));
+                        cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", inventorizationId));
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -360,7 +356,7 @@ namespace Inventorization.Data
             _rests.Clear();
         }
 
-        public void UpdateRests(IEnumerable<Rests> rests)
+        public void UpdateRests(Guid inventorizationId, IEnumerable<Rests> rests)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -373,17 +369,13 @@ namespace Inventorization.Data
                         SET Count = @Count, 
                             Price = @Price,
                         WHERE ""Code"" = @Code AND ""InventorizationId"" = @InventorizationId'";
-                    cmd.Parameters.Add(new NpgsqlParameter("Code", NpgsqlDbType.Varchar));
-                    cmd.Parameters.Add(new NpgsqlParameter("Count", NpgsqlDbType.Integer));
-                    cmd.Parameters.Add(new NpgsqlParameter("Price", NpgsqlDbType.Double));
-                    cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", NpgsqlDbType.Uuid));
                     foreach (var rest in rests)
                     {
                         cmd.Parameters.Clear();
-                        cmd.Parameters["Code"] = new NpgsqlParameter("Code", rest.Code);
-                        cmd.Parameters["Count"] = new NpgsqlParameter("Count", rest.Count);
-                        cmd.Parameters["Price"] = new NpgsqlParameter("Price", rest.Price);
-                        cmd.Parameters["InventorizationId"] = new NpgsqlParameter("InventorizationId", rest.InventorizationId);
+                        cmd.Parameters.Add(new NpgsqlParameter("Code", rest.Code));
+                        cmd.Parameters.Add(new NpgsqlParameter("Count", rest.Count));
+                        cmd.Parameters.Add(new NpgsqlParameter("Price", rest.Price));
+                        cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", inventorizationId));
                         cmd.ExecuteNonQuery();
                     }
                 }

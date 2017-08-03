@@ -11,8 +11,16 @@ import { browserHistory } from 'react-router'
 import Divider from 'material-ui/Divider';
 import Dialog from 'material-ui/Dialog';
 import FileInput  from 'react-file-input';
-
-import { saveInventorization, validateInventorization, importRests } from '../../actions/inventorizationActions'
+import {
+    PARSE_RESTS_DATA,
+} from '../../constants/actionTypes'
+import { 
+    saveInventorization, 
+    validateInventorization, 
+    importRests, 
+    openImportDialog, 
+    closeImportDialog 
+} from '../../actions/inventorizationActions'
 import { loadCompanies } from '../../actions/companyActions'
 
 const paperStyle = {
@@ -32,7 +40,7 @@ class Form extends Component {
         }
     }
     render() {
-        let { inventorization, userInfo, dispatch, company } = this.props;
+        let { inventorization, userInfo, dispatch, company, dataForImport } = this.props;
         let onNameChange = function (event, value) {
             dispatch(validateInventorization({ Name: value }));
         }
@@ -51,7 +59,7 @@ class Form extends Component {
 
 
         function onImport() {
-            dispatch(importRests(itemsToUpload, inventorization.Id, userInfo.Token))
+            dispatch(importRests(dataForImport, inventorization.Id, userInfo.Token))
         };
 
         function updateProgress(evt) {
@@ -66,7 +74,7 @@ class Form extends Component {
         }
 
         function loaded(evt) {
-            dispatch({ type: PARSE_DATA, data: evt.target.result });
+            dispatch({ type: PARSE_RESTS_DATA, data: evt.target.result });
         }
 
         function errorHandler(evt) {
@@ -126,29 +134,30 @@ class Form extends Component {
                     <FlatButton label="Назад" onClick={goBack} />
                     <FlatButton disabled={inventorization.Readonly} label="Сохранить" onClick={save} disabled={!!inventorization.NameError} />
                 </Paper>
-                {/*<Paper style={paperStyle} zDepth={3} rounded={false}>
-
-                    <FlatButton label="Импорт справочника" hoverColor={green} onClick={handleOpen}/>
+                <Paper style={paperStyle} zDepth={3} rounded={false}>
+                    <FlatButton label="Импорт справочника остатков" hoverColor={green} onClick={handleOpen}/>
                     <Dialog
-                        title="Загрузка справочника товаров"
+                        title="Загрузка справочника остатков"
                         actions={actionButtons}
                         modal={false}
-                        read
                         open={this.props.isDialogOpened}
                         onRequestClose={handleClose}>
                         {this.props.importInProgress ? 'Идёт загрузка...' : 'Для загрузки справочника выберите файл и нажмите "Загрузить"'}
                         <br/>
-                        {!!this.props.dataForImport ? 'Распознано ' + this.props.dataForImport.length + ' товаров' : ''}
+                        {!!this.props.dataForImport ? 'Распознано строк: ' + this.props.dataForImport.length : ''}
                     </Dialog>
-                </Paper>*/}
+                </Paper>
             </div> : null)
     }
 }
 
 const mapStateToProps = (state) => {
+    debugger
     return {
         userInfo: state.auth,
-        company: state.company
+        company: state.company,
+        dataForImport: state.inventorization.dataForImport,
+        isDialogOpened: state.inventorization.isImportDialogOpened,
     }
 }
 

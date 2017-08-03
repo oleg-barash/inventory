@@ -1,8 +1,8 @@
 import {
     INVENTORIZATION_LOADING,
     INVENTORIZATION_LOADED,
-    OPEN_IMPORT_DIALOG,
-    CLOSE_IMPORT_DIALOG,
+    OPEN_IMPORT_RESTS_DIALOG,
+    CLOSE_IMPORT_RESTS_DIALOG,
     INVENTORIZATION_LIST_LOADING,
     INVENTORIZATION_LIST_LOADED,
     INVENTORIZATION_SAVING,
@@ -38,9 +38,9 @@ export default function inventorization(state = def, action) {
             return Object.assign({}, state, { isListLoading: true })
         case INVENTORIZATION_LIST_LOADED:
             return Object.assign({}, state, { isListLoading: false, list: action.list })
-        case OPEN_IMPORT_DIALOG:
+        case OPEN_IMPORT_RESTS_DIALOG:
             return Object.assign({}, state, { isImportDialogOpened: true })
-        case CLOSE_IMPORT_DIALOG:
+        case CLOSE_IMPORT_RESTS_DIALOG:
             return Object.assign({}, state, { isImportDialogOpened: false })
         case START_RESTS_IMPORT:
             return Object.assign({}, state, {
@@ -55,7 +55,7 @@ export default function inventorization(state = def, action) {
             let itemsToUpload = rows.map((row) => {
                 let columns = row.split(",")
                 return {
-                    BarCode: columns[0],
+                    Code: columns[0],
                     Count: columns[1],
                     Price: columns[2],
 

@@ -368,15 +368,11 @@ namespace Inventorization.Api.Controllers
         [Route("{inventorizationId}/rests")]
         public HttpResponseMessage GetRests(Guid inventorizationId, [FromUri]ActionType type = ActionType.FirstScan)
         {
-            var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
-            var items = _companyRepository.GetItems(inventorization.Company);
             //string code = Convert.ToBase64String(Encoding.Unicode.GetBytes(items.GetHashCode().ToString()));
             //var requestedETag = Request.Headers.IfNoneMatch.ToString();
             //if (requestedETag == code)
             //    return Request.CreateResponse(HttpStatusCode.NotModified);
 
-            var actions = inventorizationDomain.GetActions(inventorizationId);
-            var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
             var rests = inventorizationDomain.GetAllRests(inventorizationId);
 
             HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, rests);

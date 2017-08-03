@@ -116,9 +116,8 @@ export function deleteAction(action, userToken){
                 'Content-Type': 'application/json'
             }})
             .then(response => {
-                dispatch(actionDeleted(action))
-                toastr.success("Действие успешно удалено")
-                //dispatch(fetchActions(action.Inventorization, userToken))
+                dispatch(actionDeleted(action));
+                toastr.success("Действие успешно удалено");
             })
     }
 }

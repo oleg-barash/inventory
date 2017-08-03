@@ -19,8 +19,8 @@ namespace Inventorization.Business.Interfaces
         void ReopenZone(Guid id, Guid zoneId);
         void UpdateInventorization(Model.Inventorization inventorization);
         List<Rests> GetRests(Guid id);
-        void AddRest(Rests rest);
-        void AddRests(IEnumerable<Rests> rests);
-        void UpdateRests(IEnumerable<Rests> rests);
+        void AddRest(Guid inventorizationId, Rests rest);
+        void AddRests(Guid inventorizationId, IEnumerable<Rests> rests);
+        void UpdateRests(Guid inventorizationId, IEnumerable<Rests> rests);
     }
 }

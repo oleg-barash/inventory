@@ -2,7 +2,8 @@ import fetch from 'isomorphic-fetch'
 import {
     INVENTORIZATION_LOADING,
     OPEN_IMPORT_DIALOG,
-    CLOSE_IMPORT_DIALOG,
+    OPEN_IMPORT_RESTS_DIALOG,
+    CLOSE_IMPORT_RESTS_DIALOG,
     INVENTORIZATION_LOADED,
     INVENTORIZATION_SAVED,
     INVENTORIZATION_LIST_LOADING,
@@ -48,7 +49,7 @@ export function importRests(rests, inventorization, userToken) {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(items)
+            body: JSON.stringify(rests)
         })
             .then(response => {
                 dispatch(dataImported())
