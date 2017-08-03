@@ -21,13 +21,14 @@ namespace Inventorization.Business.Domains
             this.inventorizationRepository = inventorizationRepository;
         }
 
-        public void InsertAction(Model.Action action) {
+        public Model.Action InsertAction(Model.Action action) {
             CheckZoneAccess(action);
             if (action.Id == null || action.Id == Guid.Empty)
             {
                 action.Id = Guid.NewGuid();
             }
             actionRepository.CreateAction(action);
+            return action;
         }
 
         private void CheckZoneAccess(Model.Action action)
@@ -48,16 +49,17 @@ namespace Inventorization.Business.Domains
             actionRepository.UpdateAction(action);
         }
 
-        public void UpsertAction(Model.Action action)
+        public Model.Action UpsertAction(Model.Action action)
         {
             bool actionExists = ActionExists(action.Id);
             if (actionExists)
             {
                 UpdateAction(action);
+                return action;
             }
             else
             {
-                InsertAction(action);
+                return InsertAction(action);
             }
         }
 

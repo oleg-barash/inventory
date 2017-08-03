@@ -67,7 +67,7 @@ class Items extends Component {
     }
 
     render() {
-        var { dispatch, userInfo, filter, actions } = this.props;
+        var { dispatch, userInfo, filter, actions, items } = this.props;
 
         if (!userInfo.SelectedInventorization) {
             return null;
@@ -162,9 +162,9 @@ class Items extends Component {
                             type="number" />
                     </Paper>
                 <h2 style={{ display: this.props.isFetching ? "block" : "none" }}>Загрузка...</h2>
-                <List items={this.props.items} />
+                <List items={items} />
                 <FlatButton style={{ display: this.props.isFetching ? "none" : "block" }} label="Загрузить ещё" hoverColor={green} onClick={handleLoadMore} />
-                <h2 style={{ display: this.props.isFetching && this.props.items.length > 0 ? "block" : "none" }}>Загрузка...</h2>
+                <h2 style={{ display: this.props.isFetching && items.length > 0 ? "block" : "none" }}>Загрузка...</h2>
             </div>);
     }
 };

@@ -29,7 +29,7 @@ function _applyFilter(items, filter){
             return _.take(result, filter.pageSize * filter.currentPage);
 }
 
-export default function dictionary(state = { isFetching: false, items: [], displayItems:[], filter: { currentPage : 1, pageSize : 100, text: undefined, type: undefined } }, action)
+export default function dictionary(state = { isFetching: false, displayItems:[], filter: { currentPage : 1, pageSize : 100, text: undefined, type: undefined } }, action)
 {
     switch (action.type){
         case FILTER_DICTIONARY_ITEMS:

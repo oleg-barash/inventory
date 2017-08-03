@@ -10,8 +10,7 @@ import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import { validateAction, saveAction, loadCurrentAction } from '../../actions/actionActions'
-import { fetchItems } from '../../actions/itemActions'
-import { fetchZones } from '../../actions/zoneActions'
+import { fetchItems } from '../../actions/dictionaryActions'
 import ZoneSelect from '../zone/select'
 import { connect } from 'react-redux'
 import _ from 'lodash'
@@ -29,7 +28,7 @@ const mapStateToProps = (state) => {
         inventorization: state.auth.SelectedInventorization,
         action: state.action,
         availabledZones: state.zones.items || [],
-        availabledItems: state.items.items || []
+        availabledItems: state.dictionary
     }
 }
 
@@ -50,11 +49,8 @@ class Form extends Component {
 
     render() {
         let {action, dispatch, availabledItems, inventorization, userInfo} = this.props;
-        if (!this.props.availabledItems || this.props.availabledItems.length == 0){
-             dispatch(fetchItems(inventorization.Id, {}, userInfo.Token));
-        }
-        if (!this.props.availabledZones || this.props.availabledZones.length == 0){
-            dispatch(fetchZones(inventorization.Id, userInfo.Token));
+        if (!availabledItems.items && ! availabledItems.isFetching){
+             dispatch(fetchItems(inventorization.Company, {}, userInfo.Token));
         }
         let onItemChange = function(value) {
             dispatch(validateAction({Name: value.Name, BarCode: value.Code}));
@@ -80,7 +76,6 @@ class Form extends Component {
                 dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone, Quantity: action.Quantity || ''}));
             }
         }
-        debugger
         return (
             <Paper>
                 <AutoComplete 
@@ -91,7 +86,7 @@ class Form extends Component {
                     hintText="1234567890" 
                     searchText={action.BarCode} 
                     floatingLabelText="Укажите код товара" 
-                    dataSource={this.props.availabledItems}
+                    dataSource={availabledItems.items || []}
                     style={action.Type == 2 ? {display:"none"} : {} }
                     onNewRequest={onItemChange} 
                     dataSourceConfig={itemDataSourceConfig}
@@ -106,7 +101,7 @@ class Form extends Component {
                     hintText="Велотренажер" 
                     searchText={action.Name} 
                     floatingLabelText="Укажите наименование товара" 
-                    dataSource={this.props.availabledItems}
+                    dataSource={availabledItems.items || []}
                     onNewRequest={onItemChange} 
                     style={action.Type == 2 ? {display:"none"} : {} }
                     dataSourceConfig={itemNameDataSourceConfig}

@@ -1,37 +1,42 @@
-import React, { PropTypes, Component  } from 'react';
+import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux'
+import { fetchZones } from '../../actions/zoneActions'
 import AutoComplete from 'material-ui/AutoComplete';
 const mapStateToProps = (state) => {
     return {
-        availabledZones: state.zones.items || []
+        availabledZones: state.zones,
+        userInfo: state.auth
     }
 }
 const zoneDataSourceConfig = {
-  text: 'ZoneName',
-  value: 'ZoneId',
+    text: 'ZoneName',
+    value: 'ZoneId',
 };
 class Select extends Component {
     constructor(props) {
         super(props);
     }
     render() {
-        let { zone, onZoneChange, errorText } = this.props;
+        let { zone, onZoneChange, errorText, availabledZones, dispatch, userInfo } = this.props;
+        if (!availabledZones.items && !availabledZones.isFetching) {
+            dispatch(fetchZones(userInfo.SelectedInventorization.Id, userInfo.Token));
+        }
         return (
-            <AutoComplete 
+            <AutoComplete
                 id="Zone"
                 floatingLabelText="Зона"
-                dataSource={this.props.availabledZones}
-                searchText={this.props.zone ? this.props.zone.ZoneName : ''} 
-                onNewRequest={onZoneChange}  
+                dataSource={availabledZones.items || []}
+                searchText={zone ? zone.ZoneName : ''}
+                onNewRequest={onZoneChange}
                 dataSourceConfig={zoneDataSourceConfig}
-                errorText={errorText}/>)
-        }
+                errorText={errorText} />)
+    }
 }
 
 Select.propTypes = {
     zone: PropTypes.shape({
         Id: PropTypes.string.isRequired,
-        ZoneName: PropTypes.string.isRequired,
+        Number: PropTypes.number.isRequired,
     }),
     errorText: PropTypes.string
 }

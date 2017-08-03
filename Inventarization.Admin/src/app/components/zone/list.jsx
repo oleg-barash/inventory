@@ -14,17 +14,19 @@ class List extends Component {
         return (<Table>
         <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
-                <TableHeaderColumn style={{width: '100px'}}>Зона</TableHeaderColumn>
-                <TableHeaderColumn style={{width: '100px'}}>Время открытия</TableHeaderColumn>
-                <TableHeaderColumn style={{width: '100px'}}>Время закрытия</TableHeaderColumn>
-                <TableHeaderColumn style={{width: '100px'}}>Товаров в зоне</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '40px'}}>Зона</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '80px'}}>Время открытия</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '100px'}}>Открыл</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '80px'}}>Время закрытия</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '100px'}}>Закрыл</TableHeaderColumn>
+                <TableHeaderColumn style={{width: '70px'}}>Товаров в зоне</TableHeaderColumn>
                 <TableHeaderColumn>Действия</TableHeaderColumn>
             </TableRow>
         </TableHeader>
         <TableBody>
-            {zones.map(zone =>
+            {zones ? zones.map(zone =>
                 <Row zone={zone} key={zone.ZoneStatusId}/>
-            )}
+            ) : null}
         </TableBody>
     </Table>)
     }

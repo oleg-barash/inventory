@@ -78,13 +78,16 @@ namespace Inventorization.Data
 
         public static ZoneModel ToZone(this NpgsqlDataReader reader)
         {
-            return new ZoneModel()
+            ZoneModel result = new ZoneModel()
             {
                 Id = reader.GetGuid(0),
-                Name = reader.GetString(1),
-                Code = reader.GetString(2),
-                
+                Name = reader.GetString(1)
             };
+            if (!reader.IsDBNull(2))
+            {
+                result.Number = reader.GetInt32(2);
+            }
+            return result;
         }
 
         public static ZoneState ToZoneState(this NpgsqlDataReader reader)

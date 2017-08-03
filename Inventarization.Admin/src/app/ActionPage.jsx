@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import ActionForm from './components/action/form'
+import Form from './components/action/form'
 import AuthorizedComponent from './components/authorizedComponent'
 import { connect } from 'react-redux'
 import { loadCurrentAction } from './actions/actionActions'
@@ -29,7 +29,7 @@ class ActionPage extends AuthorizedComponent {
     return (
           <div>
               <h2 style={styles.headline}>Действие</h2>
-              <ActionForm/>
+              <Form/>
           </div>
     )};
 }

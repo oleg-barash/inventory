@@ -19,7 +19,7 @@ export function fetchZones(inventorization, userToken){
 
 export function openZone(zone, inventorization, userToken){
     return function (dispatch){
-        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/reopen?code=' + zone.Code, { headers: { "Authorization": userToken } })
+        return fetch(process.env.API_URL + 'inventorization/' + inventorization + '/zone/reopen?number=' + zone.Number, { headers: { "Authorization": userToken } })
             .then(response => {
                 dispatch(zoneOpened(zone))
                 dispatch(fetchZones(inventorization, userToken))

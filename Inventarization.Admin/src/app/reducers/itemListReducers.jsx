@@ -105,10 +105,9 @@ export function itemList(state = { isFetching: false, items: [], displayItems: [
             });
             return Object.assign({}, state, { isFetching: false, items: updatedItems, displayItems: _applyFilter(updatedItems, state.filter) });
         case ACTION_DELETED:
-            var items = state.items.filter((actionItem) => actionItem.Id !== action.id);
-            var filtredActions = filterActions(items, state.filter);
-            return Object.assign({}, state, { isFetching: false, items, filtredActions })
+            let newItems = state.items.map((item) => Object.assign({}, item, { Actions: _.filter(item.Actions, itemAction => itemAction.Id !== action.action.Id) }));
+            return Object.assign({}, state, { isFetching: false, items: newItems });
         default:
-            return state
-    }
+    return state;
+}
 }

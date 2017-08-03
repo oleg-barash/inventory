@@ -58,9 +58,11 @@ class Row extends Component {
 
         return (
             <TableRow style={getStyle(zone)}>
-                <TableRowColumn style={{width: '100px'}}>{zone.ZoneName}</TableRowColumn>
-                <TableRowColumn style={{width: '100px'}}>{zone.OpenedAt == undefined ? "не открыта" : moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
-                <TableRowColumn style={{width: '100px'}}>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
+                <TableRowColumn style={{width: '40px'}}>{zone.Number}</TableRowColumn>
+                <TableRowColumn style={{width: '80px'}}>{zone.OpenedAt == undefined ? "не открыта" : moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}>{zone.OpenedBy}</TableRowColumn>
+                <TableRowColumn style={{width: '80px'}}>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
+                <TableRowColumn style={{width: '100px'}}>{zone.ClosedBy}</TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}>{zone.TotalItems}</TableRowColumn>
                 <TableRowColumn >
                     <FlatButton disabled={zone.Status == ZoneStatuses.Closed || zone.Status == ZoneStatuses.NotOpened}

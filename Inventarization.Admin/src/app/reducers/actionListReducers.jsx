@@ -1,7 +1,16 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { FILTER_ACTION, REQUEST_ACTION, RECEIVE_ACTIONS, DELETING_ACTION, ACTION_DELETED, SHOW_LOADING, HIDE_LOADING, UPDATE_ACTIONS_FILTER } from '../constants/actionTypes'
+import { FILTER_ACTION, 
+    REQUEST_ACTION, 
+    RECEIVE_ACTIONS,
+    DELETING_ACTION, 
+    ACTION_DELETED, 
+    SHOW_LOADING, 
+    HIDE_LOADING, 
+    UPDATE_ACTIONS_FILTER,
+    ACTION_SAVED
+} from '../constants/actionTypes'
 
 const filterActions = (items, filter) => {
     if (items == undefined){
@@ -27,7 +36,7 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
 {
     switch (action.type){
         case ACTION_DELETED:
-            var items = state.items.filter((actionItem) => actionItem.Id !== action.id);
+            var items = state.items.filter((actionItem) => actionItem.Id !== action.action.Id);
             var filtredActions = filterActions(items, state.filter);
             return Object.assign({}, state, { isFetching: false, items, filtredActions })
         case DELETING_ACTION:
@@ -65,6 +74,16 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
                     }),
                     filtredActions: items,
                     lastUpdated: action.receivedAt
+            })
+        case ACTION_SAVED:
+            return Object.assign({}, state, {
+                items: state.items.map((actionItem) => {
+                    if (actionItem.Id === action.action.Id)
+                    {
+                        Object.assign({}, actionItem, action.action);
+                    }
+                    return actionItem;
+                })
             })
         default:
             return state

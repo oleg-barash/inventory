@@ -37,14 +37,13 @@ namespace Inventorization.Controllers
             ZoneModel[] currentZones = _zoneRepository.GetZones().ToArray();
             for (int i = 1; i <= count; i++)
             {
-                string code = i.ToString();
-                ZoneModel zone = currentZones.FirstOrDefault(x => x.Code == code);
+                ZoneModel zone = currentZones.FirstOrDefault(x => x.Number == i);
                 if (zone == null)
                 {
                     zone = new ZoneModel();
                     zone.Id = Guid.NewGuid();
                     zone.Name = "Зона " + i;
-                    zone.Code = code;
+                    zone.Number = i;
                     _zoneRepository.Create(zone);
                 }
                 zones.Add(zone);
@@ -106,9 +105,9 @@ namespace Inventorization.Controllers
 
 
         [HttpGet]
-        public HttpResponseMessage Get(string code)
+        public HttpResponseMessage Get(int number)
         {
-            var zone = _zoneRepository.GetZone(code);
+            var zone = _zoneRepository.GetZone(number);
             if (zone == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -126,7 +125,7 @@ namespace Inventorization.Controllers
         [HttpPost]
         public HttpResponseMessage Create([FromBody]ZoneModel zone)
         {
-            zone.Name = "Зона " + zone.Code;
+            zone.Name = "Зона " + zone.Number;
             zone.Id = Guid.NewGuid();
             _zoneRepository.Create(zone);
             return Request.CreateResponse(HttpStatusCode.OK, zone);

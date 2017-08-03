@@ -1,7 +1,4 @@
-/**
- * Created by Барашики on 27.03.2017.
- */
-import { VALIDATE_ACTION, SET_CURRENT_ACTION } from '../constants/actionTypes'
+import { VALIDATE_ACTION, SET_CURRENT_ACTION, ACTION_SAVED } from '../constants/actionTypes'
 
 export function action(state = { Type: 0 }, action)
 {
@@ -24,10 +21,11 @@ export function action(state = { Type: 0 }, action)
                     }
                 }
             }
-            return actionItem;
+            return Object.assign({}, state, actionItem);
         case SET_CURRENT_ACTION:
-            return action.action;
-            
+            return Object.assign({}, state,  action.action);
+        case ACTION_SAVED:
+            return Object.assign({}, state, action.action);
         default:
             return state
     }

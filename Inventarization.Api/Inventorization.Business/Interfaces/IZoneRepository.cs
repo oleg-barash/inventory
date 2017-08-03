@@ -15,7 +15,7 @@ namespace Inventorization.Business.Interfaces
         List<ZoneModel> GetZones(Guid[] ids);
         List<ZoneModel> GetAllZones();
         ZoneModel GetZone(Guid id);
-        ZoneModel GetZone(string code);
+        ZoneModel GetZone(int number);
         void DeleteZone(Guid id);
     }
 }

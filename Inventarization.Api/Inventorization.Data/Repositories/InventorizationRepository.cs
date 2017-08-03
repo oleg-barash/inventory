@@ -155,7 +155,7 @@ namespace Inventorization.Data
             }
         }
 
-        public ZoneState GetZoneState(Guid inventorizationId, string zone)
+        public ZoneState GetZoneState(Guid inventorizationId, int zoneNumber)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -164,10 +164,10 @@ namespace Inventorization.Data
                 {
                     cmd.Connection = conn;
                     cmd.CommandText = @"SELECT * FROM public.""ZoneStates"" AS state
-                        JOIN public.""Zones"" AS zone ON zone.""Code"" = @zone
+                        JOIN public.""Zones"" AS zone ON zone.""Number"" = @zone
                         WHERE state.""InventorizationId"" = @inventorizationId AND state.""ZoneId"" = zone.""Id""";
                     cmd.Parameters.Add(new NpgsqlParameter("inventorizationId", inventorizationId));
-                    cmd.Parameters.Add(new NpgsqlParameter("zone", zone));
+                    cmd.Parameters.Add(new NpgsqlParameter("zone", zoneNumber));
                     using (var reader = cmd.ExecuteReader())
                     {
                         return reader.Read() ? reader.ToZoneState() : null;

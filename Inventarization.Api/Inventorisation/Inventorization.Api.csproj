@@ -242,7 +242,6 @@
     <Compile Include="Controllers\ActionController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
-    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ZonesController.cs" />
     <Compile Include="MyAuthExtensions.cs" />

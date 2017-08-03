@@ -11,7 +11,7 @@ namespace Inventorization.Business.Model
         public Guid Id { get; set; }
         [JsonProperty(PropertyName = "Name", Order = 1)]
         public string Name { get; set; }
-        [JsonProperty(PropertyName = "Code", Order = 2)]
-        public string Code { get; set; }
+        [JsonProperty(PropertyName = "Number", Order = 2)]
+        public int? Number { get; set; }
     }
 }

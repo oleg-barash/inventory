@@ -12,7 +12,7 @@ namespace Inventorization.Business.Interfaces
         Model.Inventorization GetInventorization(Guid id);
         List<Model.Inventorization> GetInventorizations();
         List<Model.Inventorization> GetInventorizationsForCompany(Guid companyId);
-        ZoneState GetZoneState(Guid inventorizationId, string zone);
+        ZoneState GetZoneState(Guid inventorizationId, int zoneNumber);
         ZoneState GetZoneState(Guid id, Guid zoneId);
         List<ZoneState> GetZoneStates(Guid id);
         void OpenZone(Guid id, Guid zoneId, Guid userId);

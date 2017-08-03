@@ -19,10 +19,21 @@ class ItemRow extends Component {
     render() {
         let { item } = this.props;
 
+        let getSourceName = x => {
+            switch(x){
+                case 1:
+                    return 'Импорт';
+                case 2:
+                    return 'Ручное создание';
+                default:
+                    return 'Неизвестно';
+            }}
+
         return (
             <TableRow>
                 <TableRowColumn style={{width: '280px'}}>{item.Name}</TableRowColumn>
                 <TableRowColumn>{item.Code}</TableRowColumn>
+                <TableRowColumn>{getSourceName(item.Source)}</TableRowColumn>
             </TableRow>)
     }
 }

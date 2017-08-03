@@ -6,7 +6,7 @@ namespace Inventorization.Api.ViewModels
     public class ZoneViewModel
     {
         public Guid ZoneId { get; set; }
-        public string Code { get; set; }
+        public int? Number { get; set; }
         public string ZoneName { get; set; }
         public DateTime? OpenedAt { get; set; }
         public DateTime? ClosedAt { get; set; }

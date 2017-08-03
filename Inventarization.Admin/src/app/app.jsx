@@ -35,7 +35,7 @@ import LeftMenu from './components/user/leftMenu'
 import InventorizationDialog from './components/inventorizationDialog'
 
 import { withCookies } from 'react-cookie';
-import { LOGIN_FINISHED, LOGOUT, INVENTORIZATION_SELECTED, CLOSE_INVENTORIZATION_DIALOG, TOGGLE_DRAWER } from './constants/actionTypes'
+import { LOGIN_FINISHED, LOGOUT, INVENTORIZATION_SELECTED, CLOSE_INVENTORIZATION_DIALOG, TOGGLE_DRAWER, ACTION_SAVED } from './constants/actionTypes'
 import { toggleDrawer } from './actions/globalActions'
 import { browserHistory } from 'react-router'
 
@@ -74,6 +74,9 @@ function authCookies({ getState }) {
                 document.cookie = "UserData="
                 browserHistory.push('/login');
                 break
+            case ACTION_SAVED:
+            debugger
+                browserHistory.push('/editAction?id=' + action.id);
         }
     }
 
@@ -127,7 +130,7 @@ class App extends Component {
         <MuiThemeProvider>
             <Provider store={store}>
                 <div>
-                    <AppBar title="Title" 
+                    <AppBar title="Инвентаризация" 
                         onLeftIconButtonTouchTap={handleToggle}
                         iconClassNameRight="muidocs-icon-navigation-expand-more"
                         iconElementRight={<AuthStatus cookies={this.props.cookies}/>}

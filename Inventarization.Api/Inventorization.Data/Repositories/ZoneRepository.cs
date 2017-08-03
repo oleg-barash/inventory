@@ -25,10 +25,10 @@ namespace Inventorization.Data
                 using (var cmd = new NpgsqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = @"INSERT INTO public.""Zones""(""Id"", ""Name"", ""Code"") VALUES(:Id, :Name, :Code)";
+                    cmd.CommandText = @"INSERT INTO public.""Zones""(""Id"", ""Name"", ""Number"") VALUES(:Id, :Name, :Number)";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", zone.Id));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", zone.Name));
-                    cmd.Parameters.Add(new NpgsqlParameter("Code", zone.Code));
+                    cmd.Parameters.Add(new NpgsqlParameter("Number", zone.Number));
                     
                     cmd.ExecuteNonQuery();
                 }
@@ -148,7 +148,7 @@ namespace Inventorization.Data
             }
         }
 
-        public ZoneModel GetZone(string code)
+        public ZoneModel GetZone(int number)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
             {
@@ -157,8 +157,8 @@ namespace Inventorization.Data
                 {
                     cmd.Connection = conn;
 
-                    cmd.CommandText = "SELECT * FROM public.\"Zones\" WHERE \"Code\" = @code";
-                    cmd.Parameters.Add(new NpgsqlParameter("code", code));
+                    cmd.CommandText = "SELECT * FROM public.\"Zones\" WHERE \"Number\" = @number";
+                    cmd.Parameters.Add(new NpgsqlParameter("number", number));
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
