@@ -12,7 +12,7 @@ class List extends Component {
     }
 
     render() {
-        var { items, actions, rests, showOnlyActive } = this.props;
+        var { items } = this.props;
         return (
             <Table>
                 <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
