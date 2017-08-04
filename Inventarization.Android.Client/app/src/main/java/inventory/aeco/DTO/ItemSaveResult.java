@@ -11,4 +11,5 @@ import inventory.aeco.network.models.*;
 public class ItemSaveResult {
     @JsonIgnoreProperties
     public Item foundItem;
+    public Action action;
 }

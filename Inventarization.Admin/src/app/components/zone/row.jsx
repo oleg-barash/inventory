@@ -55,7 +55,7 @@ class Row extends Component {
                     return { backgroundColor:  white}
             }
         }
-
+debugger
         return (
             <TableRow style={getStyle(zone)}>
                 <TableRowColumn style={{width: '40px'}}>{zone.Number}</TableRowColumn>
