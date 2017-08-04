@@ -6,7 +6,7 @@ import inventory.aeco.network.models.*;
 
 /**
  * Created by Барашики on 22.05.2017.
- */
+        */
 
 public class ItemSaveResult {
     @JsonIgnoreProperties

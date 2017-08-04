@@ -7,6 +7,7 @@ export function loadINV3(inventarizationId, userToken){
             .then(response => response.blob())
             .then(blob => {
                 dispatch(hideLoading())
+                debugger
                 window.open( URL.createObjectURL(blob),'_blank');
 
             })

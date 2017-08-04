@@ -152,7 +152,6 @@ class Form extends Component {
 }
 
 const mapStateToProps = (state) => {
-    debugger
     return {
         userInfo: state.auth,
         company: state.company,
