@@ -21,7 +21,6 @@ export default function user(state = { Type: 0, HasError: hasError }, action)
             }
             return userItem;
         case SET_CURRENT_USER:
-            debugger
             return Object.assign({ HasError: hasError }, action.user);
         default:
             return state
