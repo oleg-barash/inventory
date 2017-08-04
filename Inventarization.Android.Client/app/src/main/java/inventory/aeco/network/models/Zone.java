@@ -7,5 +7,5 @@ package inventory.aeco.network.models;
 public class Zone {
     public String Id;
     public String Name;
-    public String Code;
+    public String Number;
 }
