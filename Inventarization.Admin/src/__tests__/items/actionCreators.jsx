@@ -1,5 +1,5 @@
 import configureMockStore from 'redux-mock-store'
-import { fetchItems } from '../../app/actions/itemActions.jsx'
+import { fetchItems } from '../../app/actions/dictionaryActions.jsx'
 import thunk from 'redux-thunk'
 import nock from 'nock'
 

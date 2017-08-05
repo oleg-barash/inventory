@@ -52,7 +52,7 @@ class Items extends Component {
         super(props);
     }
     componentWillMount() {
-        let { dispatch, userInfo, actionsUpdateDate, availabledZones } = this.props;
+        let { dispatch, userInfo, actionsUpdateDate, availabledZones, items } = this.props;
         if (userInfo.Token != undefined && this.props.userInfo.SelectedInventorization !== undefined) {
             dispatch(fetchItems(userInfo.SelectedInventorization.Company, {}, userInfo.Token))
             dispatch(fetchRests(userInfo.SelectedInventorization.Id, userInfo.Token))
@@ -162,7 +162,7 @@ class Items extends Component {
                             type="number" />
                     </Paper>
                 <h2 style={{ display: this.props.isFetching ? "block" : "none" }}>Загрузка...</h2>
-                <List items={items} />
+                <List items={items || []} />
                 <FlatButton style={{ display: this.props.isFetching ? "none" : "block" }} label="Загрузить ещё" hoverColor={green} onClick={handleLoadMore} />
                 <h2 style={{ display: this.props.isFetching && items.length > 0 ? "block" : "none" }}>Загрузка...</h2>
             </div>);

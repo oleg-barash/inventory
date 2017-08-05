@@ -94,17 +94,6 @@ export function saveItem(item, company, userToken){
     }
 }
 
-export function fetchItems(company, filter, userToken){
-    return function (dispatch){
-        dispatch(requestItems())
-        return fetch(process.env.API_URL + 'company/' + company + '/items', { headers: { "Authorization": userToken } })
-            .then(response => response.json())
-            .then(json =>
-                dispatch(receiveItems(json, filter))
-            )
-    }
-}
-
 export function itemSaved(item){
     return {
         type: ITEM_SAVED,

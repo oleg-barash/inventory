@@ -18,10 +18,10 @@ function _applyFilter(items, filter) {
     if (filter.type !== undefined) {
         switch (filter.type) {
             case '1':
-                result = _.filter(result, (item) => item.QuantityFact < item.QuantityPlan)
+                result = _.filter(result, (item) => item.Actions !== undefined && item.Fact < item.Count);
                 break
             case '2':
-                result = _.filter(result, (item) => item.QuantityFact > item.QuantityPlan)
+                result = _.filter(result, (item) => item.Actions !== undefined && item.Fact > item.Count)
                 break
             default:
                 break
@@ -31,7 +31,7 @@ function _applyFilter(items, filter) {
     if (filter.text !== undefined && filter.text.length > 4) {
         result = _.filter(result, (item) => {
             let val = filter.text.toUpperCase();
-            return item.BarCode && item.BarCode.toUpperCase().startsWith(val)
+            return item.Code && item.Code.toUpperCase().startsWith(val)
                 || item.Number && item.Number.toUpperCase().startsWith(val)
                 || item.Name && item.Name.toUpperCase().startsWith(val)
                 || item.Description && item.Description.toUpperCase().startsWith(val);
@@ -40,7 +40,7 @@ function _applyFilter(items, filter) {
 
     if (filter.zone !== undefined) {
         result = _.filter(result, (item) => {
-            let details = item.Actions.reduce((previousValue, currentValue) => previousValue.concat(currentValue.Zone), [])
+            let details = item.Actions != undefined ? item.Actions.reduce((previousValue, currentValue) => previousValue.concat(currentValue.Zone), []) : [];
             return details.some(x => x.ZoneName === filter.zone.ZoneName);
         })
     }
@@ -48,7 +48,7 @@ function _applyFilter(items, filter) {
         let devation = parseInt(filter.devation);
         if (!isNaN(devation)) {
             result = _.filter(result, (item) => {
-                return item.QuantityPlan - item.QuantityFact >= devation
+                return item.Count - item.Fact >= devation
             });
         }
     }
@@ -56,7 +56,7 @@ function _applyFilter(items, filter) {
         let priceDevation = parseInt(filter.priceDevation);
         if (!isNaN(priceDevation)) {
             result = _.filter(result, (item) => {
-                return item.QuantityPlan * item.Price - item.QuantityFact * item.Price >= priceDevation
+                return item.Count != undefined && item.Price != undefined && (item.Count * item.Price - item.Fact * item.Price >= priceDevation)
             });
         }
     }
@@ -64,7 +64,7 @@ function _applyFilter(items, filter) {
     return _.take(result, filter.pageSize * filter.currentPage);
 }
 
-export function itemList(state = { isFetching: false, items: [], displayItems: [], filter: { currentPage: 1, pageSize: 100, text: undefined, type: undefined } }, action) {
+export function itemList(state = { isFetching: false, filter: { currentPage: 1, pageSize: 100, text: undefined, type: undefined } }, action) {
     switch (action.type) {
         case FILTER_ITEMS:
             var filter = Object.assign({}, state.filter, action.filter);
@@ -76,34 +76,42 @@ export function itemList(state = { isFetching: false, items: [], displayItems: [
                 })
             })
         case RECEIVE_DICTIONARY:
-            var result = _applyFilter(action.items, state.filter).map(x => {
+            let joinedItems = state.items != undefined ? action.items.map(item => {
+                let found =_.find(state.items, stateItem => stateItem.Code === item.Code);
+                return found != undefined ? Object.assign({}, found, item) : item;
+            }) : action.items;
+            var result = _applyFilter(joinedItems, state.filter).map(x => {
                 x.key = x.Id;
                 return x;
             });
-            return Object.assign({}, state, { items: action.items, displayItems: result });
+            return Object.assign({}, state, { items: joinedItems, displayItems: result });
         case UPDATE_ITEMS_FILTER:
             return Object.assign({}, state, { isFetching: true, filter: Object.assign({}, state.filter, action.filter) })
         case RECEIVE_RESTS:
-            let rests = action.items;
-            let items = _.map(state.items, item => {
-                let itemRest = _.find(rests, rest => rest.Code === item.Code);
-                if (itemRest) {
-                    return Object.assign(item, { Count: itemRest.Count, Price: itemRest.Price })
+            var itemsWithRests = _.map(action.items, rest => {
+                let restItem = _.find(state.items, item => rest.Code === item.Code);
+                if (restItem) {
+                    return Object.assign({}, restItem, rest)
                 }
-                return item;
+                return rest;
             });
-            return Object.assign({}, state, { isFetching: false, items: items, displayItems: _applyFilter(items, state.filter) });
+
+            var allItems = _.unionBy(state.items, itemsWithRests, x => x.Code);
+
+            return Object.assign({}, state, { isFetching: false, items: allItems, displayItems: _applyFilter(allItems, state.filter) });
 
         case RECEIVE_ACTIONS:
-            var actions = action.items;
-            let updatedItems = _.map(state.items, item => {
-                let itemActions = _.filter(actions, action => action.BarCode === item.Code);
-                if (itemActions) {
-                    return Object.assign(item, { Actions: itemActions })
+            var grouppedActions = _.groupBy(action.items, a => a.BarCode);
+            var itemsWithActions = _.map(grouppedActions, (values, key) => {
+                let item = _.find(state.items, item  => key === item.Code);
+                if (item) {
+                    return Object.assign(item, { Actions: values })
                 }
-                return item;
+                return { Code: key, Actions: values, Fact: _.sumBy(values, value => value.Quantity) };
             });
-            return Object.assign({}, state, { isFetching: false, items: updatedItems, displayItems: _applyFilter(updatedItems, state.filter) });
+
+            var allItems = _.unionBy(state.items, itemsWithActions, x => x.Code);
+            return Object.assign({}, state, { isFetching: false, items: allItems, displayItems: _applyFilter(allItems, state.filter) });
         case ACTION_DELETED:
             let newItems = state.items.map((item) => Object.assign({}, item, { Actions: _.filter(item.Actions, itemAction => itemAction.Id !== action.action.Id) }));
             return Object.assign({}, state, { isFetching: false, items: newItems });
