@@ -133,6 +133,21 @@ namespace Inventorization.Data
             return items;
         }
 
+        public void ClearItems(Guid id)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "DELETE FROM public.\"Item\" WHERE \"CompanyId\" = @Id;";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", id));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        
 
         private ConcurrentDictionary<Guid, List<Item>> _itemsCache = new ConcurrentDictionary<Guid, List<Item>>();
 
