@@ -34,7 +34,6 @@ namespace Inventorization.Data
                 }
             }
         }
-
         public void Update(ZoneModel zone)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -52,8 +51,6 @@ namespace Inventorization.Data
                 }
             }
         }
-
-
         public List<ZoneModel> GetZones()
         {
             List<ZoneModel> result = new List<ZoneModel>();
@@ -75,7 +72,6 @@ namespace Inventorization.Data
             }
             return result;
         }
-
         public List<ZoneModel> GetZones(Guid[] ids)
         {
             List<ZoneModel> result = new List<ZoneModel>();
@@ -102,7 +98,6 @@ namespace Inventorization.Data
             }
             return result;
         }
-
         public List<ZoneModel> GetAllZones()
         {
             List<ZoneModel> result = new List<ZoneModel>();
@@ -126,8 +121,6 @@ namespace Inventorization.Data
             }
             return result;
         }
-
-
         public ZoneModel GetZone(Guid id)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -147,7 +140,6 @@ namespace Inventorization.Data
                 }
             }
         }
-
         public ZoneModel GetZone(int number)
         {
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -170,7 +162,6 @@ namespace Inventorization.Data
             }
             return null;
         }
-
         public void DeleteZone(Guid id)
         {
             using (var conn = new NpgsqlConnection(_connectionString))

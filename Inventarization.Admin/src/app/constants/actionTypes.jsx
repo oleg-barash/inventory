@@ -17,6 +17,8 @@ export const UPDATE_ACTIONS_FILTER = 'UPDATE_ACTIONS_FILTER';
 
 export const RECEIVE_ZONES = 'RECEIVE_ZONES';
 export const REQUEST_ZONES = 'REQUEST_ZONES';
+export const RECEIVE_USAGES = 'RECEIVE_USAGES';
+export const REQUEST_USAGES = 'REQUEST_USAGES';
 
 
 export const CREATE_ITEM = 'CREATE_ITEM';
@@ -41,8 +43,9 @@ export const CLOSE_IMPORT_DIALOG = 'CLOSE_IMPORT_DIALOG';
 export const CREATE_ZONE = 'CREATE_ZONE';
 export const OPEN_ZONE = 'OPEN_ZONE';
 export const EDIT_ZONE = 'EDIT_ZONE';
-export const ZONE_OPENED = 'ZONE_OPENED';
-export const ZONE_CLOSED = 'ZONE_CLOSED';
+export const USAGE_OPENED = 'USAGE_OPENED';
+export const USAGE_CLOSED = 'USAGE_CLOSED';
+export const USAGE_CLEARED = 'USAGE_CLEARED';
 
 export const SHOW_LOADING = 'SHOW_LOADING';
 export const HIDE_LOADING = 'HIDE_LOADING';

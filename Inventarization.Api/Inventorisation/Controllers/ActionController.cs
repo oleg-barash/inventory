@@ -20,14 +20,20 @@ namespace Inventorization.Api.Controllers
         private IActionRepository _actionRepository;
         private IZoneRepository _zoneRepository;
         private ICompanyRepository _companyRepository;
+        private IUsageRepository _usageRepository;
         private IInventorizationRepository _inventorizationRepository;
         
-        public ActionController(IActionRepository actionRepository, IZoneRepository zoneRepository, ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository)
+        public ActionController(IActionRepository actionRepository
+            , IZoneRepository zoneRepository
+            , ICompanyRepository companyRepository
+            , IInventorizationRepository inventorizationRepository
+            , IUsageRepository usageRepository)
         {
             _actionRepository = actionRepository;
             _zoneRepository = zoneRepository;
             _companyRepository = companyRepository;
             _inventorizationRepository = inventorizationRepository;
+            _usageRepository = usageRepository;
         }
 
         [HttpGet]
@@ -38,18 +44,22 @@ namespace Inventorization.Api.Controllers
             var zone = _zoneRepository.GetZone(action.Zone);
             var company = _inventorizationRepository.GetInventorization(action.Inventorization).Company;
             var items = _companyRepository.GetItems(company, new[] { action.BarCode });
-            List<ZoneState> states = _inventorizationRepository.GetZoneStates(action.Inventorization).Where(x => x.ZoneId != Guid.Empty).ToList();
+            List<ZoneUsage> states = _usageRepository.GetZoneUsages(action.Inventorization).Where(x => x.ZoneId != zone.Id).ToList();
             var foundItem = items.FirstOrDefault(i => i.Code == action.BarCode);
-            var foundState = states.FirstOrDefault(z => z.ZoneId == zone.Id);
 
             var zoneVm = new ZoneViewModel()
             {
-                ZoneId = zone.Id,
+                Id = zone.Id,
                 Number = zone.Number,
-                ClosedAt = foundState?.ClosedAt,
-                ClosedBy = foundState?.ClosedBy,
-                OpenedAt = foundState?.OpenedAt,
-                OpenedBy = foundState?.OpenedBy,
+                Usages = states.Select(state => new ZoneUsageViewModel
+                {
+                    Type = state.Type,
+                    OpenedAt = state.OpenedAt,
+                    OpenedBy = state.OpenedBy,
+                    ClosedAt = state?.ClosedAt,
+                    ClosedBy = state?.ClosedBy,
+                }).ToArray(),
+
                 ZoneName = zone.Name
             };
             var res = new ViewModels.Action()

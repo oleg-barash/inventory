@@ -13,12 +13,17 @@ namespace Inventorization.Business.Domains
     {
         private IZoneRepository zoneRepository;
         private IActionRepository actionRepository;
+        private IUsageRepository usageRepository;
         private IInventorizationRepository inventorizationRepository;
-        public ActionDomain(IZoneRepository zoneRepository, IActionRepository actionRepository, IInventorizationRepository inventorizationRepository)
+        public ActionDomain(IZoneRepository zoneRepository
+            , IActionRepository actionRepository
+            , IInventorizationRepository inventorizationRepository
+            , IUsageRepository usageRepository)
         {
             this.zoneRepository = zoneRepository;
             this.actionRepository = actionRepository;
             this.inventorizationRepository = inventorizationRepository;
+            this.usageRepository = usageRepository;
         }
 
         public Model.Action InsertAction(Model.Action action) {
@@ -33,12 +38,12 @@ namespace Inventorization.Business.Domains
 
         private void CheckZoneAccess(Model.Action action)
         {
-            ZoneState zoneState = inventorizationRepository.GetZoneState(action.Inventorization, action.Zone);
-            if (zoneState == null)
+            ZoneUsage zoneUsage = this.usageRepository.GetZoneUsages(action.Inventorization, action.Zone).FirstOrDefault(x => x.Type == action.Type);
+            if (zoneUsage == null)
             {
                 throw new ZoneAccessException(action.Zone, $"Зона не была открыта. Сначала откройте зону.");
             }
-            if (zoneState.ClosedAt.HasValue && zoneState.ClosedAt.Value.ToUniversalTime() < DateTime.Now)
+            if (zoneUsage.ClosedAt.HasValue && zoneUsage.ClosedAt.Value.ToUniversalTime() < DateTime.Now)
             {
                 throw new ZoneAccessException(action.Zone, $"Зона закрыта. Выберите другую зону.");
             }

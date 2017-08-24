@@ -1,12 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System;
 
 namespace Inventorization.Business.Model
 {
-    public class ZoneState
+    public class ZoneUsage
     {
         public Guid ZoneId { get; set; }
         public Guid InventorizationId { get; set; }
@@ -14,21 +10,7 @@ namespace Inventorization.Business.Model
         public DateTime? ClosedAt { get; set; }
         public Guid OpenedBy { get; set; }
         public Guid? ClosedBy { get; set; }
-    }
-
-    public static class ZoneStateExtensions
-    {
-        public static ZoneStatus GetStatus(this ZoneState state)
-        {
-            if (state == null)
-            {
-                return ZoneStatus.NotOpened;
-            }
-            if (state.ClosedAt.HasValue && state.ClosedAt < DateTime.MaxValue) {
-                return ZoneStatus.Closed;
-            }
-            return ZoneStatus.Opened;
-        }
+        public ActionType Type { get; set; }
     }
 
     public enum ZoneStatus

@@ -90,9 +90,9 @@ namespace Inventorization.Data
             return result;
         }
 
-        public static ZoneState ToZoneState(this NpgsqlDataReader reader)
+        public static ZoneUsage ToZoneState(this NpgsqlDataReader reader)
         {
-            return new ZoneState()
+            return new ZoneUsage()
             {
                 ZoneId = reader.GetGuid(0),
                 InventorizationId = reader.GetGuid(1),
@@ -100,6 +100,7 @@ namespace Inventorization.Data
                 OpenedBy = reader.GetGuid(3),
                 ClosedBy = reader.IsDBNull(4) ? new Guid() : reader.GetGuid(4),
                 ClosedAt = reader.IsDBNull(5) ? DateTime.MaxValue : reader.GetDateTime(5),
+                Type = (ActionType)Enum.Parse(typeof(ActionType), reader.GetString(6))
             };
         }
 

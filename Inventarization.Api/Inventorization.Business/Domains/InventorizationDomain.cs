@@ -24,25 +24,22 @@ namespace Inventorization.Business.Domains
             this.companyRepository = companyRepository;
             this.zoneRepository = zoneRepository;
         }
-        public void ClearZone(Guid inventorizationId, Guid zoneId)
+        public void ClearZone(Guid inventorizationId, Guid zoneId, ActionType type)
         {
-            List<Model.Action> actions = actionRepository.GetActionsByInventorization(inventorizationId).Where(x => x.Zone == zoneId).ToList();
+            List<Model.Action> actions = actionRepository.GetActionsByInventorization(inventorizationId).Where(x => x.Zone == zoneId && x.Type == type).ToList();
             foreach (Model.Action action in actions)
             {
                 actionRepository.DeleteAction(action.Id);
             }
         }
-
         public List<Model.Action> GetActions(Guid inventorizationId)
         {
             return actionRepository.GetActionsByInventorization(inventorizationId);
         }
-
         public List<Model.Action> GetActionsByCode(Guid inventorizationId, string code)
         {
             return actionRepository.GetActionsByCode(inventorizationId, code);
         }
-
         public void UpdateRests(Guid inventorizationId, List<Rests> rests)
         {
             IEnumerable<Rests> oldRests = inventorizationRepository.GetRests(inventorizationId);
@@ -51,12 +48,10 @@ namespace Inventorization.Business.Domains
             inventorizationRepository.UpdateRests(inventorizationId, existedRests);
             inventorizationRepository.AddRests(inventorizationId, newRests);
         }
-
         public IEnumerable<Rests> GetAllRests(Guid id)
         {
             return inventorizationRepository.GetRests(id);
         }
-
         public Model.Rests GetRests(Guid id, string code)
         {
             return inventorizationRepository.GetRests(id).FirstOrDefault(x => x.Code == code);

@@ -24,7 +24,9 @@ namespace Inventorization.Api
             container.RegisterInstance<IInventorizationRepository>(new InventorizationRepository(connectionString));
             container.RegisterInstance<TaskRepository>(new TaskRepository(connectionString));
             container.RegisterInstance<IZoneRepository>(new ZoneRepository(connectionString));
+            container.RegisterInstance<IUsageRepository>(new UsageRepository(connectionString));
             container.RegisterInstance<UserRepository>(new UserRepository(connectionString));
+            
 
 
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);

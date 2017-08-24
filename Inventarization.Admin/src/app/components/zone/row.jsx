@@ -3,21 +3,24 @@
  */
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux'
-import { TableRow, TableRowColumn} from 'material-ui/Table';
+import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+
 import Replay from 'material-ui/svg-icons/av/replay';
 import Done from 'material-ui/svg-icons/action/done';
 import Clear from 'material-ui/svg-icons/content/clear';
-import {blue200 as blue}  from 'material-ui/styles/colors';
-import {green200 as green}  from 'material-ui/styles/colors';
-import {red200 as red}  from 'material-ui/styles/colors';
-import {fullWhite as white}  from 'material-ui/styles/colors';
+import { blue200 as blue } from 'material-ui/styles/colors';
+import { green200 as green } from 'material-ui/styles/colors';
+import { red200 as red } from 'material-ui/styles/colors';
+import { fullWhite as white } from 'material-ui/styles/colors';
 import { openZone, closeZone, clearZone } from '../../actions/zoneActions';
 import { setCurrentAction } from '../../actions/actionActions';
 import Add from 'material-ui/svg-icons/Content/add';
 import { browserHistory } from 'react-router'
+import UsageRow from '../../components/zone/usageRow';
+
 import moment from 'moment';
-import { ZoneStatuses } from '../../constants/zoneStatuses';
 moment.locale("ru-RU")
 
 class Row extends Component {
@@ -26,69 +29,25 @@ class Row extends Component {
     }
 
     render() {
-        let {zone, dispatch, inventorization, userInfo} = this.props;
-
-        let openFunc = function () {
-            dispatch(openZone(zone, inventorization.Id, userInfo.Token))
-        }
-
-        let closeFunc = function () {
-            dispatch(closeZone(zone, inventorization.Id, userInfo.Token))
-        }
-
-        let clearFunc = function () {
-            dispatch(clearZone(zone, inventorization.Id, userInfo.Token))
-        }
-
-        let newAction = function() {
-            dispatch(setCurrentAction({Zone: zone, Type: 0}))
-            browserHistory.push('/editAction');
-        }
-
-        let getStyle = function(zone){
-            switch(zone.Status){
-                case ZoneStatuses.Opened:
-                    return { backgroundColor:  blue}
-                case ZoneStatuses.Closed:
-                    return { backgroundColor:  green}
-                default:
-                    return { backgroundColor:  white}
-            }
-        }
-debugger
+        let { zone, actions, dispatch, inventorization, userInfo } = this.props;
         return (
-            <TableRow style={getStyle(zone)}>
-                <TableRowColumn style={{width: '40px'}}>{zone.Number}</TableRowColumn>
-                <TableRowColumn style={{width: '80px'}}>{zone.OpenedAt == undefined ? "не открыта" : moment(zone.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
-                <TableRowColumn style={{width: '100px'}}>{zone.OpenedBy}</TableRowColumn>
-                <TableRowColumn style={{width: '80px'}}>{zone.ClosedAt == undefined ? "не закрыта" : moment(zone.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
-                <TableRowColumn style={{width: '100px'}}>{zone.ClosedBy}</TableRowColumn>
-                <TableRowColumn style={{width: '100px'}}>{zone.TotalItems}</TableRowColumn>
-                <TableRowColumn >
-                    <FlatButton disabled={zone.Status == ZoneStatuses.Closed || zone.Status == ZoneStatuses.NotOpened}
-                        hoverColor={blue}
-                        icon={<Add/>}
-                        onClick={newAction}
-                    />
-                    <FlatButton disabled={zone.Status != ZoneStatuses.NotOpened && zone.Status != ZoneStatuses.Closed}
-                        hoverColor={red}
-                        icon={<Replay/>}
-                        onClick={openFunc}
-                    />
-                    <FlatButton disabled={zone.Status == ZoneStatuses.Closed || zone.Status == ZoneStatuses.NotOpened}
-                        hoverColor={green}
-                        icon={<Done/>}
-                        onClick={closeFunc}
-                    />
-                    <FlatButton disabled={zone.Status == ZoneStatuses.Undefined}
-                        hoverColor={red}
-                        icon={<Clear/>}
-                        onClick={clearFunc}
-                    />
-
-                    {/*<LinearProgress mode="indeterminate"/>*/}
+            <TableRow>
+                <TableRowColumn style={{ width: '40px' }}>{zone.Number}</TableRowColumn>
+                <TableRowColumn>
+                    <Table>
+                        <TableBody>
+                            {zone ? zone.Usages.map(usage => {
+                                let usageActions = actions.filter((x) => x.Zone.Id === zone.Id && x.Type === usage.Type);
+                                return (<UsageRow zone={zone}
+                                    usage={usage}
+                                    key={usage.Type}
+                                    actions={usageActions} />)
+                            }
+                            ) : null}
+                        </TableBody>
+                    </Table>
                 </TableRowColumn>
-            </TableRow>       
+            </TableRow>
         )
     }
 }
@@ -101,6 +60,7 @@ Row.propTypes = {
 
 const mapStateToProps = (state) => {
     return {
+        actions: state.actions.items,
         inventorization: state.auth.SelectedInventorization,
         userInfo: state.auth
     }

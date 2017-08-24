@@ -24,6 +24,7 @@ namespace Inventorization.Api.Controllers
         private IInventorizationRepository _inventorizationRepository;
         private IZoneRepository _zoneRepository;
         private ICompanyRepository _companyRepository;
+        private IUsageRepository _usageRepository;
         private ActionDomain actionDomain;
         private InventorizationDomain inventorizationDomain;
         private ZoneDomain zoneDomain;
@@ -32,6 +33,7 @@ namespace Inventorization.Api.Controllers
         public InventorizationController(IInventorizationRepository inventorizationRepository
             , IZoneRepository zoneRepository
             , ICompanyRepository companyRepository
+            , IUsageRepository usageRepository
             , ActionDomain actionDomain
             , InventorizationDomain inventorizationDomain
             , ZoneDomain zoneDomain)
@@ -39,6 +41,7 @@ namespace Inventorization.Api.Controllers
             _inventorizationRepository = inventorizationRepository;
             _zoneRepository = zoneRepository;
             _companyRepository = companyRepository;
+            _usageRepository = usageRepository;
             this.actionDomain = actionDomain;
             this.inventorizationDomain = inventorizationDomain;
             this.zoneDomain = zoneDomain;
@@ -112,23 +115,25 @@ namespace Inventorization.Api.Controllers
                 IOwinContext ctx = Request.GetOwinContext();
                 ClaimsPrincipal user = ctx.Authentication.User;
                 IEnumerable<Claim> claims = user.Claims;
-                List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorization).Where(x => x.ZoneId != Guid.Empty).ToList();
+                List<ZoneUsage> usages = _usageRepository.GetZoneUsages(inventorization).Where(x => x.ZoneId != Guid.Empty).ToList();
                 List<ZoneModel> zones = _zoneRepository.GetAllZones().OrderBy(x => x.Name).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK, zones.Select(x =>
                 {
                     List<Business.Model.Action> actions = inventorizationDomain.GetActions(inventorization).Where(i => i.Zone == x.Id).ToList();
-                    var state = states.FirstOrDefault(s => x.Id == s.ZoneId);
+                    var currentZoneUsages = usages.Where(s => x.Id == s.ZoneId);
                     return new ZoneViewModel()
                     {
-                        ZoneId = x.Id,
+                        Id = x.Id,
                         Number = x.Number,
-                        ClosedAt = state != null && state.ClosedAt != null && state.ClosedAt < DateTime.MaxValue ? state.ClosedAt : null,
-                        ClosedBy = state?.ClosedBy,
-                        OpenedAt = state?.OpenedAt,
-                        OpenedBy = state?.OpenedBy,
-                        ZoneName = x.Name,
-                        Status = state.GetStatus(),
-                        TotalItems = actions.Sum(a => a.Quantity)
+                        Usages = currentZoneUsages.Select(state => new ZoneUsageViewModel
+                        {
+                            Type = state.Type,
+                            OpenedAt = state.OpenedAt,
+                            OpenedBy = state.OpenedBy,
+                            ClosedAt = state?.ClosedAt,
+                            ClosedBy = state?.ClosedBy
+                        }).ToArray(),
+                        ZoneName = x.Name
                     };
                 }).OrderBy(x => x.Number));
             }
@@ -137,98 +142,6 @@ namespace Inventorization.Api.Controllers
                 _logger.Error(ex, $"Error getting zones. InventorizationId: {inventorization}");
             }
             return Request.CreateResponse(HttpStatusCode.NoContent);
-        }
-
-        [HttpGet]
-        [Route("{inventorization}/zone/open")]
-        public HttpResponseMessage OpenZone(Guid inventorization, [FromUri]int code)
-        {
-            try
-            {
-                ZoneModel zone = _zoneRepository.GetZone(code);
-                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, code);
-                if (state == null)
-                {
-                    if (zone == null)
-                    {
-                        zone = new ZoneModel();
-                        zone.Id = Guid.NewGuid();
-                        zone.Name = "Зона " + code;
-                        zone.Number = code;
-                        _zoneRepository.Create(zone);
-                    }
-                    var userClaims = Request.GetOwinContext().Authentication.User;
-                    _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value));
-                    state = _inventorizationRepository.GetZoneState(inventorization, zone.Id);
-                }
-                if (state.ClosedAt.HasValue && state.ClosedAt.Value.ToUniversalTime() < DateTime.UtcNow)
-                {
-                    return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
-                }
-                return Request.CreateResponse(HttpStatusCode.OK, zone);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, $"Open zone error. Zone code:{code}. InventorizationId: {inventorization}");
-            }
-            return Request.CreateResponse(HttpStatusCode.OK);
-        }
-
-        [HttpGet]
-        [Route("{inventorization}/zone/reopen")]
-        public HttpResponseMessage ReopenZone(Guid inventorization, [FromUri]int number)
-        {
-            try
-            {
-                ZoneModel zone = _zoneRepository.GetZone(number);
-                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, number);
-                var userClaims = Request.GetOwinContext().Authentication.User;
-                _inventorizationRepository.OpenZone(inventorization, zone.Id, Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value));
-                state = _inventorizationRepository.GetZoneState(inventorization, number);
-                return Request.CreateResponse(HttpStatusCode.OK, zone);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, $"Open zone error. Zone code:{Environment.NewLine} {JsonConvert.SerializeObject(number)}. InventorizationId: {inventorization}");
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
-            }
-        }
-
-        [HttpPost]
-        [Route("{inventorization}/zone/close")]
-        public HttpResponseMessage CloseZone(Guid inventorization, [FromBody]ZoneVM zone)
-        {
-            try
-            {
-                ZoneState state = _inventorizationRepository.GetZoneState(inventorization, zone.ZoneId);
-                if (state != null)
-                {
-                    var userClaims = Request.GetOwinContext().Authentication.User;
-                    _inventorizationRepository.CloseZone(state, Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value));
-                    return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
-                }
-                return Request.CreateResponse(HttpStatusCode.Forbidden, new { Result = "Error", Reason = "Зона не была открыта" });
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, $"Open zone error. Zone: {zone.ZoneId}. InventorizationId: {inventorization}");
-            }
-            return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
-        }
-
-        [HttpPost]
-        [Route("{inventorization}/zone/clear")]
-        public HttpResponseMessage ClearZone(Guid inventorization, [FromBody]ZoneVM zone)
-        {
-            try
-            {
-                inventorizationDomain.ClearZone(inventorization, zone.ZoneId);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, $"Zone clearing error. Zone: {zone.ZoneId}. InventorizationId: {inventorization}");
-            }
-            return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
         }
 
         [HttpPost]
@@ -282,21 +195,25 @@ namespace Inventorization.Api.Controllers
             var actions = inventorizationDomain.GetActions(inventorizationId);
             var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
             var items = _companyRepository.GetItems(inventorization.Company, actions.Select(x => x.BarCode).ToArray());
-            List<ZoneState> states = _inventorizationRepository.GetZoneStates(inventorizationId).Where(x => x.ZoneId != Guid.Empty).ToList();
+            List<ZoneUsage> usages = _usageRepository.GetZoneUsages(inventorizationId).Where(x => x.ZoneId != Guid.Empty).ToList();
             var result = actions.Select(x =>
             {
                 var foundItem = items.FirstOrDefault(i => i.Code == x.BarCode);
                 var foundZone = zones.First(z => z.Id == x.Zone);
-                var foundState = states.FirstOrDefault(z => z.ZoneId == foundZone.Id);
+                var currentZoneUsages = usages.Where(z => z.ZoneId == foundZone.Id);
 
                 var zoneVm = new ZoneViewModel()
                 {
-                    ZoneId = foundZone.Id,
+                    Id = foundZone.Id,
                     Number = foundZone.Number,
-                    ClosedAt = foundState?.ClosedAt,
-                    ClosedBy = foundState?.ClosedBy,
-                    OpenedAt = foundState?.OpenedAt,
-                    OpenedBy = foundState?.OpenedBy,
+                    Usages = currentZoneUsages.Select(state => new ZoneUsageViewModel
+                    {
+                        Type = state.Type,
+                        OpenedAt = state.OpenedAt,
+                        OpenedBy = state.OpenedBy,
+                        ClosedAt = state?.ClosedAt,
+                        ClosedBy = state?.ClosedBy
+                    }).ToArray(),
                     ZoneName = foundZone.Name
                 };
                 var res = new ViewModels.Action()
