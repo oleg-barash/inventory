@@ -17,6 +17,7 @@ import { setCurrentAction } from '../../actions/actionActions';
 import Add from 'material-ui/svg-icons/Content/add';
 import { browserHistory } from 'react-router'
 import moment from 'moment';
+import _ from 'lodash'
 moment.locale("ru-RU")
 
 class UsageRow extends Component {
@@ -28,15 +29,15 @@ class UsageRow extends Component {
         let { zone, usage, actions, dispatch, inventorization, userInfo } = this.props;
 
         let openFunc = function () {
-            dispatch(openUsage(zone.Id, usage.Type, inventorization.Id, userInfo.Token))
+            dispatch(openUsage(zone, inventorization.Id, usage.Type, userInfo.Token))
         }
 
         let closeFunc = function () {
-            dispatch(closeUsage(zone.Id, usage.Type, inventorization.Id, userInfo.Token))
+            dispatch(closeUsage(zone, inventorization.Id, usage.Type, userInfo.Token))
         }
 
         let clearFunc = function () {
-            dispatch(clearUsage(zone.Id, usage.Type, inventorization.Id, userInfo.Token))
+            dispatch(clearUsage(zone, inventorization.Id, usage.Type, userInfo.Token))
         }
 
         let newAction = function () {

@@ -18,11 +18,10 @@ class List extends Component {
                 <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
                     <TableRow>
                         <TableHeaderColumn style={{ width: '280px' }}>Наименование</TableHeaderColumn>
-                        <TableHeaderColumn>Код</TableHeaderColumn>
-                        <TableHeaderColumn>Зоны</TableHeaderColumn>
-                        <TableHeaderColumn>Факт/План</TableHeaderColumn>
-                        <TableHeaderColumn>Сумма</TableHeaderColumn>
-                        <TableHeaderColumn>Действия</TableHeaderColumn>
+                        <TableHeaderColumn style={{ width: '120px' }}>Код</TableHeaderColumn>
+                        <TableHeaderColumn style={{ width: '90px' }}>Зоны</TableHeaderColumn>
+                        <TableHeaderColumn style={{ width: '70px' }}>Факт/План</TableHeaderColumn>
+                        <TableHeaderColumn style={{ width: '100px' }}>Сумма</TableHeaderColumn>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

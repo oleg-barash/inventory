@@ -1,7 +1,7 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { REQUEST_ZONES, RECEIVE_ZONES } from '../constants/actionTypes'
+import { REQUEST_ZONES, RECEIVE_ZONES, USAGES_LOADED } from '../constants/actionTypes'
 import _ from 'lodash'
 export function zoneList(state = { isFetching: false }, action)
 {
@@ -17,6 +17,14 @@ export function zoneList(state = { isFetching: false }, action)
                 }), x => x.Number),
                 lastUpdated: action.receivedAt
             })
+        case USAGES_LOADED:
+            let zones = state.items.map(x => {
+                if (action.zone.Id == x.Id){
+                    return Object.assign({}, x, { Usages: action.usages});
+                }
+                return x;
+            });
+            return Object.assign({}, state, { items: zones })
         default:
             return state
     }

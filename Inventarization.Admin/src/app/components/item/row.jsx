@@ -46,21 +46,14 @@ class ItemRow extends Component {
         return (
             <TableRow style={rowStyle}>
                 <TableRowColumn style={{ width: '280px' }}>{item.Name}</TableRowColumn>
-                <TableRowColumn>{item.Code}</TableRowColumn>
-                <TableRowColumn>{_.uniq(zones).map((zone) => {
+                <TableRowColumn style={{ width: '120px' }}>{item.Code}</TableRowColumn>
+                <TableRowColumn style={{ width: '90px' }}>{_.uniq(zones).map((zone) => {
                     return <Link key={zone} to={{ pathname: "/actions", query: { ZoneName: zone.ZoneName, Code: item.Code } }}>{zone.ZoneName}({_.sumBy(_.filter(actions, (a) => a.Zone.ZoneId == zone.ZoneId), (a) => a.Quantity)})<br />
                     </Link>
                 }
                 )}</TableRowColumn>
-                <TableRowColumn>{quantityValue}</TableRowColumn>
-                <TableRowColumn>{priceValue}</TableRowColumn>
-                <TableRowColumn>
-                    <FlatButton disabled={item.IsDeleting}
-                        hoverColor={green}
-                        icon={<Edit />}
-                        onClick={editItem}
-                    />
-                </TableRowColumn>
+                <TableRowColumn style={{ width: '70px' }}>{quantityValue}</TableRowColumn>
+                <TableRowColumn style={{ width: '100px' }}>{priceValue}</TableRowColumn>
             </TableRow>)
     }
 }

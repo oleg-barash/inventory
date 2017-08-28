@@ -76,10 +76,7 @@ export function itemList(state = { isFetching: false, filter: { currentPage: 1, 
                 })
             })
         case RECEIVE_DICTIONARY:
-            let joinedItems = state.items != undefined ? action.items.map(item => {
-                let found =_.find(state.items, stateItem => stateItem.Code === item.Code);
-                return found != undefined ? Object.assign({}, found, item) : item;
-            }) : action.items;
+            let joinedItems = _.unionBy(state.items, action.items, item => item.Code);
             var result = _applyFilter(joinedItems, state.filter).map(x => {
                 x.key = x.Id;
                 return x;
@@ -97,7 +94,6 @@ export function itemList(state = { isFetching: false, filter: { currentPage: 1, 
             });
 
             var allItems = _.unionBy(state.items, itemsWithRests, x => x.Code);
-
             return Object.assign({}, state, { isFetching: false, items: allItems, displayItems: _applyFilter(allItems, state.filter) });
 
         case RECEIVE_ACTIONS:
@@ -109,7 +105,6 @@ export function itemList(state = { isFetching: false, filter: { currentPage: 1, 
                 }
                 return { Code: key, Actions: values, Fact: _.sumBy(values, value => value.Quantity) };
             });
-
             var allItems = _.unionBy(state.items, itemsWithActions, x => x.Code);
             return Object.assign({}, state, { isFetching: false, items: allItems, displayItems: _applyFilter(allItems, state.filter) });
         case ACTION_DELETED:

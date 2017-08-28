@@ -189,7 +189,7 @@ class Form extends Component {
                     <FlatButton style={{ display: this.props.isFetching ? "none" : "block" }} label="Загрузить ещё" hoverColor={green} onClick={handleLoadMore} />
                     <h2 style={{ display: this.props.isFetching && this.props.items.length > 0 ? "block" : "none" }}>
                         Загрузка...
-            </h2>
+                    </h2>
                 </Paper>
             </div>)
     }

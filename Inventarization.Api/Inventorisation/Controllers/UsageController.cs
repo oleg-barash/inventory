@@ -49,9 +49,9 @@ namespace Inventorization.Api.Controllers
 
         [HttpGet]
         [Route("list")]
-        public HttpResponseMessage GetUsages([FromBody]ZoneUsageIdentifierViewModel usageIdentifier)
+        public HttpResponseMessage GetUsages([FromUri]Guid inventorizationId, [FromUri]Guid zoneId)
         {
-            return Request.CreateResponse(HttpStatusCode.OK, _usageRepository.GetZoneUsages(usageIdentifier.InventorizationId, usageIdentifier.ZoneId));
+            return Request.CreateResponse(HttpStatusCode.OK, _usageRepository.GetZoneUsages(inventorizationId, zoneId));
         }
 
 

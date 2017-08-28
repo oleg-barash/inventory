@@ -46,6 +46,7 @@ export const EDIT_ZONE = 'EDIT_ZONE';
 export const USAGE_OPENED = 'USAGE_OPENED';
 export const USAGE_CLOSED = 'USAGE_CLOSED';
 export const USAGE_CLEARED = 'USAGE_CLEARED';
+export const USAGES_LOADED = 'USAGES_LOADED';
 
 export const SHOW_LOADING = 'SHOW_LOADING';
 export const HIDE_LOADING = 'HIDE_LOADING';
