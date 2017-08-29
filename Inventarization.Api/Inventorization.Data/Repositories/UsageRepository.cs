@@ -107,11 +107,12 @@ namespace Inventorization.Data
                     cmd.Connection = conn;
                     cmd.CommandText = @"UPDATE public.""ZoneUsages"" 
                         SET ""ClosedAt"" = @date, ""ClosedBy"" = @user
-                        WHERE ""InventorizationId"" = @id AND ""ZoneId"" = @zoneId";
+                        WHERE ""InventorizationId"" = @id AND ""ZoneId"" = @zoneId AND ""Type"" = @type";
                     cmd.Parameters.Add(new NpgsqlParameter("zoneId", zoneId));
                     cmd.Parameters.Add(new NpgsqlParameter("id", inventorizationId));
                     cmd.Parameters.Add(new NpgsqlParameter("date", DateTime.UtcNow));
                     cmd.Parameters.Add(new NpgsqlParameter("user", userId));
+                    cmd.Parameters.Add(new NpgsqlParameter("type", type));
                     cmd.ExecuteNonQuery();
                 }
             }

@@ -45,6 +45,7 @@ import inventory.aeco.network.models.Zone;
 import static java.util.UUID.randomUUID;
 
 public class BlindScanActivity extends Activity {
+    private String currentInventorization;
     private String currentZone;
     private ActionType currentActionType;
     private EditText quantity;
@@ -61,6 +62,7 @@ public class BlindScanActivity extends Activity {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         currentZone = extras.getString(ActionActivity.ZONE_MESSAGE);
+        currentInventorization = extras.getString(ActionActivity.INVENTORIZATION_MESSAGE);
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
         token = settings.getString("token", "undefined");
         UUID inventorization = UUID.fromString(settings.getString("inventorization", "undefined"));
@@ -134,8 +136,10 @@ public class BlindScanActivity extends Activity {
                                 try {
                                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                                     HashMap<String, String> params = new HashMap<>();
-                                    params.put("zoneId", currentZone);
-                                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, baseUrl + "zone/close"
+                                    params.put("ZoneId", currentZone);
+                                    params.put("InventorizationId", currentInventorization);
+                                    params.put("Type", currentActionType.toString());
+                                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, Configuration.BaseUrl + "usage/close"
                                             , new JSONObject(params),
                                             new Response.Listener<JSONObject>() {
                                                 @Override

@@ -155,9 +155,6 @@ namespace Inventorization.Api.Controllers
             try
             {
                 var userClaims = Request.GetOwinContext().Authentication.User;
-                var inventarization = _inventorizationRepository.GetInventorization(inventorization);
-                List<Item> items = _companyRepository.GetItems(inventarization.Company);
-                Item foundItem = items.FirstOrDefault(x => x.Code == actionVm.BarCode);
 
                 Business.Model.Action action = new Business.Model.Action()
                 {
@@ -171,16 +168,22 @@ namespace Inventorization.Api.Controllers
                     UserId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value)
                 };
 
+                if (actionVm.Type == ActionType.BlindScan)
+                {
+                    Business.Model.Action updatedAction = _actionDomain.UpsertAction(action);
+                    return Request.CreateResponse(HttpStatusCode.OK, new { ok = true, action = updatedAction });
+                }
+
+                var inventarization = _inventorizationRepository.GetInventorization(inventorization);
+                List<Item> items = _companyRepository.GetItems(inventarization.Company);
+                Item foundItem = items.FirstOrDefault(x => x.Code == actionVm.BarCode);
+
                 if (foundItem != null || UndefinedItemAllowed)
                 {
 
                     Business.Model.Action updatedAction = _actionDomain.UpsertAction(action);
+                    return Request.CreateResponse(HttpStatusCode.OK, new {foundItem, action = updatedAction});
 
-                    if (actionVm.Type != ActionType.BlindScan)
-                    {
-                        return Request.CreateResponse(HttpStatusCode.OK, new {foundItem, action = updatedAction});
-                    }
-                    return Request.CreateResponse(HttpStatusCode.OK, new {ok = true, action = updatedAction});
                 }
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "Товар не был найден в справочнике. Действие не зафиксировано.");
             }
