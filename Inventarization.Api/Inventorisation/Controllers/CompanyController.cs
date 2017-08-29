@@ -189,29 +189,31 @@ namespace Inventorization.Api.Controllers
         [Route("{companyId}/import")]
         public HttpResponseMessage Import(Guid companyId, [FromBody]List<ItemViewModel> items)
         {
-            var foundItems =_companyRepository.GetItems(companyId, items.Select(x => x.BarCode).ToArray());
+            _companyRepository.ClearItems(companyId);
+            //string bodyResult = await Request.Content.ReadAsStringAsync();
+            //var foundItems =_companyRepository.GetItems(companyId, items.Select(x => x.BarCode).ToArray());
             ImportItemsResult result = new ImportItemsResult();
             foreach (var item in items)
             {
                 try {
-                    Business.Model.Item itemModel = new Business.Model.Item();
+                    Item itemModel = new Item();
                     itemModel.Code = item.BarCode;
                     itemModel.ItemNumber = item.Number;
                     itemModel.Name = item.Name;
                     itemModel.Description = item.Description;
                     itemModel.CompanyId = companyId;
-                    var foundItem = foundItems.FirstOrDefault(x => x.Code == item.BarCode);
-                    if (foundItem == null)
-                    {
+                    //var foundItem = foundItems.FirstOrDefault(x => x.Code == item.BarCode);
+                    //if (foundItem == null)
+                    //{
                         itemModel.CreatedAt = DateTime.UtcNow;
                         itemModel.Source = ItemSource.Import;
                         _companyRepository.CreateItem(companyId, itemModel);
-                    }
-                    else
-                    {
-                        itemModel.Id = foundItem.Id;
-                        _companyRepository.UpdateItem(itemModel);
-                    }
+                    //}
+                    //else
+                    //{
+                    //    itemModel.Id = foundItem.Id;
+                    //    _companyRepository.UpdateItem(itemModel);
+                    //}
                 }
                 catch(Exception ex)
                 {
