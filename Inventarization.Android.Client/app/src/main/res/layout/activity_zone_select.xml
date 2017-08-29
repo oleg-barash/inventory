@@ -33,7 +33,7 @@
         android:layout_below="@+id/zoneText"
         android:layout_marginTop="19dp"
         android:gravity="center"
-        android:hint="@string/scanner_hint"
+        android:hint="@string/pick_zone"
         android:inputType="number"
         android:maxLines="1" />
 
