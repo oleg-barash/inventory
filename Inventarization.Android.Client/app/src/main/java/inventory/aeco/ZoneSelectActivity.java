@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.os.Vibrator;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,11 +25,14 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,6 +40,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import inventory.R;
+import inventory.aeco.network.models.OpenZoneResponse;
 import inventory.aeco.network.models.Zone;
 
 public class ZoneSelectActivity extends Activity {
@@ -94,8 +97,8 @@ public class ZoneSelectActivity extends Activity {
         createButton.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View arg0) {
-                                                if (showScanResult.getText() != null && !showScanResult.getText().toString().isEmpty()) {
-                                                    openZone(showScanResult.getText().toString());
+                                                if (zone != null) {
+                                                    openZone();
                                                 }
                                                 else{
                                                     showToast("Просканируйте зону, либо укажите номер зоны при помощи клавиатуры");
@@ -107,8 +110,8 @@ public class ZoneSelectActivity extends Activity {
 
             @Override
             public void onClick(View arg0) {
-                if (showScanResult.getText() != null && !showScanResult.getText().toString().isEmpty()) {
-                    openZone(showScanResult.getText().toString());
+                if (zone != null) {
+                    openZone();
                 }
                 else{
                     showToast("Просканируйте зону, либо укажите номер зоны при помощи клавиатуры");
@@ -143,41 +146,47 @@ public class ZoneSelectActivity extends Activity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
-    private void openZone(String code){
+    private void openZone(){
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, baseInventorizationUrl + "/zone/open?code=" + code,
-                new Response.Listener<String>()  {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("InventorizationId", inventorization.toString());
+        params.put("ZoneId", zone.Id.toString());
+        params.put("Type", currentActionType.toString());
+
+        JsonObjectRequest request = new JsonObjectRequest(Configuration.BaseUrl + "usage/open", new JSONObject(params),
+                new Response.Listener<JSONObject>()  {
                     @Override
-                    public void onResponse(String response) {
-                        try {
-                            ObjectMapper mapper = new ObjectMapper();
-                            zone = mapper.readValue(response.toString(), Zone.class);
+                    public void onResponse(JSONObject response) {
                             Intent intent = new Intent(ZoneSelectActivity.this, currentActionType == ActionType.BlindScan ? BlindScanActivity.class : ActionActivity.class);
                             Bundle extras = new Bundle();
-                            extras.putString(ActionActivity.ZONE_MESSAGE, zone.Id);
+                        try{
+                            ObjectMapper mapper = new ObjectMapper();
+                            OpenZoneResponse res = mapper.readValue(response.toString(), OpenZoneResponse.class);
+                            extras.putString(ActionActivity.ZONE_MESSAGE, res.ZoneId.toString());
+                            extras.putString(ActionActivity.INVENTORIZATION_MESSAGE, res.InventorizationId.toString());
                             extras.putString(ZoneSelectActivity.ACTION_TYPE_MESSAGE, currentActionType.toString());
                             intent.putExtras(extras);
                             startActivity(intent);
                         }
                         catch (IOException exception){
-                            Log.e(TAG, "Error parsing zone: " + response.toString());
-                            setState(ZoneActivityStates.Initial);
-                            showToast("При открытии зоны произошла ошибка.");
+                            Log.e(TAG, "Error parsing item: " + response.toString());
+                            showToast("Ошибка: " + response.toString());
                         }
-
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                setState(ZoneActivityStates.Initial);
-                if (error.networkResponse.statusCode == 403) {
-                    String message = "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру или выберите другую зону";
-                    resultTextView.setText(message);
-                    showToast(message);
+                setState(ZoneActivityStates.ZoneFound);
+                if (error.networkResponse != null) {
+                    if (error.networkResponse.statusCode == 403) {
+                        String message = "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру или выберите другую зону";
+                        resultTextView.setText(message);
+                        showToast(message);
+                    } else {
+                        showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
+                    }
                 }
-                else {
-                    showToast("Ошибка при получении информации о зоне. Код " + error.networkResponse.statusCode);
-                }
+                else{showToast("Произошла ошибка: " + error.getMessage());}
 
             }
         }){
@@ -188,8 +197,8 @@ public class ZoneSelectActivity extends Activity {
                 return headers;
             }
         };
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        queue.add(stringRequest);
+        request.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(request);
     }
 
     private void showToast(CharSequence text){
@@ -208,7 +217,7 @@ public class ZoneSelectActivity extends Activity {
                 createButton.setEnabled(false);
                 break;
             case ZoneFound:
-                if (zone.Id == ""){
+                if (zone.Id == null){
                     setState(ZoneActivityStates.Error);
                     return;
                 }
@@ -290,10 +299,7 @@ public class ZoneSelectActivity extends Activity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     if (error.networkResponse != null) {
-                        if (error.networkResponse.statusCode == 404) {
-                            setState(ZoneActivityStates.ZoneNotFound);
-                            showToast("Зона не найдена.");// Вы можете создать её.");
-                        } else if (error.networkResponse.statusCode == 403) {
+                        if (error.networkResponse.statusCode == 403) {
                             setState(ZoneActivityStates.Initial);
                             showToast("Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
                         } else {
@@ -384,11 +390,15 @@ public class ZoneSelectActivity extends Activity {
     public boolean dispatchKeyEvent(KeyEvent event) {
         Log.i("key pressed", String.valueOf(event.getKeyCode()));
         if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
-            if (showScanResult.getText() != null && !showScanResult.getText().toString().isEmpty()) {
-                openZone(showScanResult.getText().toString());
+            if (zone != null) {
+                openZone();
             }
-            else{
-                showToast("Просканируйте зону, либо укажите номер зоны при помощи клавиатуры");
+            else {
+                if (showScanResult.getText() != null && !showScanResult.getText().toString().isEmpty()) {
+                    searchZone(showScanResult.getText().toString());
+                } else {
+                    showToast("Просканируйте зону, либо укажите номер зоны при помощи клавиатуры");
+                }
             }
             return false;
         }

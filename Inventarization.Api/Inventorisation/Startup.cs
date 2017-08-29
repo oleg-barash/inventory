@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Inventorization.Data.Repositories;
 using Thinktecture.IdentityModel.Owin;
 
 [assembly: OwinStartup(typeof(Inventorization.Startup))]

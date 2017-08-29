@@ -1,15 +1,15 @@
-﻿using Inventorization.Business.Model;
+﻿using System;
+using System.Collections.Generic;
+using Inventorization.Business.Model;
 using Inventorization.Data.Support;
 using Npgsql;
-using System;
-using System.Collections.Generic;
 
-namespace Inventorization.Data
+namespace Inventorization.Data.Repositories
 {
     public class UserRepository
     {
 
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public UserRepository(string connectionString)
         {

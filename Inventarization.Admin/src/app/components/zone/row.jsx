@@ -36,7 +36,7 @@ class Row extends Component {
                 <TableRowColumn>
                     <Table>
                         <TableBody>
-                            {zone ? zone.Usages.map(usage => {
+                            {zone ? zone.Usages.sort(usage => usage.type).map(usage => {
                                 let usageActions = actions.filter((x) => x.Zone.Id === zone.Id && x.Type === usage.Type);
                                 return (<UsageRow zone={zone}
                                     usage={usage}

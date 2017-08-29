@@ -28,7 +28,7 @@ namespace Inventorization.Business.Domains
 
         public Model.Action InsertAction(Model.Action action) {
             CheckZoneAccess(action);
-            if (action.Id == null || action.Id == Guid.Empty)
+            if (action.Id == Guid.Empty)
             {
                 action.Id = Guid.NewGuid();
             }

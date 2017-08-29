@@ -10,7 +10,7 @@ namespace Inventorization.Data
     public class ZoneRepository : IZoneRepository
     {
 
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public ZoneRepository(string connectionString)
         {

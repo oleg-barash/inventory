@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Inventorization.Business.Model;
+using Inventorization.Data.Repositories;
 
 namespace Inventorization.Tests.Data
 {

@@ -25,8 +25,8 @@ class ActionListPage extends AuthorizedComponent {
         super(props);
     }
     componentDidMount() {
-        const { ZoneName, Code } = this.props.location.query
-        this.props.dispatch(updateActionsFilter({ZoneName, Code}))
+        const { ZoneName, Code, Type } = this.props.location.query
+        this.props.dispatch(updateActionsFilter({ZoneName, Code, Type}))
     }
     render() {
         return (

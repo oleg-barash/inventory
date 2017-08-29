@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Inventorization.Data.Repositories;
 
 namespace Inventorization.Api.Controllers
 {
@@ -25,26 +26,20 @@ namespace Inventorization.Api.Controllers
     [Authorize]
     public class UsageController : ApiController
     {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
-        private ICompanyRepository _companyRepository;
-        private IInventorizationRepository _inventorizationRepository;
-        private IUsageRepository _usageRepository;
-        private IActionRepository _actionRepository;
-        private IZoneRepository _zoneRepository;
-        private InventorizationDomain _inventorizationDomain;
-        public UsageController(ICompanyRepository companyRepository
-            , IInventorizationRepository inventorizationRepository
-            , IActionRepository actionRepository
-            , IZoneRepository zoneRepository
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private readonly IUsageRepository _usageRepository;
+        private readonly IZoneRepository _zoneRepository;
+        private readonly UserRepository _userRepository;
+        private readonly InventorizationDomain _inventorizationDomain;
+        public UsageController(IZoneRepository zoneRepository
             , IUsageRepository usageRepository
-            , InventorizationDomain inventorizationDomain)
+            , InventorizationDomain inventorizationDomain
+            , UserRepository userRepository)
         {
-            _companyRepository = companyRepository;
-            _inventorizationRepository = inventorizationRepository;
-            _actionRepository = actionRepository;
             _zoneRepository = zoneRepository;
             _inventorizationDomain = inventorizationDomain;
             _usageRepository = usageRepository;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
@@ -61,31 +56,32 @@ namespace Inventorization.Api.Controllers
         {
             try
             {
-                ZoneModel zone = _zoneRepository.GetZone(usageIdentifier.ZoneId);
                 List<ZoneUsage> usages = _usageRepository.GetZoneUsages(usageIdentifier.InventorizationId, usageIdentifier.ZoneId);
+                ClaimsPrincipal userClaims = Request.GetOwinContext().Authentication.User;
+                Guid userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
                 if (usages.Any(x => x.Type == usageIdentifier.Type))
                 {
-                    ZoneUsage usage = usages.FirstOrDefault(x => x.Type == usageIdentifier.Type);
-                    if (usage == null)
-                    {
-                        ClaimsPrincipal userClaims = Request.GetOwinContext().Authentication.User;
-                        Guid userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
-                        if (usage == null)
-                        {
-                            _usageRepository.OpenUsage(usageIdentifier.InventorizationId, usageIdentifier.ZoneId, usageIdentifier.Type, userId);
-                            return Request.CreateResponse(HttpStatusCode.OK, zone);
-                        }
-                    }
+                    ZoneUsage usage = usages.First(x => x.Type == usageIdentifier.Type);
+                    
                     if (usage.ClosedAt.HasValue && usage.ClosedAt.Value.ToUniversalTime() < DateTime.UtcNow)
                     {
                         return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
                     }
+
+                    if (usage.OpenedBy != userId)
+                    {
+                        Business.Model.User user = _userRepository.GetUser(usage.OpenedBy);
+                        return Request.CreateResponse(HttpStatusCode.Forbidden, $"Зона уже была открыта пользователем: {user.Login}");
+                    }
+
                 }
-                
+                _usageRepository.OpenUsage(usageIdentifier.InventorizationId, usageIdentifier.ZoneId, usageIdentifier.Type, userId);
+                return Request.CreateResponse(HttpStatusCode.OK, new { usageIdentifier.ZoneId, usageIdentifier.InventorizationId });
+
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Open zone error. Zone:{usageIdentifier.ZoneId}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
+                Logger.Error(ex, $"Open zone error. Zone:{usageIdentifier.ZoneId}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
             }
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -104,7 +100,7 @@ namespace Inventorization.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Open zone error. Zone:{Environment.NewLine} {JsonConvert.SerializeObject(usageIdentifier.ZoneId)}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
+                Logger.Error(ex, $"Open zone error. Zone:{Environment.NewLine} {JsonConvert.SerializeObject(usageIdentifier.ZoneId)}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
@@ -127,7 +123,7 @@ namespace Inventorization.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Close zone error. Zone:{Environment.NewLine} {JsonConvert.SerializeObject(usageIdentifier.ZoneId)}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
+                Logger.Error(ex, $"Close zone error. Zone:{Environment.NewLine} {JsonConvert.SerializeObject(usageIdentifier.ZoneId)}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
             }
             return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
         }
@@ -142,7 +138,7 @@ namespace Inventorization.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Zone clearing error. Zone: {usageIdentifier.ZoneId}. InventorizationId: {usageIdentifier.InventorizationId}");
+                Logger.Error(ex, $"Zone clearing error. Zone: {usageIdentifier.ZoneId}. InventorizationId: {usageIdentifier.InventorizationId}");
             }
             return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
         }

@@ -4,6 +4,7 @@ using Npgsql;
 using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Inventorization.Data
 {
@@ -126,12 +127,11 @@ namespace Inventorization.Data
                 using (var cmd = new NpgsqlCommand())
                 {
                     cmd.Connection = conn;
-                    if (zoneUsage != null)
+                    if (zoneUsage.Any(x => x.Type == type))
                     {
                         ReopenUsage(inventorizationId, zoneId, type, userId);
                         return;
                     }
-                    Guid newId = Guid.NewGuid();
                     cmd.CommandText = @"INSERT INTO public.""ZoneUsages""(""ZoneId"", ""InventorizationId"", ""OpenedAt"", ""OpenedBy"", ""Type"") VALUES(:ZoneId, :InventorizationId, :OpenedAt, :OpenedBy, :Type)";
                     cmd.Parameters.Add(new NpgsqlParameter("OpenedAt", DateTime.UtcNow));
                     cmd.Parameters.Add(new NpgsqlParameter("OpenedBy", userId));

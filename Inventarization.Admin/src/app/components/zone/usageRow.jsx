@@ -15,7 +15,7 @@ import { fullWhite as white } from 'material-ui/styles/colors';
 import { openUsage, closeUsage, clearUsage } from '../../actions/usageActions';
 import { setCurrentAction } from '../../actions/actionActions';
 import Add from 'material-ui/svg-icons/Content/add';
-import { browserHistory } from 'react-router'
+import { Link, browserHistory } from 'react-router'
 import moment from 'moment';
 import _ from 'lodash'
 moment.locale("ru-RU")
@@ -65,7 +65,9 @@ class UsageRow extends Component {
         return (
             <TableRow>
                 <TableRowColumn style={{ width: '120px' }}>{getTypeText(usage.Type)}</TableRowColumn>
-                <TableRowColumn style={{ width: '80px' }}>{sum}</TableRowColumn>
+                <TableRowColumn style={{ width: '80px' }}>
+                    <Link key={zone} to={{ pathname: "/actions", query: { ZoneName: zone.ZoneName, Type: usage.Type } }}>{sum}</Link>
+                </TableRowColumn>
                 {/*<TableRowColumn style={{width: '40px'}}>{usage.OpenedBy}</TableRowColumn>*/}
                 <TableRowColumn style={{ width: '150px' }}>{usage.OpenedAt == undefined ? "не открыта" : moment(usage.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
                 <TableRowColumn style={{ width: '150px' }}>{usage.ClosedAt == undefined ? "не закрыта" : moment(usage.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>

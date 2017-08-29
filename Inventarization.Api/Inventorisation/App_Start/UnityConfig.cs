@@ -4,6 +4,7 @@ using Microsoft.Practices.Unity;
 using NLog;
 using System.Configuration;
 using System.Web.Http;
+using Inventorization.Data.Repositories;
 using Unity.WebApi;
 
 namespace Inventorization.Api

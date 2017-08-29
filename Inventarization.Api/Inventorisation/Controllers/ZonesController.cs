@@ -18,14 +18,10 @@ namespace Inventorization.Controllers
     public class ZoneController : ApiController
     {
 
-        private IZoneRepository _zoneRepository;
-        private IActionRepository _actionRepository;
-        private TaskRepository _taskRepository;
-        public ZoneController(IZoneRepository zoneRepository, TaskRepository taskRepository, IActionRepository actionRepository)
+        private readonly IZoneRepository _zoneRepository;
+        public ZoneController(IZoneRepository zoneRepository)
         {
             _zoneRepository = zoneRepository;
-            _taskRepository = taskRepository;
-            _actionRepository = actionRepository;
         }
 
 

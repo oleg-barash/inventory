@@ -46,6 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +69,7 @@ public class ActionActivity extends Activity {
 
     private final static String SCAN_ACTION = "urovo.rcv.message";
     public static final String ZONE_MESSAGE = "com.inventorization.ZONE";
+    public static final String INVENTORIZATION_MESSAGE = "com.inventorization.INVENTORIZATION";
     private EditText showScanResult;
     private EditText quantity;
     private TextView zone_title;
@@ -82,6 +84,7 @@ public class ActionActivity extends Activity {
     private int soundid;
     private int errorSoundid;
     private String currentZone;
+    private String currentInventorization;
     private ActionType currentActionType;
     Action currentAction;
     private static LinkedList<String> actionList = new LinkedList<>();
@@ -135,8 +138,7 @@ public class ActionActivity extends Activity {
         params.put("quantity", currentAction.Quantity.toString());
         params.put("type", currentAction.Type.toString());
         params.put("barCode", currentAction.BarCode);
-        params.put("inventorization", currentAction.Inventorization);
-        params.put("zone", currentAction.Zone);
+        params.put("zone", currentZone);
         SimpleDateFormat formatUTC = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
         formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
         params.put("dateTime", formatUTC.format(new Date()));
@@ -181,23 +183,17 @@ public class ActionActivity extends Activity {
             public void onErrorResponse(VolleyError error) {
                 showScanResult.setText("");
                 currentAction.Status = ActionStatus.Error;
-                String text = currentAction.BarCode;
                 if (error.networkResponse != null){
-                    if (error.networkResponse.statusCode == 403){
-                        showToast("Зона уже закрыта. Выберите другую зону.");
-                        Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
-                        startActivity(intent);
-                        text += " не был добавлен в зону";
-                    }
-                    else {
-                        showToast("Ошибка при регистрации штрих-кода: " + error.toString());
+                    try {
+                        String body = new String(error.networkResponse.data, "UTF-8");
+                        showToast("Ошибка при регистрации штрих-кода: " + body);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
                     }
                 }
-                actionList.addFirst(text);
-                if (actionList.size() > 4){
-                    actionList.removeLast();
+                else {
+                    showToast("Ошибка при регистрации штрих-кода: " + error.getMessage());
                 }
-                adapter.notifyDataSetChanged();
             }
         }){
             @Override
@@ -225,6 +221,8 @@ public class ActionActivity extends Activity {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         currentZone = extras.getString(ActionActivity.ZONE_MESSAGE);
+        currentInventorization = extras.getString(ActionActivity.INVENTORIZATION_MESSAGE);
+
         currentActionType = ActionType.valueOf(extras.getString(ZoneSelectActivity.ACTION_TYPE_MESSAGE));
 
         SharedPreferences settings = getSharedPreferences("UserInfo", 0);
@@ -355,8 +353,10 @@ public class ActionActivity extends Activity {
                                 try {
                                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                                     HashMap<String, String> params = new HashMap<>();
-                                    params.put("zoneId", currentZone);
-                                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, baseUrl + "zone/close"
+                                    params.put("ZoneId", currentZone);
+                                    params.put("InventorizationId", currentInventorization);
+                                    params.put("Type", currentActionType.toString());
+                                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, Configuration.BaseUrl + "usage/close"
                                             , new JSONObject(params),
                                             new Response.Listener<JSONObject>() {
                                                 @Override

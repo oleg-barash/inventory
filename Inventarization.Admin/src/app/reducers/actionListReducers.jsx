@@ -11,6 +11,7 @@ import { FILTER_ACTION,
     UPDATE_ACTIONS_FILTER,
     ACTION_SAVED
 } from '../constants/actionTypes'
+import _ from 'lodash'
 
 const filterActions = (items, filter) => {
     if (items == undefined){
@@ -28,8 +29,18 @@ const filterActions = (items, filter) => {
                 return item.BarCode.toUpperCase().startsWith(filter.Code.toUpperCase());
             })
         }
+        if (filter.Type != undefined){
+            result = result.filter((item) => {
+                return item.Type == filter.Type;
+            })
+        }
     }
     return result;
+}
+
+
+let getTypes = function(actions){
+   return _.uniq(actions.map(x => { return { id: x.Type, text: getTypeLabel(x.Type) } }, (x, y) => x.id === y.id ));
 }
 
 export function actionList(state = { isFetching: false, items: [], filter: {}, action: {}, filtredActions: [] }, action)
@@ -59,7 +70,7 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
         case UPDATE_ACTIONS_FILTER:
             var filter = Object.assign(state.filter, action.filter)
             var items = filterActions(state.items, filter)
-            return Object.assign({}, state, { filter, filtredActions: items })
+            return Object.assign({}, state, { filter, filtredActions: items  })
         case REQUEST_ACTION:
             return Object.assign({}, state, {
                 isFetching: true

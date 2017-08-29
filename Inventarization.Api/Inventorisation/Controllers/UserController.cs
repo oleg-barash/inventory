@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Inventorization.Data.Repositories;
 
 namespace Inventorization.Api.Controllers
 {
