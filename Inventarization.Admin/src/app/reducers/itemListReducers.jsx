@@ -93,7 +93,7 @@ export function itemList(state = { isFetching: false, filter: { currentPage: 1, 
                 return rest;
             });
 
-            var allItems = _.unionBy(state.items, itemsWithRests, x => x.Code);
+            var allItems = _.unionBy(itemsWithRests, state.items, x => x.Code);
             return Object.assign({}, state, { isFetching: false, items: allItems, displayItems: _applyFilter(allItems, state.filter) });
 
         case RECEIVE_ACTIONS:

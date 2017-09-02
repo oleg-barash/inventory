@@ -47,6 +47,26 @@ const defaultThrottleOption = {
 
 const throttleMiddleware = throttle(defaultWait, defaultThrottleOption);
 
+let _hub;
+function signalRMiddleware(store) {
+    return (next) => (action) => {
+        if (action.signalR) {
+            switch (action.type) {
+                case ABC:
+                    _hub.server.methodOnTheServer();
+                    break;
+                default:
+                    {
+                        const myCurrentState = store.getState().objectWithinState;
+                        _hub.server.methodOnTheServer2(action.type, myCurrentState);
+                    }
+            }
+        }
+        return next(action);
+    }
+}
+
+
 function authCookies({ getState }) {
   return (next) => (action) => {
     let returnValue = next(action)
@@ -66,16 +86,15 @@ function authCookies({ getState }) {
                 }
                 break
             case INVENTORIZATION_SELECTED:
-                browserHistory.push('/items');
-                state.auth.SelectedInventorization = action.inventorization
-                document.cookie = "UserData=" + JSON.stringify(state.auth)
+                //browserHistory.push('/items');
+                state.auth.SelectedInventorization = action.inventorization;
+                document.cookie = "UserData=" + JSON.stringify(state.auth);
                 break
             case LOGOUT:
                 document.cookie = "UserData="
                 browserHistory.push('/login');
                 break
             case ACTION_SAVED:
-            debugger
                 browserHistory.push('/editAction?id=' + action.id);
         }
     }
@@ -86,7 +105,7 @@ function authCookies({ getState }) {
 
 injectTapEventPlugin();
 const loggerMiddleware = createLogger()
-const middleware = [thunkMiddleware,loggerMiddleware,throttleMiddleware, authCookies];
+const middleware = [thunkMiddleware,loggerMiddleware,throttleMiddleware, authCookies, signalRMiddleware];
 let store = createStore(
     combineReducers({ actions: actionList, 
         items: itemList, 

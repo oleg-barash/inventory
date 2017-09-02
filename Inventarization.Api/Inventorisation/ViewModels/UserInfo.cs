@@ -14,9 +14,8 @@ namespace Inventorization.Api.ViewModels
         public bool IsAuthorized;
         public string Username;
         public string Password;
-        public List<Business.Model.Inventorization> Inventorizations;
-        public Business.Model.Inventorization DefaultInventorization;
         public List<Business.Model.Company> Companies;
         public Business.Model.Company Company;
+        public Business.Model.Inventorization DefaultInventorization;
     }
 }

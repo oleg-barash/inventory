@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Items from './containers/items'
 import AllActions from './containers/allActions'
-import AuthorizedComponent from './components/authorizedComponent'
+import InventorizationComponent from './components/inventorizationComponent'
 import { connect } from 'react-redux'
 
 
@@ -23,7 +23,7 @@ const mapStateToProps = (state) => {
 }
 
 
-class ItemListPage extends AuthorizedComponent {
+class ItemListPage extends InventorizationComponent {
   constructor(props) {
       super(props);
   }

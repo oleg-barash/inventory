@@ -25,7 +25,7 @@ class List extends Component {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {items.map(item => <Row item={item} key={item.Code} />)}
+                    {_.filter(items, x => !!x.Code).map(item => <Row item={item} key={item.Code} />)}
                 </TableBody>
             </Table>
         )

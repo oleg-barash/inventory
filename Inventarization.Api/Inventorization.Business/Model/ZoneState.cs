@@ -10,6 +10,7 @@ namespace Inventorization.Business.Model
         public DateTime? ClosedAt { get; set; }
         public Guid OpenedBy { get; set; }
         public Guid? ClosedBy { get; set; }
+        public Guid? AssignedAt { get; set; }
         public ActionType Type { get; set; }
     }
 

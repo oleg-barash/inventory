@@ -1,44 +1,43 @@
-﻿using Inventorization.Business.Exceptions;
-using Inventorization.Business.Interfaces;
-using Inventorization.Business.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Inventorization.Business.Exceptions;
+using Inventorization.Business.Interfaces;
+using Inventorization.Business.Model;
+using Action = Inventorization.Business.Model.Action;
 
 namespace Inventorization.Business.Domains
 {
     public class ActionDomain
     {
-        private IZoneRepository zoneRepository;
-        private IActionRepository actionRepository;
-        private IUsageRepository usageRepository;
-        private IInventorizationRepository inventorizationRepository;
-        public ActionDomain(IZoneRepository zoneRepository
-            , IActionRepository actionRepository
-            , IInventorizationRepository inventorizationRepository
-            , IUsageRepository usageRepository)
+        private readonly IActionRepository _actionRepository;
+        private readonly IUsageRepository _usageRepository;
+
+        public ActionDomain(IActionRepository actionRepository, IUsageRepository usageRepository)
         {
-            this.zoneRepository = zoneRepository;
-            this.actionRepository = actionRepository;
-            this.inventorizationRepository = inventorizationRepository;
-            this.usageRepository = usageRepository;
+            _actionRepository = actionRepository;
+            _usageRepository = usageRepository;
         }
 
-        public Model.Action InsertAction(Model.Action action) {
+        public IEnumerable<Action> GetActionsByType(Guid inventorizationId, Guid zoneId, ActionType type)
+        {
+            return _actionRepository.GetActionsByInventorization(inventorizationId)
+                .Where(x => x.Zone == zoneId && x.Type == type);
+        }
+
+        public Action InsertAction(Action action) {
             CheckZoneAccess(action);
             if (action.Id == Guid.Empty)
             {
                 action.Id = Guid.NewGuid();
             }
-            actionRepository.CreateAction(action);
+            _actionRepository.CreateAction(action);
             return action;
         }
 
-        private void CheckZoneAccess(Model.Action action)
+        private void CheckZoneAccess(Action action)
         {
-            ZoneUsage zoneUsage = this.usageRepository.GetZoneUsages(action.Inventorization, action.Zone).FirstOrDefault(x => x.Type == action.Type);
+            ZoneUsage zoneUsage = _usageRepository.GetZoneUsages(action.Inventorization, action.Zone).FirstOrDefault(x => x.Type == action.Type);
             if (zoneUsage == null)
             {
                 throw new ZoneAccessException(action.Zone, $"Зона не была открыта. Сначала откройте зону.");
@@ -49,12 +48,12 @@ namespace Inventorization.Business.Domains
             }
         }
 
-        public void UpdateAction(Model.Action action) {
+        public void UpdateAction(Action action) {
             CheckZoneAccess(action);
-            actionRepository.UpdateAction(action);
+            _actionRepository.UpdateAction(action);
         }
 
-        public Model.Action UpsertAction(Model.Action action)
+        public Action UpsertAction(Action action)
         {
             bool actionExists = ActionExists(action.Id);
             if (actionExists)
@@ -62,20 +61,17 @@ namespace Inventorization.Business.Domains
                 UpdateAction(action);
                 return action;
             }
-            else
-            {
-                return InsertAction(action);
-            }
+            return InsertAction(action);
         }
 
         public bool ActionExists(Guid id) {
-            return id != default(Guid) && actionRepository.ActionExists(id);
+            return id != default(Guid) && _actionRepository.ActionExists(id);
         }
 
 
-        public List<Model.Action> GetUsersLastActions(Guid userId, int length)
+        public List<Action> GetUsersLastActions(Guid userId, int length)
         {
-            return actionRepository.GetUsersActions(userId, length);
+            return _actionRepository.GetUsersActions(userId, length);
         }
 
     }

@@ -3,6 +3,7 @@ import AuthorizedComponent from './components/authorizedComponent'
 import { connect } from 'react-redux'
 import Form from './components/inventorization/form'
 import { loadInventorizationInfo } from './actions/inventorizationActions'
+import moment from 'moment';
 const styles = {
     headline: {
         fontSize: 24,
@@ -15,7 +16,7 @@ const styles = {
 const mapStateToProps = (state) => {
     return {
         userInfo: state.auth,
-        inventorization: state.inventorization
+        inventorization: state.inventorization.inventorization
     }
 }
 
@@ -25,17 +26,18 @@ class InventorizationPage extends AuthorizedComponent {
     }
     componentDidMount() {
         const { dispatch, userInfo } = this.props
-        const { id } = this.props.location.query
+        const { id, companyId } = this.props.location.query
         if (id !== undefined) {
             dispatch(loadInventorizationInfo(id, userInfo.Token));
         }
     }
     render() {
         const { inventorization } = this.props
+        const { companyId } = this.props.location.query
         return (
             <div>
                 <h2 style={styles.headline}>Карточка инверторизации</h2>
-                {!!inventorization.inventorization ? <Form inventorization={inventorization.inventorization}/> : null}
+                <Form inventorization={inventorization} companyId={companyId}/>
             </div>
         )
     }

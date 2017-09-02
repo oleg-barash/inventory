@@ -16,5 +16,11 @@ namespace Inventorization.Business.Model
         public DateTime? LastLoginAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public UserLevel Level { get; set; }
+        public Guid? Inventorization { get; set; }
+        public string GetFullName()
+        {
+            return $"{FamilyName} {FirstName} ({Login})";
+        }
+
     }
 }

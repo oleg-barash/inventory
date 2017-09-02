@@ -15,6 +15,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Inventorization.Business.Model;
 using Inventorization.Data.Repositories;
 
 namespace Inventorization.Api.Controllers
@@ -23,18 +24,18 @@ namespace Inventorization.Api.Controllers
     [RoutePrefix("api/user")]
     public class UserController : ApiController
     {
-        private static ILogger logger = LogManager.GetCurrentClassLogger();
-        private ICompanyRepository _companyRepository;
-        private UserRepository _userRepository;
-        private ActionDomain actionDomain;
-        private IInventorizationRepository _inventorizationRepository;
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+        private readonly ICompanyRepository _companyRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ActionDomain _actionDomain;
+        private readonly IInventorizationRepository _inventorizationRepository;
 
-        public UserController(ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository, UserRepository userRepository, ActionDomain actionDomain)
+        public UserController(ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository, IUserRepository userRepository, ActionDomain actionDomain)
         {
             _companyRepository = companyRepository;
             _inventorizationRepository = inventorizationRepository;
             _userRepository = userRepository;
-            this.actionDomain = actionDomain;
+            this._actionDomain = actionDomain;
         }
 
 
@@ -58,10 +59,12 @@ namespace Inventorization.Api.Controllers
                     info.Username = user.Login;
                     info.Password = user.Password;
                     info.Token = "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Login + ":" +user.Password));
-                    info.Inventorizations = _inventorizationRepository.GetInventorizations();
                     info.Companies = _companyRepository.GetCompanies();
-                    info.DefaultInventorization = info.Inventorizations.Last();
-
+                    if (user.Inventorization.HasValue)
+                    {
+                        info.DefaultInventorization =
+                            _inventorizationRepository.GetInventorization(user.Inventorization.Value);
+                    }
                     var claims = new List<Claim> {
                         new Claim(ClaimTypes.Sid, user.Id.ToString()),
                         new Claim(ClaimTypes.Name,loginInfo.Username),
@@ -105,7 +108,7 @@ namespace Inventorization.Api.Controllers
         }
 
         [Route("info"), HttpPost, Authorize]
-        public IHttpActionResult SaveUser([FromBody]Business.Model.User user)
+        public IHttpActionResult SaveUser([FromBody]User user)
         {
             try
             {
@@ -126,7 +129,46 @@ namespace Inventorization.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Saving user info failed");
+                Logger.Error(ex, "Saving user info failed");
+                return Ok(new { status = "failed", message = "Произошла ошибка при сохранении инфомации о пользователе" });
+            }
+        }
+
+        [Route("assign"), HttpPost, Authorize]
+        public IHttpActionResult AssignUser([FromBody]User user)
+        {
+            try
+            {
+                _userRepository.Assign(user.Id, user.Inventorization);
+                return Ok(new { status = "success", user = _userRepository.GetUser(user.Id) });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Saving user info failed");
+                return Ok(new { status = "failed", message = "Произошла ошибка при сохранении инфомации о пользователе" });
+            }
+        }
+
+        [Route("deassign"), HttpPost, Authorize]
+        public IHttpActionResult DessignUser([FromBody]User user)
+        {
+            try
+            {
+                User foundUser = _userRepository.GetUser(user.Id);
+                if (foundUser == null)
+                {
+                    return Ok(new
+                    {
+                        status = "validation_error",
+                        fields = new {LoginError = "Пользователь не существует"}
+                    });
+                }
+                _userRepository.Deassign(foundUser.Id);
+                return Ok(new { status = "success", user = foundUser });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Saving user info failed");
                 return Ok(new { status = "failed", message = "Произошла ошибка при сохранении инфомации о пользователе" });
             }
         }
@@ -138,7 +180,7 @@ namespace Inventorization.Api.Controllers
             ClaimsPrincipal user = ctx.Authentication.User;
             IEnumerable<Claim> claims = user.Claims;
             Guid userId = Guid.Parse(claims.Single(x => x.Type == ClaimTypes.Sid).Value);
-            List<Business.Model.Action> userActions = actionDomain.GetUsersLastActions(userId, 6);
+            List<Business.Model.Action> userActions = _actionDomain.GetUsersLastActions(userId, 6);
             return Ok(userActions);
         }
 
@@ -152,7 +194,7 @@ namespace Inventorization.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Deleting user failed");
+                Logger.Error(ex, "Deleting user failed");
                 return Ok(new { status = "failed", message = "Произошла ошибка при удалении пользователя" });
             }
         }

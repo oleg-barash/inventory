@@ -6,7 +6,7 @@ namespace Inventorization.Business.Interfaces
 {
     public interface IInventorizationRepository
     {
-        Model.Inventorization CreateInventorization(Guid companyId, DateTime? date);
+        Business.Model.Inventorization CreateInventorization(Guid companyId, string name, DateTime? date);
         void DeleteInventorization(Guid id);
         Model.Inventorization GetInventorization(Guid id);
         List<Model.Inventorization> GetInventorizations();

@@ -16,6 +16,7 @@ import {
     PARSE_DATA,
     DATA_IMPORTED
 } from '../constants/actionTypes';
+import _ from 'lodash'
 
 export default function company(state = { isLoading: false, isListLoading: false, isImportDialogOpened: false, importInProgress: false }, action) {
     switch (action.type) {
@@ -54,7 +55,7 @@ export default function company(state = { isLoading: false, isListLoading: false
                 return {
                     BarCode: columns[0],
                     Name: columns[1],
-
+ 
                 }
             });
             return Object.assign({}, state, { dataForImport: itemsToUpload })

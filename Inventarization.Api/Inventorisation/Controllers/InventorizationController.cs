@@ -14,6 +14,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Inventorization.Api.ViewModels.Builders;
 
 namespace Inventorization.Api.Controllers
 {
@@ -26,6 +27,7 @@ namespace Inventorization.Api.Controllers
         private readonly IZoneRepository _zoneRepository;
         private readonly ICompanyRepository _companyRepository;
         private readonly IUsageRepository _usageRepository;
+        private readonly IUsageBuilder _usageBuilder;
         private readonly ActionDomain _actionDomain;
         private readonly InventorizationDomain _inventorizationDomain;
         private readonly ZoneDomain _zoneDomain;
@@ -41,6 +43,7 @@ namespace Inventorization.Api.Controllers
             , IZoneRepository zoneRepository
             , ICompanyRepository companyRepository
             , IUsageRepository usageRepository
+            , IUsageBuilder usageBuilder
             , ActionDomain actionDomain
             , InventorizationDomain inventorizationDomain
             , ZoneDomain zoneDomain)
@@ -52,6 +55,7 @@ namespace Inventorization.Api.Controllers
             _actionDomain = actionDomain;
             _inventorizationDomain = inventorizationDomain;
             _zoneDomain = zoneDomain;
+            _usageBuilder = usageBuilder;
         }
 
         [HttpGet]
@@ -69,12 +73,28 @@ namespace Inventorization.Api.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("list")]
+        public HttpResponseMessage List()
+        {
+            return Request.CreateResponse(HttpStatusCode.OK, _inventorizationDomain.GetAll());
+        }
+
         [HttpPost]
         [Route("save")]
         public HttpResponseMessage Save([FromBody]Business.Model.Inventorization inventorization)
         {
-            _inventorizationRepository.UpdateInventorization(inventorization);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            if (inventorization.Id == Guid.Empty)
+            {
+                var created = _inventorizationRepository.CreateInventorization(inventorization.Company,
+                    inventorization.Name, inventorization.Date);
+                inventorization.Id = created.Id;
+            }
+            else
+            {
+                _inventorizationRepository.UpdateInventorization(inventorization);
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, inventorization);
         }
 
         [HttpDelete]
@@ -124,18 +144,11 @@ namespace Inventorization.Api.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, zones.Select(x =>
                 {
                     var currentZoneUsages = usages.Where(s => x.Id == s.ZoneId);
-                    return new ZoneViewModel()
+                    return new ZoneViewModel
                     {
                         Id = x.Id,
                         Number = x.Number,
-                        Usages = currentZoneUsages.Select(state => new ZoneUsageViewModel
-                        {
-                            Type = state.Type,
-                            OpenedAt = state.OpenedAt,
-                            OpenedBy = state.OpenedBy,
-                            ClosedAt = state?.ClosedAt,
-                            ClosedBy = state?.ClosedBy
-                        }).ToArray(),
+                        Usages = _usageBuilder.GetUsageViewModels(currentZoneUsages.ToList()).ToArray(),
                         ZoneName = x.Name
                     };
                 }).OrderBy(x => x.Number));
@@ -170,6 +183,12 @@ namespace Inventorization.Api.Controllers
 
                 if (actionVm.Type == ActionType.BlindScan)
                 {
+                    List<Business.Model.Action> foundActions = _actionDomain.GetActionsByType(inventorization, actionVm.Zone, actionVm.Type).ToList();
+                    if (foundActions.Any())
+                    {
+                        Business.Model.Action foundAction = foundActions.Single();
+                        action.Id = foundAction.Id;
+                    }
                     Business.Model.Action updatedAction = _actionDomain.UpsertAction(action);
                     return Request.CreateResponse(HttpStatusCode.OK, new { ok = true, action = updatedAction });
                 }
@@ -199,7 +218,6 @@ namespace Inventorization.Api.Controllers
         [Route("{inventorizationId}/actions")]
         public HttpResponseMessage GetActions(Guid inventorizationId)
         {
-            var claims = Request.GetOwinContext().Authentication.User;
             var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
             var actions = _inventorizationDomain.GetActions(inventorizationId);
             var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
@@ -207,7 +225,6 @@ namespace Inventorization.Api.Controllers
             List<ZoneUsage> usages = _usageRepository.GetZoneUsages(inventorizationId).Where(x => x.ZoneId != Guid.Empty).ToList();
             var result = actions.Select(x =>
             {
-                var foundItem = items.FirstOrDefault(i => i.Code == x.BarCode);
                 var foundZone = zones.First(z => z.Id == x.Zone);
                 var currentZoneUsages = usages.Where(z => z.ZoneId == foundZone.Id);
 
@@ -215,14 +232,7 @@ namespace Inventorization.Api.Controllers
                 {
                     Id = foundZone.Id,
                     Number = foundZone.Number,
-                    Usages = currentZoneUsages.Select(state => new ZoneUsageViewModel
-                    {
-                        Type = state.Type,
-                        OpenedAt = state.OpenedAt,
-                        OpenedBy = state.OpenedBy,
-                        ClosedAt = state?.ClosedAt,
-                        ClosedBy = state?.ClosedBy
-                    }).ToArray(),
+                    Usages = _usageBuilder.GetUsageViewModels(currentZoneUsages.ToList()).ToArray(),
                     ZoneName = foundZone.Name
                 };
                 var res = new ViewModels.Action()
@@ -234,11 +244,24 @@ namespace Inventorization.Api.Controllers
                     User = x.UserId.ToString(),
                     Inventorization = x.Inventorization,
                     Zone = zoneVm,
-                    BarCode = x.BarCode,
-                    FoundInItems = foundItem != null,
-                    Name = foundItem != null ? foundItem.Name : "Не найдена в номенклатуре",
-                    Description = foundItem != null ? foundItem.Description : "Не найдена в номенклатуре",
+                    BarCode = x.BarCode
                 };
+
+                if (x.Type != ActionType.BlindScan && !string.IsNullOrWhiteSpace(x.BarCode))
+                {
+                    var foundItem = items.FirstOrDefault(i => i.Code == x.BarCode);
+                    if (foundItem != null)
+                    {
+                        res.FoundInItems = true;
+                        res.Name = foundItem.Name;
+                        res.Description = foundItem.Description;
+                    }
+                    else
+                    {
+                        res.Name = "Не найдена в номенклатуре";
+                        res.Description = "Не найдена в номенклатуре";
+                    }
+                }
                 return res;
             });
             return Request.CreateResponse(HttpStatusCode.OK, result.OrderByDescending(x => x.DateTime));
@@ -274,7 +297,7 @@ namespace Inventorization.Api.Controllers
                     ZoneDetails = action.Select(x => new ActionZoneDetails()
                     {
                         Quantity = x.Quantity,
-                        Zone = zones.FirstOrDefault(z => z.Id == x.Zone).Name
+                        Zone = zones.FirstOrDefault(z => z.Id == x.Zone)?.Name
                     }).ToList()
 
                 });
@@ -304,7 +327,6 @@ namespace Inventorization.Api.Controllers
         [Route("{inventorizationId}/rests")]
         public HttpResponseMessage UploadRests(Guid inventorizationId, [FromBody]List<Rests> rests)
         {
-            var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
             _inventorizationDomain.UpdateRests(inventorizationId, rests);
             return Request.CreateResponse(HttpStatusCode.OK);
         }

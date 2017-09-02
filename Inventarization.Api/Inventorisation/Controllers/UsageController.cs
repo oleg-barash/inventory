@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Inventorization.Api.ViewModels.Builders;
 using Inventorization.Data.Repositories;
 
 namespace Inventorization.Api.Controllers
@@ -29,17 +30,20 @@ namespace Inventorization.Api.Controllers
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly IUsageRepository _usageRepository;
         private readonly IZoneRepository _zoneRepository;
-        private readonly UserRepository _userRepository;
+        private readonly IUsageBuilder _usageBuilder;
+        private readonly IUserRepository _userRepository;
         private readonly InventorizationDomain _inventorizationDomain;
         public UsageController(IZoneRepository zoneRepository
             , IUsageRepository usageRepository
             , InventorizationDomain inventorizationDomain
-            , UserRepository userRepository)
+            , IUserRepository userRepository
+            , IUsageBuilder usageBuilder)
         {
             _zoneRepository = zoneRepository;
             _inventorizationDomain = inventorizationDomain;
             _usageRepository = usageRepository;
             _userRepository = userRepository;
+            _usageBuilder = usageBuilder;
         }
 
         [HttpGet]
@@ -52,95 +56,102 @@ namespace Inventorization.Api.Controllers
 
         [HttpPost]
         [Route("open")]
-        public HttpResponseMessage OpenZone([FromBody]ZoneUsageIdentifierViewModel usageIdentifier)
+        public HttpResponseMessage OpenZone([FromBody]UsageOpenViewModel model)
         {
             try
             {
-                List<ZoneUsage> usages = _usageRepository.GetZoneUsages(usageIdentifier.InventorizationId, usageIdentifier.ZoneId);
+                List<ZoneUsage> usages = _usageRepository.GetZoneUsages(model.InventorizationId, model.ZoneId);
                 ClaimsPrincipal userClaims = Request.GetOwinContext().Authentication.User;
                 Guid userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
-                if (usages.Any(x => x.Type == usageIdentifier.Type))
+                if (usages.Any(x => x.Type == model.Type))
                 {
-                    ZoneUsage usage = usages.First(x => x.Type == usageIdentifier.Type);
+                    ZoneUsage usage = usages.First(x => x.Type == model.Type);
                     
                     if (usage.ClosedAt.HasValue && usage.ClosedAt.Value.ToUniversalTime() < DateTime.UtcNow)
                     {
                         return Request.CreateResponse(HttpStatusCode.Forbidden, "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру.");
                     }
 
-                    if (usage.OpenedBy != userId)
+                    if (usage.AssignedAt.HasValue && usage.AssignedAt != userId)
                     {
-                        Business.Model.User user = _userRepository.GetUser(usage.OpenedBy);
-                        return Request.CreateResponse(HttpStatusCode.Forbidden, $"Зона уже была открыта пользователем: {user.Login}");
+                        Business.Model.User user = _userRepository.GetUser(usage.AssignedAt.Value);
+                        return Request.CreateResponse(HttpStatusCode.Forbidden, $"Зона уже была назначена на пользователея: {user.Login}");
                     }
 
                 }
-                _usageRepository.OpenUsage(usageIdentifier.InventorizationId, usageIdentifier.ZoneId, usageIdentifier.Type, userId);
-                return Request.CreateResponse(HttpStatusCode.OK, new { usageIdentifier.ZoneId, usageIdentifier.InventorizationId });
+                _usageRepository.OpenUsage(model.InventorizationId, model.ZoneId, model.Type, userId, model.AssignTo ?? userId);
+                return Request.CreateResponse(HttpStatusCode.OK, new { model.ZoneId, model.InventorizationId });
 
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, $"Open zone error. Zone:{usageIdentifier.ZoneId}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
+                Logger.Error(ex, $"Open zone error. Zone:{model.ZoneId}. InventorizationId: {model.InventorizationId}. Type: {model.Type}");
             }
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpPost]
         [Route("reopen")]
-        public HttpResponseMessage ReopenZone([FromBody]ZoneUsageIdentifierViewModel usageIdentifier)
+        public HttpResponseMessage ReopenZone([FromBody]UsageOpenViewModel model)
         {
             try
             {
-                List<ZoneUsage> usage = _usageRepository.GetZoneUsages(usageIdentifier.ZoneId);
                 ClaimsPrincipal userClaims = Request.GetOwinContext().Authentication.User;
                 Guid userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
-                _usageRepository.OpenUsage(usageIdentifier.InventorizationId, usageIdentifier.ZoneId, usageIdentifier.Type, userId);
-                return Request.CreateResponse(HttpStatusCode.OK, usage);
+                _usageRepository.ReopenUsage(model.InventorizationId, model.ZoneId, model.Type, userId);
+                List<ZoneUsage> usages = _usageRepository.GetZoneUsages(model.InventorizationId, model.ZoneId);
+                IEnumerable<ZoneUsageViewModel> viewModels = _usageBuilder.GetUsageViewModels(usages);
+                return Request.CreateResponse(HttpStatusCode.OK, viewModels);
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, $"Open zone error. Zone:{Environment.NewLine} {JsonConvert.SerializeObject(usageIdentifier.ZoneId)}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
+                Logger.Error(ex, $"Open zone error. Zone:{Environment.NewLine} {JsonConvert.SerializeObject(model.ZoneId)}. InventorizationId: {model.InventorizationId}. Type: {model.Type}");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
 
         [HttpPost]
         [Route("close")]
-        public HttpResponseMessage CloseZone([FromBody]ZoneUsageIdentifierViewModel usageIdentifier)
+        public HttpResponseMessage CloseZone([FromBody]UsageViewModel model)
         {
             try
             {
-                ZoneUsage state = _usageRepository.GetZoneUsage(usageIdentifier.InventorizationId, usageIdentifier.ZoneId, usageIdentifier.Type);
+                ZoneUsage state = _usageRepository.GetZoneUsage(model.InventorizationId, model.ZoneId, model.Type);
                 if (state != null)
                 {
                     var userClaims = Request.GetOwinContext().Authentication.User;
                     Guid userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
-                    _usageRepository.CloseUsage(usageIdentifier.InventorizationId, usageIdentifier.ZoneId, usageIdentifier.Type, userId);
-                    return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
+                    _usageRepository.CloseUsage(model.InventorizationId, model.ZoneId, model.Type, userId);
+                    List<ZoneUsage> usages = _usageRepository.GetZoneUsages(model.InventorizationId, model.ZoneId);
+                    IEnumerable<ZoneUsageViewModel> viewModels = _usageBuilder.GetUsageViewModels(usages);
+                    return Request.CreateResponse(HttpStatusCode.OK, viewModels);
                 }
                 return Request.CreateResponse(HttpStatusCode.Forbidden, new { Result = "Error", Reason = "Зона не была открыта" });
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, $"Close zone error. Zone:{Environment.NewLine} {JsonConvert.SerializeObject(usageIdentifier.ZoneId)}. InventorizationId: {usageIdentifier.InventorizationId}. Type: {usageIdentifier.Type}");
+                Logger.Error(ex, $"Close zone error. Zone:{Environment.NewLine} {JsonConvert.SerializeObject(model.ZoneId)}. InventorizationId: {model.InventorizationId}. Type: {model.Type}");
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, new { Result = "Error", Reason = ex.Message });
             }
-            return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
         }
 
         [HttpPost]
         [Route("clear")]
-        public HttpResponseMessage ClearZone([FromBody]ZoneUsageIdentifierViewModel usageIdentifier)
+        public HttpResponseMessage ClearZone([FromBody]UsageViewModel model)
         {
             try
             {
-                _inventorizationDomain.ClearZone(usageIdentifier.InventorizationId, usageIdentifier.ZoneId, usageIdentifier.Type);
+                _inventorizationDomain.ClearZone(model.InventorizationId, model.ZoneId, model.Type);
+                List<ZoneUsage> usages = _usageRepository.GetZoneUsages(model.InventorizationId, model.ZoneId);
+                IEnumerable<ZoneUsageViewModel> viewModels = _usageBuilder.GetUsageViewModels(usages);
+                return Request.CreateResponse(HttpStatusCode.OK, viewModels);
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, $"Zone clearing error. Zone: {usageIdentifier.ZoneId}. InventorizationId: {usageIdentifier.InventorizationId}");
+                Logger.Error(ex, $"Zone clearing error. Zone: {model.ZoneId}. InventorizationId: {model.InventorizationId}");
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-            return Request.CreateResponse(HttpStatusCode.OK, new { Result = "Ok" });
+
         }
 
 

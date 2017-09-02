@@ -16,9 +16,7 @@ import { openUsage, closeUsage, clearUsage } from '../../actions/usageActions';
 import { setCurrentAction } from '../../actions/actionActions';
 import Add from 'material-ui/svg-icons/Content/add';
 import { Link, browserHistory } from 'react-router'
-import moment from 'moment';
 import _ from 'lodash'
-moment.locale("ru-RU")
 
 class UsageRow extends Component {
     constructor(props) {
@@ -62,18 +60,24 @@ class UsageRow extends Component {
         //     }
         // }
         let sum = _.sum(actions.map(a => a.Quantity));
+        let status = "не открыта";
+        if (usage.OpenedAt !== null){
+            if (usage.ClosedAt !== null){
+                status = "закрыта";
+            }
+            else status = usage.AssignedAt !== null ? "в работе" : "открыта";
+        } 
+        let assigned = usage.AssignedAt !== null ? usage.AssignedAt : "не назначена";
         return (
             <TableRow>
                 <TableRowColumn style={{ width: '120px' }}>{getTypeText(usage.Type)}</TableRowColumn>
                 <TableRowColumn style={{ width: '80px' }}>
                     <Link key={zone} to={{ pathname: "/actions", query: { ZoneName: zone.ZoneName, Type: usage.Type } }}>{sum}</Link>
                 </TableRowColumn>
-                {/*<TableRowColumn style={{width: '40px'}}>{usage.OpenedBy}</TableRowColumn>*/}
-                <TableRowColumn style={{ width: '150px' }}>{usage.OpenedAt == undefined ? "не открыта" : moment(usage.OpenedAt).format("DD MMMM hh:mm")}</TableRowColumn>
-                <TableRowColumn style={{ width: '150px' }}>{usage.ClosedAt == undefined ? "не закрыта" : moment(usage.ClosedAt).format("DD MMMM hh:mm")}</TableRowColumn>
-                {/*<TableRowColumn style={{width: '100px'}}>{usage.ClosedBy}</TableRowColumn>*/}
+                <TableRowColumn style={{ width: '80px' }}>{status}</TableRowColumn>
+                <TableRowColumn style={{ width: '200px' }}>{assigned}</TableRowColumn>
                 <TableRowColumn >
-                    <FlatButton disabled={!usage.ClosedAt || !!usage.OpenedAt}
+                    <FlatButton disabled={!usage.ClosedAt && !!usage.OpenedAt}
                         hoverColor={blue}
                         icon={<Add />}
                         onClick={newAction}
@@ -83,7 +87,7 @@ class UsageRow extends Component {
                         icon={<Replay />}
                         onClick={openFunc}
                     />
-                    <FlatButton disabled={!usage.ClosedAt || !usage.OpenedAt}
+                    <FlatButton disabled={!!usage.ClosedAt}
                         hoverColor={green}
                         icon={<Done />}
                         onClick={closeFunc}
@@ -93,8 +97,6 @@ class UsageRow extends Component {
                         icon={<Clear />}
                         onClick={clearFunc}
                     />
-
-                    {/*<LinearProgress mode="indeterminate"/>*/}
                 </TableRowColumn>
             </TableRow>
         )

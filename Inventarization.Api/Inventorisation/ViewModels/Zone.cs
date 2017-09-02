@@ -17,7 +17,10 @@ namespace Inventorization.Api.ViewModels
         public DateTime? ClosedAt { get; set; }
         public Guid? OpenedBy { get; set; }
         public Guid? ClosedBy { get; set; }
+        public Guid ZoneId{ get; set; }
+        public Guid InventorizationId { get; set; }
         public ActionType Type { get; set; }
+        public string AssignedAt { get; set; }
     }
 
 }

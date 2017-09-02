@@ -33,7 +33,7 @@ class List extends Component {
         function handleZoneChange(event, value) {
             dispatch(updateActionsFilter({ ZoneName: value }))
         };
-        function handleCodeChange(event, value) {
+        function handleCodeChange(event, value) {ё
             dispatch(updateActionsFilter({ Code: value }))
         };
         function handleTypeChange() {

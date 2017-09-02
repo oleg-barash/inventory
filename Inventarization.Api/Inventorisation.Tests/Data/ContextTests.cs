@@ -34,7 +34,7 @@ namespace Inventorization.Tests.Data
 
             User user = userRepositoriy.CreateUser(new User() { FirstName = "test_name", FamilyName = "test_family", MiddleName = "test_middlename", Level = UserLevel.Scaner, CreatedAt = DateTime.UtcNow, Login = "test", Password = "test" });
             Company company = companyRepositoriy.CreateCompany("Тест1");
-            Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, DateTime.UtcNow);
+            Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, string.Empty, DateTime.UtcNow);
             Guid firstActionId = Guid.NewGuid();
             Guid secondActionId = Guid.NewGuid();
 
@@ -80,7 +80,7 @@ namespace Inventorization.Tests.Data
         public void ZoneCreatingWorks()
         {
             Company company = companyRepositoriy.CreateCompany("Тест1");
-            Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, DateTime.UtcNow);
+            Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, string.Empty, DateTime.UtcNow);
             Guid firstZoneId = Guid.NewGuid();
             ZoneModel firstZone = new ZoneModel()
             {
@@ -108,7 +108,7 @@ namespace Inventorization.Tests.Data
             User manager = userRepositoriy.CreateUser(new User() { Id = userGuid, FirstName = "test_manager_name", FamilyName = "test_manager_family", MiddleName = "test_manager_middlename", Level = UserLevel.Scaner, CreatedAt = DateTime.UtcNow, Login = "manager_test", Password = "test" });
 
             Company company = companyRepositoriy.CreateCompany("Тест1");
-            Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, DateTime.UtcNow);
+            Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, string.Empty, DateTime.UtcNow);
             Guid firstTaskId = Guid.NewGuid();
             taskRepository.CreateTask(firstTaskId, managerGuid, userGuid, inventarisation.Id);
 
@@ -130,7 +130,7 @@ namespace Inventorization.Tests.Data
             User manager = userRepositoriy.CreateUser(new User() { FirstName = "test_manager_name", FamilyName = "test_manager_family", MiddleName = "test_manager_middlename", Level = UserLevel.Scaner, CreatedAt = DateTime.UtcNow, Login = "manager_test", Password = "test" });
 
             Company company = companyRepositoriy.CreateCompany("Тест1");
-            Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, DateTime.UtcNow);
+            Business.Model.Inventorization inventarisation = inventorizationRepositoriy.CreateInventorization(company.Id, string.Empty, DateTime.UtcNow);
             Guid firstZoneId = Guid.NewGuid();
             ZoneModel firstZone = new ZoneModel()
             {

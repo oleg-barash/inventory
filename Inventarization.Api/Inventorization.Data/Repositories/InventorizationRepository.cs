@@ -13,13 +13,13 @@ namespace Inventorization.Data
     public class InventorizationRepository : IInventorizationRepository
     {
 
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public InventorizationRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
-        public Business.Model.Inventorization CreateInventorization(Guid companyId, DateTime? date)
+        public Business.Model.Inventorization CreateInventorization(Guid companyId, string name, DateTime? date)
         {
             Business.Model.Inventorization result = new Business.Model.Inventorization();
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -29,14 +29,15 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = "INSERT INTO public.\"Inventorizations\"(\"Id\", \"Company\", \"CreatedAt\", \"Date\") VALUES(:Id, :Company, :CreatedAt, :Date)";
+                    cmd.CommandText = @"INSERT INTO public.""Inventorizations""(""Id"", ""Company"", ""CreatedAt"", ""Name"", ""Date"") VALUES(:Id, :Company, :CreatedAt, :Name, :Date)";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", id));
                     cmd.Parameters.Add(new NpgsqlParameter("Company", companyId));
+                    cmd.Parameters.Add(new NpgsqlParameter("Name", name));
                     cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", DateTime.UtcNow));
                     cmd.Parameters.Add(new NpgsqlParameter("Date", date ?? DateTime.UtcNow));
                     cmd.ExecuteNonQuery();
 
-                    cmd.CommandText = "SELECT * FROM public.\"Inventorizations\" WHERE \"Id\" = @Id";
+                    cmd.CommandText = @"SELECT * FROM public.""Inventorizations"" WHERE ""Id"" = @Id";
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())

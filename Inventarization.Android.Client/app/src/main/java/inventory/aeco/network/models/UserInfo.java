@@ -11,7 +11,6 @@ public class UserInfo
     public String Token;
     public String Error;
     public String FullName;
-    public Inventorization[] Inventorizations;
     public boolean IsAuthorized;
     public String Username;
     public String Password;

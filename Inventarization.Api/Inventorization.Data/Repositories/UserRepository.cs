@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Inventorization.Business.Interfaces;
 using Inventorization.Business.Model;
 using Inventorization.Data.Support;
 using Npgsql;
 
 namespace Inventorization.Data.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
 
         private readonly string _connectionString;
@@ -51,20 +52,20 @@ namespace Inventorization.Data.Repositories
 
         public void UpdateUserData(User user)
         {
-            User result = new User();
             using (var conn = new NpgsqlConnection(_connectionString))
             {
                 conn.Open();
                 using (var cmd = new NpgsqlCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = @"UPDATE public.""Users"" SET ""Id"" = @id,
+                    cmd.CommandText = @"UPDATE public.""Users"" SET
                         ""FirstName"" = @FirstName, 
                         ""FamilyName"" =  @FamilyName, 
                         ""Login"" = @Login,
                         ""Password"" = @Password,
                         ""CreatedAt"" = @CreatedAt,
-                        ""Level"" = @Level
+                        ""Level"" = @Level,
+                        ""Inventorization"" = @Inventorization
                         WHERE ""Id"" = @Id";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", user.Id));
                     cmd.Parameters.Add(new NpgsqlParameter("FirstName", user.FirstName));
@@ -73,11 +74,46 @@ namespace Inventorization.Data.Repositories
                     cmd.Parameters.Add(new NpgsqlParameter("Password", user.Password));
                     cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", user.CreatedAt));
                     cmd.Parameters.Add(new NpgsqlParameter("Level", (int)user.Level));
+                    cmd.Parameters.Add(new NpgsqlParameter("Inventorization", user.Inventorization));
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
+        public void Assign(Guid userId, Guid? inventorizationId)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"UPDATE public.""Users"" SET
+                        ""Inventorization"" = @Inventorization
+                        WHERE ""Id"" = @Id";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", userId));
+                    cmd.Parameters.Add(new NpgsqlParameter("Inventorization", inventorizationId));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void Deassign(Guid userId)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var cmd = new NpgsqlCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = @"UPDATE public.""Users"" SET
+                        ""Inventorization"" = null
+                        WHERE ""Id"" = @Id";
+                    cmd.Parameters.Add(new NpgsqlParameter("Id", userId));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
         public User GetUser(Guid id)
         {
             User result = new User();

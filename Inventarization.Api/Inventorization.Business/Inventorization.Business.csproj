@@ -60,6 +60,7 @@
     <Compile Include="Interfaces\ICompanyRepository.cs" />
     <Compile Include="Interfaces\IInventorizationRepository.cs" />
     <Compile Include="Interfaces\IUsageRepository.cs" />
+    <Compile Include="Interfaces\IUserRepository.cs" />
     <Compile Include="Interfaces\IZoneRepository.cs" />
     <Compile Include="Model\Action.cs" />
     <Compile Include="Model\ActionType.cs" />

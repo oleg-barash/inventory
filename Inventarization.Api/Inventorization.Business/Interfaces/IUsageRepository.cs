@@ -7,7 +7,7 @@ namespace Inventorization.Business.Interfaces
     public interface IUsageRepository
     {
         void CloseUsage(Guid inventorizationId, Guid zoneId, ActionType type, Guid userId);
-        void OpenUsage(Guid inventorizationId, Guid zoneId, ActionType type, Guid userId);
+        void OpenUsage(Guid inventorizationId, Guid zoneId, ActionType type, Guid userId, Guid assignedTo);
         void ReopenUsage(Guid inventorizationId, Guid zoneId, ActionType type, Guid userId);
 
         ZoneUsage GetZoneUsage(Guid inventorizationId, Guid zoneId, ActionType type);

@@ -92,12 +92,10 @@ export function saveInventorization(inventorization, token) {
                 },
                 body: JSON.stringify(inventorization)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw Error(response.statusText);
-                }
+            .then(response => response.json())
+            .then(json => {
                 toastr.success("Информация об инверторизации сохранена")
-                dispatch({ type: INVENTORIZATION_SAVED, inventorization})
+                dispatch({ type: INVENTORIZATION_SAVED, inventorization: json })
             })
             .catch(function () {
                 toastr.error("Произошла ошибка при сохранении информации об инверторизации")

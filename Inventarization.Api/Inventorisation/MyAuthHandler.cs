@@ -23,7 +23,7 @@ namespace Inventorization.Api
         protected override async Task<AuthenticationTicket> AuthenticateCoreAsync()
         {
             var authzValue = Request.Headers.Get("Authorization");
-            string token = string.Empty;
+            string token;
             if (string.IsNullOrEmpty(authzValue) || !authzValue.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
             {
                 var userDataCookie = Request.Cookies["UserData"];
@@ -34,7 +34,7 @@ namespace Inventorization.Api
                     var userInfo = JsonConvert.DeserializeObject<UserInfo>(userDataCookie);
                     token = userInfo.Token;
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     return null;
                 }

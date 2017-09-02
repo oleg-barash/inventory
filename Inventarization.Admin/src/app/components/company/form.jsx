@@ -10,6 +10,9 @@ import TextField from 'material-ui/TextField';
 import { browserHistory } from 'react-router'
 import Divider from 'material-ui/Divider';
 import {
+    INVENTORIZATION_LOADED
+} from '../../constants/actionTypes'
+import {
     validateCompany,
     saveCompany,
     openImportDialog,
@@ -25,6 +28,10 @@ import {
     updateItemsFilter,
     requestItems
 } from '../../actions/dictionaryActions'
+import {
+    loadInventorizations
+} from '../../actions/inventorizationActions'
+
 
 import Dialog from 'material-ui/Dialog';
 import FileInput from 'react-file-input';
@@ -49,13 +56,14 @@ class Form extends Component {
     componentWillMount() {
         if (this.props.userInfo.Token != undefined) {
             this.props.dispatch(fetchItems(this.props.company.Id, {}, this.props.userInfo.Token))
+            this.props.dispatch(loadInventorizations(this.props.userInfo.Token))
         }
         else {
             this.props.dispatch(openInventorizationDialog());
         }
     }
     render() {
-        let { company, userInfo, dispatch, dataForImport, filter } = this.props;
+        let { company, userInfo, inverntorizations, dispatch, dataForImport, filter } = this.props;
         let onNameChange = function (event, value) {
             dispatch(validateCompany({ Name: value }));
         }
@@ -125,6 +133,11 @@ class Form extends Component {
             dispatch(filterItems({ currentPage: filter.currentPage + 1 }))
         };
 
+        let createInventorization = function(){
+            dispatch({type: INVENTORIZATION_LOADED, inventorization: {Company: company.Id, Name: 'Инвентаризация ' + moment().format("YYYY/DD/MM")}});
+            browserHistory.push('/editInventorization?companyId=' + company.Id);
+        }
+
         const actionButtons = [
             <FlatButton style={{ display: this.props.importInProgress ? "none" : "inlineBlock" }} label="Выбрать" keyboardFocused={true}>
                 <FileInput name="dictionaryFile"
@@ -157,7 +170,8 @@ class Form extends Component {
                 </Paper>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
                     <label>Инвенторизации</label>
-                    <Inventorizations inventorizations={_.filter(userInfo.Inventorizations, x => x.Company === company.Id)} />
+                    <Inventorizations inventorizations={_.filter(inverntorizations, x => x.Company === company.Id)} />
+                    <FlatButton label="Добавить новую" onClick={createInventorization} />
                 </Paper>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
                     <FlatButton label="Импорт справочника" hoverColor={green} onClick={handleOpen} />
@@ -198,6 +212,7 @@ class Form extends Component {
 const mapStateToProps = (state) => {
     return {
         userInfo: state.auth,
+        inverntorizations: state.inventorization.list,
         isDialogOpened: state.company.isImportDialogOpened,
         importInProgress: state.company.importInProgress,
         dataForImport: state.company.dataForImport,

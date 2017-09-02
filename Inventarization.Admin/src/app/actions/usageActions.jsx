@@ -1,9 +1,6 @@
 import fetch from 'isomorphic-fetch'
 import {
-    USAGE_OPENED,
-    USAGE_CLOSED,
-    USAGES_LOADED,
-    USAGE_CLEARED
+    USAGE_UPDATED, USAGES_LOADED
 } from '../constants/actionTypes'
 import {toastr} from 'react-redux-toastr'
 
@@ -41,16 +38,15 @@ export function openUsage(zone, inventorizationId, type, userToken) {
                 body: JSON.stringify({ inventorizationId, zoneId: zone.Id, type })
             })
             .then(response => {
-                toastr.success("Зона успешно открыта для " + getTypeText(type))
-                dispatch(usageOpened(zone, type))
-                dispatch(fetchUsages(zone, inventorizationId, userToken))
+                toastr.success(zone.ZoneName + " успешно открыта для " + getTypeText(type));
+                return response.json();
             })
+            .then(json => dispatch(receiveUsages(zone, json)))
     }
 }
 
 export function closeUsage(zone, inventorizationId, type, userToken) {
     return function (dispatch) {
-        debugger;
         return fetch(process.env.API_URL + 'usage/close',
             {
                 method: "POST",
@@ -62,9 +58,10 @@ export function closeUsage(zone, inventorizationId, type, userToken) {
                 body: JSON.stringify({ inventorizationId, zoneId: zone.Id, type })
             })
             .then(response => {
-                dispatch(usageClosed(zone, type))
-                dispatch(fetchUsages(zone, inventorizationId, userToken))
+                toastr.warning(zone.ZoneName + " успешно закрыта для " + getTypeText(type));
+                return response.json();
             })
+            .then(json => dispatch(receiveUsages(zone, json)))
     }
 }
 
@@ -81,33 +78,17 @@ export function clearUsage(zone, inventorizationId, type, userToken) {
                 body: JSON.stringify({ inventorizationId, zoneId: zone.Id, type })
             })
             .then(response => {
-                dispatch(usageCleared(zone))
-                dispatch(fetchUsages(zone, inventorizationId, userToken))
+                toastr.warning("Зона " + zone.ZoneName + " успешно очщена");
+                return response.json();
             })
+            .then(json => dispatch(receiveUsages(zone, json)))
     }
 }
 
-function usageOpened(zone, type) {
+function usageUpdated(usage) {
     return {
-        type: USAGE_OPENED,
-        zone: zone,
-        usageType: type
-    }
-}
-
-function usageClosed(zone, type) {
-    return {
-        type: USAGE_CLOSED,
-        zone: zone,
-        usageType: type
-    }
-}
-
-function usageCleared(zone, type) {
-    return {
-        type: USAGE_CLEARED,
-        zone: zone,
-        usageType: type
+        type: USAGE_UPDATED,
+        usage
     }
 }
 

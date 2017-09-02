@@ -6,8 +6,8 @@ import { LOGIN_FINISHED,
     LOGOUT, 
     OPEN_INVENTORIZATION_DIALOG, 
     CLOSE_INVENTORIZATION_DIALOG, 
-    INVENTORIZATION_SELECTED,
-    INVENTORIZATION_SAVED } from '../constants/actionTypes'
+    INVENTORIZATION_SELECTED
+} from '../constants/actionTypes'
 import { Cookies } from 'react-cookie';
 
 function isInitializedFunction() {
@@ -34,8 +34,6 @@ export function auth(state = { IsAuthorized: false, InProcess: false, IsInitiali
             return Object.assign({}, state, { SelectedInventorization: action.inventorization });
         case UPDATE_USER_INFO:
             return Object.assign({}, state, action.userInfo);
-        case INVENTORIZATION_SAVED:
-            return Object.assign({}, state, { Inventorizations: _.map(state.Inventorizations, item => item.Id == action.inventorization.Id ? action.inventorization : item) })
         default:
             return state
     }

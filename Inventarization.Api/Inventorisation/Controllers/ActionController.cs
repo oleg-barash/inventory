@@ -9,6 +9,8 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Inventorization.Api.ViewModels.Builders;
+using Action = Inventorization.Business.Model.Action;
 
 namespace Inventorization.Api.Controllers
 {
@@ -17,23 +19,29 @@ namespace Inventorization.Api.Controllers
     [Authorize]
     public class ActionController : ApiController
     {
-        private IActionRepository _actionRepository;
-        private IZoneRepository _zoneRepository;
-        private ICompanyRepository _companyRepository;
-        private IUsageRepository _usageRepository;
-        private IInventorizationRepository _inventorizationRepository;
-        
+        private readonly IActionRepository _actionRepository;
+        private readonly IZoneRepository _zoneRepository;
+        private readonly ICompanyRepository _companyRepository;
+        private readonly IUsageRepository _usageRepository;
+        private readonly IInventorizationRepository _inventorizationRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IUsageBuilder _usageBuilder;
+
         public ActionController(IActionRepository actionRepository
             , IZoneRepository zoneRepository
             , ICompanyRepository companyRepository
             , IInventorizationRepository inventorizationRepository
-            , IUsageRepository usageRepository)
+            , IUsageRepository usageRepository
+            , IUserRepository userRepository
+            , IUsageBuilder usageBuilder)
         {
             _actionRepository = actionRepository;
             _zoneRepository = zoneRepository;
             _companyRepository = companyRepository;
             _inventorizationRepository = inventorizationRepository;
             _usageRepository = usageRepository;
+            _userRepository = userRepository;
+            _usageBuilder = usageBuilder;
         }
 
         [HttpGet]
@@ -45,20 +53,14 @@ namespace Inventorization.Api.Controllers
             var company = _inventorizationRepository.GetInventorization(action.Inventorization).Company;
             var items = _companyRepository.GetItems(company, new[] { action.BarCode });
             List<ZoneUsage> states = _usageRepository.GetZoneUsages(action.Inventorization).Where(x => x.ZoneId != zone.Id).ToList();
+
             var foundItem = items.FirstOrDefault(i => i.Code == action.BarCode);
 
             var zoneVm = new ZoneViewModel()
             {
                 Id = zone.Id,
                 Number = zone.Number,
-                Usages = states.Select(state => new ZoneUsageViewModel
-                {
-                    Type = state.Type,
-                    OpenedAt = state.OpenedAt,
-                    OpenedBy = state.OpenedBy,
-                    ClosedAt = state?.ClosedAt,
-                    ClosedBy = state?.ClosedBy,
-                }).ToArray(),
+                Usages = _usageBuilder.GetUsageViewModels(states).ToArray(),
 
                 ZoneName = zone.Name
             };
@@ -77,6 +79,8 @@ namespace Inventorization.Api.Controllers
             };
             return Request.CreateResponse(HttpStatusCode.OK, res);
         }
+
+
 
 
         [HttpPost]

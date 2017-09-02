@@ -18,18 +18,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -139,11 +146,11 @@ public class BlindScanActivity extends Activity {
                                     params.put("ZoneId", currentZone);
                                     params.put("InventorizationId", currentInventorization);
                                     params.put("Type", currentActionType.toString());
-                                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, Configuration.BaseUrl + "usage/close"
-                                            , new JSONObject(params),
-                                            new Response.Listener<JSONObject>() {
+                                    JsonRequest<Object> request = new JsonRequest<Object>(Request.Method.POST, Configuration.BaseUrl + "usage/close"
+                                            , (new JSONObject(params)).toString(),
+                                            new Response.Listener<Object>() {
                                                 @Override
-                                                public void onResponse(JSONObject response) {
+                                                public void onResponse(Object response) {
                                                     showToast("Зона закрыта");
                                                     Intent intent = new Intent(BlindScanActivity.this, ZoneSelectActivity.class);
                                                     Bundle extras = new Bundle();
@@ -167,6 +174,17 @@ public class BlindScanActivity extends Activity {
                                             }
                                         }
                                     }) {
+                                        @Override
+                                        protected Response parseNetworkResponse(NetworkResponse response) {
+                                            try {
+                                                String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                                                return Response.success(new JSONArray(jsonString),HttpHeaderParser.parseCacheHeaders(response));
+                                            } catch (UnsupportedEncodingException e) {
+                                                return Response.error(new ParseError(e));
+                                            } catch (JSONException je) {
+                                                return Response.error(new ParseError(je));
+                                            }
+                                        }
                                         @Override
                                         public Map<String, String> getHeaders() {
                                             Map<String, String> headers = new HashMap<>();

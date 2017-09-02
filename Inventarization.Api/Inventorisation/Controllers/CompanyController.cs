@@ -120,18 +120,11 @@ namespace Inventorization.Api.Controllers
             {
                 Request.CreateResponse(HttpStatusCode.NotFound);
             }
-            if (inventorization.Company != id)
+            if (inventorization != null && inventorization.Company != id)
             {
                 Request.CreateResponse(HttpStatusCode.BadRequest);
             }
             return Request.CreateResponse(HttpStatusCode.OK, inventorization);
-        }
-
-        [HttpPost]
-        [Route("{id}/inventorization")]
-        public HttpResponseMessage CreateInventorization(Guid id, [FromBody]DateTime? date)
-        {
-            return Request.CreateResponse(HttpStatusCode.Created, _inventorizationRepository.CreateInventorization(id, date ?? DateTime.UtcNow));
         }
 
         [HttpGet]

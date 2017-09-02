@@ -4,6 +4,7 @@ using Microsoft.Practices.Unity;
 using NLog;
 using System.Configuration;
 using System.Web.Http;
+using Inventorization.Api.ViewModels.Builders;
 using Inventorization.Data.Repositories;
 using Unity.WebApi;
 
@@ -26,7 +27,8 @@ namespace Inventorization.Api
             container.RegisterInstance<TaskRepository>(new TaskRepository(connectionString));
             container.RegisterInstance<IZoneRepository>(new ZoneRepository(connectionString));
             container.RegisterInstance<IUsageRepository>(new UsageRepository(connectionString));
-            container.RegisterInstance<UserRepository>(new UserRepository(connectionString));
+            container.RegisterType<IUsageBuilder, UsageBuilder>();
+            container.RegisterInstance<IUserRepository>(new UserRepository(connectionString));
             
 
 

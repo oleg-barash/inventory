@@ -33,16 +33,22 @@ import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -238,7 +244,7 @@ public class ActionActivity extends Activity {
                         try {
                             ObjectMapper mapper = new ObjectMapper();
                             Zone zone = mapper.readValue(response, Zone.class);
-                            zone_title.setText(zone.Name);
+                            zone_title.setText(zone.Name + "(" + getActionTypeText(currentActionType) + ")");
                         }
                         catch (IOException exception){
                             Log.e(TAG, "Error parsing zone: " + response);
@@ -261,6 +267,15 @@ public class ActionActivity extends Activity {
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(stringRequest);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+    }
+
+    private String getActionTypeText(ActionType type){
+        switch (type){
+            case FirstScan: return "первое сканирование";
+            case SecondScan: return "второе сканирование";
+            case BlindScan: return "слепой пересчёт";
+            default: return "тип сканирование не определён";
+        }
     }
 
     private void initScan() {
@@ -356,11 +371,11 @@ public class ActionActivity extends Activity {
                                     params.put("ZoneId", currentZone);
                                     params.put("InventorizationId", currentInventorization);
                                     params.put("Type", currentActionType.toString());
-                                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, Configuration.BaseUrl + "usage/close"
-                                            , new JSONObject(params),
-                                            new Response.Listener<JSONObject>() {
+                                    JsonRequest<Object> request = new JsonRequest<Object>(Request.Method.POST, Configuration.BaseUrl + "usage/close"
+                                            , (new JSONObject(params)).toString(),
+                                            new Response.Listener<Object>() {
                                                 @Override
-                                                public void onResponse(JSONObject response) {
+                                                public void onResponse(Object response) {
                                                     showToast("Зона закрыта");
                                                     Intent intent = new Intent(ActionActivity.this, ZoneSelectActivity.class);
                                                     Bundle extras = new Bundle();
@@ -385,6 +400,17 @@ public class ActionActivity extends Activity {
                                             }
                                         }
                                     }){
+                                        @Override
+                                        protected Response parseNetworkResponse(NetworkResponse response) {
+                                            try {
+                                                String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                                                return Response.success(new JSONArray(jsonString),HttpHeaderParser.parseCacheHeaders(response));
+                                            } catch (UnsupportedEncodingException e) {
+                                                return Response.error(new ParseError(e));
+                                            } catch (JSONException je) {
+                                                return Response.error(new ParseError(je));
+                                            }
+                                        }
                                         @Override
                                         public Map<String, String> getHeaders(){
                                             Map<String, String> headers = new HashMap<>();

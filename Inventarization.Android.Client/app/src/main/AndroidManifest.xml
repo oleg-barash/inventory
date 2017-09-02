@@ -56,7 +56,7 @@
         </activity>
         <activity
             android:name=".aeco.BlindScanActivity"
-            android:label="@string/title_activity_blind_scan"></activity>
+            android:label="@string/title_activity_blind_scan" />
     </application>
 
 </manifest>

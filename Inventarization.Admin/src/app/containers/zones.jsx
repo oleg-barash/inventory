@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import List from '../components/zone/list'
 import { fetchZones } from '../actions/zoneActions'
 import { fetchActions } from '../actions/actionActions'
+import { openInventorizationDialog } from '../actions/authorizationActions'
 
 const mapStateToProps = (state) => {
     return {

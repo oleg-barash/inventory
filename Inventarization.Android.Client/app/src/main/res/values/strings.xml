@@ -62,4 +62,5 @@
     <string name="second_scan">Second scan</string>
     <string name="blind_scan">Blind scan</string>
     <string name="pick_zone">Pick zone</string>
+    <string name="title_activity_select_inventorization">SelectInventorization</string>
 </resources>

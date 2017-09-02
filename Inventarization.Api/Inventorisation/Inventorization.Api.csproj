@@ -255,6 +255,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\User.cs" />
+    <Compile Include="ViewModels\Builders\UsageBuilder.cs" />
     <Compile Include="ViewModels\CloseZoneVM.cs" />
     <Compile Include="ViewModels\CreateItemViewModel.cs" />
     <Compile Include="ViewModels\ImportItemsErrorVM.cs" />

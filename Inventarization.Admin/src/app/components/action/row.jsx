@@ -51,7 +51,7 @@ class Row extends Component {
         }
         return (
             <TableRow style={rowStyle}>
-                <TableRowColumn style={{width: '200px'}}>{action.Description}</TableRowColumn>
+                <TableRowColumn style={{width: '200px'}}>{action.Name}</TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}>{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}><small>{getTypeName(action.Type)}</small></TableRowColumn>
                 {/*<TableRowColumn >{action.User}</TableRowColumn>*/}

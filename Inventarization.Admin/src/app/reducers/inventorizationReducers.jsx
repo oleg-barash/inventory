@@ -25,14 +25,23 @@ export default function inventorization(state = def, action) {
         case INVENTORIZATION_SAVING:
             return Object.assign({}, state, { isLoading: true })
         case INVENTORIZATION_SAVED:
-            return Object.assign({}, state, { isLoading: false, list: _.map(state.list, item =>{ item.Id == action.inventorization.Id ? action.inventorization : item}) })
+            let inventorizations = state.list;
+            let found = _.find(state.list, item => item.Id == action.inventorization.Id);
+            if (found != null){
+                inventorizations = _.map(state.list, item => item.Id == action.inventorization.Id ? action.inventorization : item);
+            }
+            else{
+                inventorizations.push(action.inventorization);
+            }
+            return Object.assign({}, state, { Inventorizations: inventorizations})
         case INVENTORIZATION_LOADED:
             return Object.assign({}, state, { isLoading: false, inventorization: action.inventorization })
         case HIDE_INVENTORIZATION_LOADING:
             return Object.assign({}, state, { isLoading: false })
         case VALIDATE_INVENTORIZATION:
-            action.inventorization.NameError = !!action.inventorization.Name ? '' : 'Укажите название инвентаризации';
             let inventorization = Object.assign({}, state.inventorization, action.inventorization);
+            inventorization.NameError = !!inventorization.Name ? '' : 'Укажите название инвентаризации';
+            inventorization.DateError = !!inventorization.Date ? '' : 'Укажите дату инвентаризации';
             return Object.assign({}, state, { isLoading: false, inventorization })
         case INVENTORIZATION_LIST_LOADING:
             return Object.assign({}, state, { isListLoading: true })

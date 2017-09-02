@@ -57,9 +57,9 @@ class ReportPage extends AuthorizedComponent {
                     <Tab label="Сотрудники">
                         <ul>
                             {
-                                users.map(user => {
+                                users !== undefined ? users.map(user => {
                                     return <li user={user} key={user.Login}>{user.Login}</li>
-                                })
+                                }) : null
                             }
                         </ul>
                     </Tab>
@@ -70,6 +70,7 @@ class ReportPage extends AuthorizedComponent {
 }
 
 const mapStateToProps = (state) => {
+    debugger
     return {
         userInfo: state.auth,
         dispatch: state.dispatch,

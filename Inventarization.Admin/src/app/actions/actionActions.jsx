@@ -57,7 +57,7 @@ export function saveAction(action, inventorization, userToken){
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(Object.assign({}, action, { Zone: action.Zone.ZoneId}))})
+                    body: JSON.stringify(Object.assign({}, action, { Zone: action.Zone.Id}))})
                 .then(response => { return response.json()})
                 .then(response => {
                     if (typeof response === "string" || response.ErrorMessage){

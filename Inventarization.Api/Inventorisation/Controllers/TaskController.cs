@@ -7,7 +7,7 @@ namespace Inventorization.Api.Controllers
 {
     public class TaskController : ApiController
     {
-        private TaskRepository _taskRepository;
+        private readonly TaskRepository _taskRepository;
         public TaskController(TaskRepository taskRepository)
         {
             _taskRepository = taskRepository;

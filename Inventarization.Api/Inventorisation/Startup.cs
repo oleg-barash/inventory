@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Inventorization.Business.Interfaces;
 using Inventorization.Data.Repositories;
 using Thinktecture.IdentityModel.Owin;
 
@@ -42,7 +43,7 @@ namespace Inventorization
         }
         private async Task<IEnumerable<Claim>> Authenticate(string username, string password)
         {
-            Business.Model.User user = (GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(UserRepository)) as UserRepository).GetUserByLogin(username);
+            Business.Model.User user = (GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IUserRepository)) as IUserRepository).GetUserByLogin(username);
             if (user != null && user.Password == password)
             {
                 return new List<Claim> {

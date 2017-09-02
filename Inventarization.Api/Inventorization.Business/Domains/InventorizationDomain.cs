@@ -36,15 +36,22 @@ namespace Inventorization.Business.Domains
         {
             return actionRepository.GetActionsByInventorization(inventorizationId);
         }
+
+        public List<Model.Inventorization> GetAll()
+        {
+            return inventorizationRepository.GetInventorizations();
+        }
+
         public List<Model.Action> GetActionsByCode(Guid inventorizationId, string code)
         {
             return actionRepository.GetActionsByCode(inventorizationId, code);
         }
         public void UpdateRests(Guid inventorizationId, List<Rests> rests)
         {
-            IEnumerable<Rests> oldRests = inventorizationRepository.GetRests(inventorizationId);
-            IEnumerable<Rests> existedRests = rests.Where(x => oldRests.Any(r => r.Code == x.Code));
-            IEnumerable<Rests> newRests = rests.Except(existedRests);
+            rests = rests.Where(x => !string.IsNullOrWhiteSpace(x.Code)).ToList();
+            List<Rests> oldRests = inventorizationRepository.GetRests(inventorizationId);
+            List<Rests> existedRests = rests.Where(x => oldRests.Any(r => r.Code == x.Code)).ToList();
+            List<Rests> newRests = rests.Except(existedRests).ToList();
             inventorizationRepository.UpdateRests(inventorizationId, existedRests);
             inventorizationRepository.AddRests(inventorizationId, newRests);
         }
@@ -66,6 +73,7 @@ namespace Inventorization.Business.Domains
 
             return item;
         }
+
 
     }
 }

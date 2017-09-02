@@ -5,11 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -26,6 +28,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +58,7 @@ public class LoginActivity
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
+    private TextView information;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +68,7 @@ public class LoginActivity
         // Set up the login form.
         mLoginView = (AutoCompleteTextView) findViewById(R.id.login);
         populateAutoComplete();
-
+        information = (TextView) findViewById(R.id.information);
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -223,11 +226,26 @@ public class LoginActivity
         mLoginView.setAdapter(adapter);
     }
 
+    private void showToast(CharSequence text){
+        Context appContext = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(appContext, text, duration);
+        toast.show();
+    }
+
+
     @Override
     public void OnLogin(UserInfo result) {
         showProgress(false);
 
         if (result.IsAuthorized) {
+
+            if (result.DefaultInventorization == null){
+                showToast("Вы не назначены на инвенторизацию");
+                information.setText("Вы не назначены на инвенторизацию");
+                return;
+            }
+            information.setText("");
             SharedPreferences settings = getSharedPreferences("UserInfo", 0);
             SharedPreferences.Editor editor = settings.edit();
             editor.putString("login", result.Username);

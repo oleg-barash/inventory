@@ -179,7 +179,7 @@ public class ZoneSelectActivity extends Activity {
                 setState(ZoneActivityStates.ZoneFound);
                 if (error.networkResponse != null) {
                     if (error.networkResponse.statusCode == 403) {
-                        String message = "Зона уже была закрыта. Для повторного открытия обратитесь к менеджеру или выберите другую зону";
+                        String message = new String(error.networkResponse.data);
                         resultTextView.setText(message);
                         showToast(message);
                     } else {

@@ -11,7 +11,7 @@ namespace Inventorization.Data
     public class UsageRepository : IUsageRepository
     {
 
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public UsageRepository(string connectionString)
         {
@@ -59,15 +59,8 @@ namespace Inventorization.Data
                     cmd.Parameters.Add(new NpgsqlParameter("type", Enum.GetName(typeof(ActionType), type)));
                     using (var reader = cmd.ExecuteReader())
                     {
-                        if (reader.HasRows)
-                        {
-                            reader.Read();
-                            return reader.ToZoneState();
-                        }
-                        else
-                        {
-                            return null;
-                        }
+                        reader.Read();
+                        return reader.ToZoneState();
                     }
                 }
             }
@@ -112,13 +105,13 @@ namespace Inventorization.Data
                     cmd.Parameters.Add(new NpgsqlParameter("id", inventorizationId));
                     cmd.Parameters.Add(new NpgsqlParameter("date", DateTime.UtcNow));
                     cmd.Parameters.Add(new NpgsqlParameter("user", userId));
-                    cmd.Parameters.Add(new NpgsqlParameter("type", type));
+                    cmd.Parameters.Add(new NpgsqlParameter("type", Enum.GetName(typeof(ActionType), type)));
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        public void OpenUsage(Guid inventorizationId, Guid zoneId, ActionType type, Guid userId)
+        public void OpenUsage(Guid inventorizationId, Guid zoneId, ActionType type, Guid userId, Guid assignedAt)
         {
             var zoneUsage = GetZoneUsages(inventorizationId, zoneId);
 
@@ -133,9 +126,10 @@ namespace Inventorization.Data
                         ReopenUsage(inventorizationId, zoneId, type, userId);
                         return;
                     }
-                    cmd.CommandText = @"INSERT INTO public.""ZoneUsages""(""ZoneId"", ""InventorizationId"", ""OpenedAt"", ""OpenedBy"", ""Type"") VALUES(:ZoneId, :InventorizationId, :OpenedAt, :OpenedBy, :Type)";
+                    cmd.CommandText = @"INSERT INTO public.""ZoneUsages""(""ZoneId"", ""InventorizationId"", ""OpenedAt"", ""OpenedBy"", ""Type"", ""AssignedAt"") VALUES(:ZoneId, :InventorizationId, :OpenedAt, :OpenedBy, :Type, :AssignedAt)";
                     cmd.Parameters.Add(new NpgsqlParameter("OpenedAt", DateTime.UtcNow));
                     cmd.Parameters.Add(new NpgsqlParameter("OpenedBy", userId));
+                    cmd.Parameters.Add(new NpgsqlParameter("AssignedAt", assignedAt));
                     cmd.Parameters.Add(new NpgsqlParameter("ZoneId", zoneId));
                     cmd.Parameters.Add(new NpgsqlParameter("InventorizationId", inventorizationId));
                     cmd.Parameters.Add(new NpgsqlParameter("Type", Enum.GetName(typeof(ActionType), type)));
@@ -153,7 +147,7 @@ namespace Inventorization.Data
                 {
                     Guid newId = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = @"UPDATE public.""ZoneUsages"" SET ""ClosedAt""=null, ""OpenedAt"" = :OpenedAt, ""OpenedBy"" = :OpenedBy WHERE ""ZoneId"" = :ZoneId AND ""InventorizationId"" = :InventorizationId AND ""Type"" = :Type";
+                    cmd.CommandText = @"UPDATE public.""ZoneUsages"" SET ""ClosedAt""=null, ""ClosedBy""=null, ""OpenedAt"" = :OpenedAt, ""OpenedBy"" = :OpenedBy WHERE ""ZoneId"" = :ZoneId AND ""InventorizationId"" = :InventorizationId AND ""Type"" = :Type";
                     cmd.Parameters.Add(new NpgsqlParameter("ZoneId", zoneId));
                     cmd.Parameters.Add(new NpgsqlParameter("OpenedAt", DateTime.UtcNow));
                     cmd.Parameters.Add(new NpgsqlParameter("OpenedBy", userId));
