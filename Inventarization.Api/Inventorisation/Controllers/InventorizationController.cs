@@ -12,8 +12,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Inventorization.Api.Models;
 using Inventorization.Api.ViewModels.Builders;
 
 namespace Inventorization.Api.Controllers
@@ -33,7 +35,7 @@ namespace Inventorization.Api.Controllers
         private readonly ZoneDomain _zoneDomain;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private static readonly bool UndefinedItemAllowed = false;
-
+        private readonly ActionsHub _actionHub;
         static InventorizationController()
         {
             UndefinedItemAllowed = Boolean.Parse(ConfigurationManager.AppSettings["UndefinedItemAllowed"]);
@@ -46,7 +48,8 @@ namespace Inventorization.Api.Controllers
             , IUsageBuilder usageBuilder
             , ActionDomain actionDomain
             , InventorizationDomain inventorizationDomain
-            , ZoneDomain zoneDomain)
+            , ZoneDomain zoneDomain
+            , ActionsHub actionHub)
         {
             _inventorizationRepository = inventorizationRepository;
             _zoneRepository = zoneRepository;
@@ -56,6 +59,7 @@ namespace Inventorization.Api.Controllers
             _inventorizationDomain = inventorizationDomain;
             _zoneDomain = zoneDomain;
             _usageBuilder = usageBuilder;
+            _actionHub = actionHub;
         }
 
         [HttpGet]
@@ -167,6 +171,7 @@ namespace Inventorization.Api.Controllers
         {
             try
             {
+                
                 var userClaims = Request.GetOwinContext().Authentication.User;
 
                 Business.Model.Action action = new Business.Model.Action()
@@ -201,6 +206,8 @@ namespace Inventorization.Api.Controllers
                 {
 
                     Business.Model.Action updatedAction = _actionDomain.UpsertAction(action);
+                    _actionHub.AddAction(updatedAction);
+                    
                     return Request.CreateResponse(HttpStatusCode.OK, new {foundItem, action = updatedAction});
 
                 }

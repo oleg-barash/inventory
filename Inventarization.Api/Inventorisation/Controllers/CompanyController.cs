@@ -22,8 +22,8 @@ namespace Inventorization.Api.Controllers
     [Authorize]
     public class CompanyController : ApiController
     {
-        private ICompanyRepository _companyRepository;
-        private IInventorizationRepository _inventorizationRepository;
+        private readonly ICompanyRepository _companyRepository;
+        private readonly IInventorizationRepository _inventorizationRepository;
         private IActionRepository _actionRepository;
         
         public CompanyController(ICompanyRepository companyRepository, IInventorizationRepository inventorizationRepository, IActionRepository actionRepository)
@@ -68,7 +68,7 @@ namespace Inventorization.Api.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
-            return Request.CreateResponse(HttpStatusCode.Created, _companyRepository.CreateCompany(company.Name));
+            return Request.CreateResponse(HttpStatusCode.Created, _companyRepository.CreateCompany(company));
         }
 
         [HttpPost, Route("save")]
@@ -84,7 +84,7 @@ namespace Inventorization.Api.Controllers
             var userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
             if (company.Id == Guid.Empty)
             {
-                return Request.CreateResponse(HttpStatusCode.Created, _companyRepository.CreateCompany(company.Name));
+                return Request.CreateResponse(HttpStatusCode.Created, _companyRepository.CreateCompany(company));
             }
             else
             {

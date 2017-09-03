@@ -1,4 +1,4 @@
-import React, { Component }  from 'react';
+import React, { Component } from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import AppBar from 'material-ui/AppBar';
@@ -9,7 +9,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { Provider } from 'react-redux'
 import { createLogger } from 'redux-logger'
-import {reducer as toastrReducer} from 'react-redux-toastr'
+import { reducer as toastrReducer } from 'react-redux-toastr'
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import ReduxToastr from 'react-redux-toastr'
 import PropTypes from 'prop-types';
@@ -41,92 +41,77 @@ import { browserHistory } from 'react-router'
 
 const defaultWait = 30000
 const defaultThrottleOption = {
-  leading: true,
-  trailing: true
+    leading: true,
+    trailing: true
 }
 
 const throttleMiddleware = throttle(defaultWait, defaultThrottleOption);
 
-let _hub;
-function signalRMiddleware(store) {
+function authCookies({ getState }) {
     return (next) => (action) => {
-        if (action.signalR) {
+        let returnValue = next(action)
+        if (typeof document !== "undefined") { // на сервере фиг знает как выставить куки в этом middleware
+            let state = getState();
             switch (action.type) {
-                case ABC:
-                    _hub.server.methodOnTheServer();
-                    break;
-                default:
-                    {
-                        const myCurrentState = store.getState().objectWithinState;
-                        _hub.server.methodOnTheServer2(action.type, myCurrentState);
+                case LOGIN_FINISHED:
+                    if (action.userInfo.IsAuthorized) {
+                        action.userInfo.Token = "Basic " + btoa(action.userInfo.Username + ":" + action.userInfo.Password)
+                        state.auth = action.userInfo
+                        document.cookie = "UserData=" + JSON.stringify(action.userInfo)
+                        browserHistory.push('/items');
                     }
+                    else {
+                        delete document.cookie;
+                        browserHistory.push('/login');
+                    }
+                    break
+                case INVENTORIZATION_SELECTED:
+                    //browserHistory.push('/items');
+                    state.auth.SelectedInventorization = action.inventorization;
+                    document.cookie = "UserData=" + JSON.stringify(state.auth);
+                    break
+                case LOGOUT:
+                    document.cookie = "UserData="
+                    browserHistory.push('/login');
+                    break
+                case ACTION_SAVED:
+                    browserHistory.push('/editAction?id=' + action.id);
             }
         }
-        return next(action);
+
+        return returnValue
     }
-}
-
-
-function authCookies({ getState }) {
-  return (next) => (action) => {
-    let returnValue = next(action)
-    if (typeof document !== "undefined"){ // на сервере фиг знает как выставить куки в этом middleware
-        let state = getState();
-        switch (action.type){
-            case LOGIN_FINISHED:
-                if (action.userInfo.IsAuthorized){
-                    action.userInfo.Token = "Basic " + btoa(action.userInfo.Username + ":" + action.userInfo.Password)
-                    state.auth = action.userInfo
-                    document.cookie = "UserData=" + JSON.stringify(action.userInfo)
-                    browserHistory.push('/items');
-                }
-                else{
-                    delete document.cookie;
-                    browserHistory.push('/login');
-                }
-                break
-            case INVENTORIZATION_SELECTED:
-                //browserHistory.push('/items');
-                state.auth.SelectedInventorization = action.inventorization;
-                document.cookie = "UserData=" + JSON.stringify(state.auth);
-                break
-            case LOGOUT:
-                document.cookie = "UserData="
-                browserHistory.push('/login');
-                break
-            case ACTION_SAVED:
-                browserHistory.push('/editAction?id=' + action.id);
-        }
-    }
-
-    return returnValue
-  }
 }
 
 injectTapEventPlugin();
 const loggerMiddleware = createLogger()
-const middleware = [thunkMiddleware,loggerMiddleware,throttleMiddleware, authCookies, signalRMiddleware];
+const middleware = [thunkMiddleware
+    , loggerMiddleware
+    , throttleMiddleware
+    , authCookies];
 let store = createStore(
-    combineReducers({ actions: actionList, 
-        items: itemList, 
-        zones: zoneList, 
-        toastr: toastrReducer, 
-        item, 
-        action, 
-        auth, 
-        global, 
-        users, 
-        user, 
-        report, 
-        rests, 
-        company, 
+    combineReducers({
+        actions: actionList,
+        items: itemList,
+        zones: zoneList,
+        toastr: toastrReducer,
+        item,
+        action,
+        auth,
+        global,
+        users,
+        user,
+        report,
+        rests,
+        company,
         inventorization,
-        dictionary  }),
+        dictionary
+    }),
     applyMiddleware(...middleware));
 
 
 const propTypes = {
- children: PropTypes.node
+    children: PropTypes.node
 };
 
 class App extends Component {
@@ -134,42 +119,43 @@ class App extends Component {
         super(props);
     }
     render() {
-        let {dispatch} = this.props;
+        let { dispatch } = this.props;
         const childrenWithCookies = React.Children.map(this.props.children,
-            (child) => React.cloneElement(child, 
+            (child) => React.cloneElement(child,
                 {
                     cookies: this.props.cookies
                 })
-            );
-        let handleToggle = function(){
+        );
+        let handleToggle = function () {
             store.dispatch(toggleDrawer());
         };
+
         return (
-            
-        <MuiThemeProvider>
-            <Provider store={store}>
-                <div>
-                    <AppBar title="Инвентаризация" 
-                        onLeftIconButtonTouchTap={handleToggle}
-                        iconClassNameRight="muidocs-icon-navigation-expand-more"
-                        iconElementRight={<AuthStatus cookies={this.props.cookies}/>}
-                    />
-                    <LeftMenu/>
+
+            <MuiThemeProvider>
+                <Provider store={store}>
                     <div>
-                        { childrenWithCookies }
-                        <ReduxToastr
-                            timeOut={4000}
-                            newestOnTop={false}
-                            preventDuplicates={true}
-                            position="top-left"
-                            transitionIn="fadeIn"
-                            transitionOut="fadeOut"
-                            progressBar/>
+                        <AppBar title="Инвентаризация"
+                            onLeftIconButtonTouchTap={handleToggle}
+                            iconClassNameRight="muidocs-icon-navigation-expand-more"
+                            iconElementRight={<AuthStatus cookies={this.props.cookies} />}
+                        />
+                        <LeftMenu />
+                        <div>
+                            {childrenWithCookies}
+                            <ReduxToastr
+                                timeOut={4000}
+                                newestOnTop={false}
+                                preventDuplicates={true}
+                                position="top-left"
+                                transitionIn="fadeIn"
+                                transitionOut="fadeOut"
+                                progressBar />
+                        </div>
+                        <InventorizationDialog cookies={this.props.cookies} />
                     </div>
-                    <InventorizationDialog cookies={this.props.cookies}/>
-                </div>
-            </Provider>
-        </MuiThemeProvider>);
+                </Provider>
+            </MuiThemeProvider>);
     }
 }
 App.propTypes = propTypes;

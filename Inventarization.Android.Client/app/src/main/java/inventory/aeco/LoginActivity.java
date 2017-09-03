@@ -248,6 +248,7 @@ public class LoginActivity
             information.setText("");
             SharedPreferences settings = getSharedPreferences("UserInfo", 0);
             SharedPreferences.Editor editor = settings.edit();
+            editor.putString("name", result.FullName);
             editor.putString("login", result.Username);
             editor.putString("token", result.Token);
             editor.putString("inventorization", result.DefaultInventorization.Id.toString());

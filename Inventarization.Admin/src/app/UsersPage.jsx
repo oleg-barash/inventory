@@ -38,7 +38,7 @@ class UsersPage extends AuthorizedComponent {
     return (
           <div>
               <h2 style={styles.headline}>Пользователи</h2>
-              <Users users={users.list}/>
+              <Users users={users.list || []}/>
           </div>
     )};
 }

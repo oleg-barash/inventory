@@ -11,6 +11,7 @@
             "program": "${workspaceRoot}\\server.js",
             "env": { 
                 "PORT": "90",
+                "SIGNALR_HUBS_URL": "http://localhost/signalr/hubs",
                 "API_URL": "http://localhost/api/",
                 "ASSETS_URL": "http://localhost:8050/public/" 
             }

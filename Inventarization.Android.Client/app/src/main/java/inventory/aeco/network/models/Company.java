@@ -9,4 +9,7 @@ import java.util.UUID;
 public class Company {
     public UUID Id;
     public String Name;
+    public String Customer;
+    public String Address;
+    public String Manager;
 }

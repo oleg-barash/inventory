@@ -67,6 +67,15 @@ class Form extends Component {
         let onNameChange = function (event, value) {
             dispatch(validateCompany({ Name: value }));
         }
+        let onCustomerChange = function (event, value) {
+            dispatch(validateCompany({ Customer: value }));
+        }
+        let onAddressChange = function (event, value) {
+            dispatch(validateCompany({ Address: value }));
+        }
+        let onManagerChange = function (event, value) {
+            dispatch(validateCompany({ Manager: value }));
+        }
 
         let goBack = function () {
             browserHistory.push('/companies');
@@ -133,8 +142,8 @@ class Form extends Component {
             dispatch(filterItems({ currentPage: filter.currentPage + 1 }))
         };
 
-        let createInventorization = function(){
-            dispatch({type: INVENTORIZATION_LOADED, inventorization: {Company: company.Id, Name: 'Инвентаризация ' + moment().format("YYYY/DD/MM")}});
+        let createInventorization = function () {
+            dispatch({ type: INVENTORIZATION_LOADED, inventorization: { Company: company.Id, Name: 'Инвентаризация ' + moment().format("YYYY/DD/MM") } });
             browserHistory.push('/editInventorization?companyId=' + company.Id);
         }
 
@@ -164,9 +173,12 @@ class Form extends Component {
             <div>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
                     <TextField id="Name" hintText="Наименование" floatingLabelText="Название компании" value={company.Name} onChange={onNameChange} errorText={company != null ? company.NameError || '' : ''} />
+                    <TextField id="Customer" hintText="Заказчик" floatingLabelText="Заказчик" value={company.Customer} onChange={onCustomerChange} errorText={company != null ? company.CustomerError || '' : ''} />
+                    <TextField id="Address" hintText="Адрес" floatingLabelText="Адрес" value={company.Address} onChange={onAddressChange} errorText={company != null ? company.AddressError || '' : ''} />
+                    <TextField id="Manager" hintText="Ответственный" floatingLabelText="Ответственный" value={company.Manager} onChange={onManagerChange} errorText={company != null ? company.ManagerError || '' : ''} />
                     <Divider />
                     <FlatButton label="Назад" onClick={goBack} />
-                    <FlatButton disabled={company.Readonly} label="Сохранить" onClick={save} disabled={!!company.NameError} />
+                    <FlatButton disabled={company.Readonly} label="Сохранить" onClick={save} disabled={!!company.HasError} />
                 </Paper>
                 <Paper style={paperStyle} zDepth={3} rounded={false}>
                     <label>Инвенторизации</label>

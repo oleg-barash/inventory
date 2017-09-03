@@ -29,8 +29,11 @@ export default function company(state = { isLoading: false, isListLoading: false
         case HIDE_COMPANY_LOADING:
             return Object.assign({}, state, { isLoading: false })
         case VALIDATE_COMPANY:
-            action.company.NameError = !!action.company.Name ? '' : 'Укажите название компании';
             let company = Object.assign({}, state.company, action.company);
+            company.NameError = !!company.Name ? '' : 'Укажите название компании';
+            company.CustomerError = !!company.Customer ? '' : 'Укажите заказчика';
+            company.AddressError = !!company.Address ? '' : 'Укажите адрес';
+            company.ManagerError = !!company.Manager ? '' : 'Укажите ответственного менеджера';
             return Object.assign({}, state, { isLoading: false, company })
         case COMPANY_LIST_LOADING:
             return Object.assign({}, state, { isListLoading: true })

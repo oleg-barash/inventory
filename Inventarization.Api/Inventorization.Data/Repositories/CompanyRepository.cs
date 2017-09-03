@@ -12,13 +12,13 @@ namespace Inventorization.Data
     public class CompanyRepository : ICompanyRepository
     {
 
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public CompanyRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
-        public Company CreateCompany(string name)
+        public Company CreateCompany(Company company)
         {
             Company result = new Company();
             using (var conn = new NpgsqlConnection(_connectionString))
@@ -28,12 +28,16 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = "INSERT INTO public.\"Companies\"(\"Id\", \"Name\") VALUES(:Id, :Name)";
+                    cmd.CommandText = @"INSERT INTO public.""Companies""(""Id"", ""Name"",""Customer"",""Address"",""Manager"" ) 
+                                VALUES(:Id, :Name, :Customer, :Address, :Manager)";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", id));
-                    cmd.Parameters.Add(new NpgsqlParameter("Name", name));
+                    cmd.Parameters.Add(new NpgsqlParameter("Name", company.Name));
+                    cmd.Parameters.Add(new NpgsqlParameter("Customer", company.Customer));
+                    cmd.Parameters.Add(new NpgsqlParameter("Address", company.Address));
+                    cmd.Parameters.Add(new NpgsqlParameter("Manager", company.Manager));
                     cmd.ExecuteNonQuery();
 
-                    cmd.CommandText = "SELECT * FROM public.\"Companies\" WHERE \"Id\" = @Id";
+                    cmd.CommandText = @"SELECT * FROM public.""Companies"" WHERE ""Id"" = @Id";
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -180,7 +184,7 @@ namespace Inventorization.Data
             return cacheItems;
         }
 
-        private ConcurrentDictionary<int, Item> _itemCache = new ConcurrentDictionary<int, Item>();
+        private readonly ConcurrentDictionary<int, Item> _itemCache = new ConcurrentDictionary<int, Item>();
         public Item GetItem(int itemId)
         {
             Item cacheItem = _itemCache.GetOrAdd(itemId, (id) =>
@@ -268,11 +272,12 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = @"UPDATE public.""Companies"" SET ""Name""=@Name, ""LastUpdatedAt""=@LastUpdatedAt, ""LastUpdatedBy""=@LastUpdatedBy WHERE ""Id"" = @Id";
+                    cmd.CommandText = @"UPDATE public.""Companies"" SET ""Name""=@Name, ""Customer""=@Customer, ""Address""=@Address, ""Manager""=@Manager  WHERE ""Id"" = @Id";
                     cmd.Parameters.Add(new NpgsqlParameter("Id", company.Id));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", company.Name));
-                    cmd.Parameters.Add(new NpgsqlParameter("LastUpdatedAt", DateTime.UtcNow));
-                    cmd.Parameters.Add(new NpgsqlParameter("LastUpdatedBy", userId));
+                    cmd.Parameters.Add(new NpgsqlParameter("Customer", company.Customer));
+                    cmd.Parameters.Add(new NpgsqlParameter("Address", company.Address));
+                    cmd.Parameters.Add(new NpgsqlParameter("Manager", company.Manager));
 
                     cmd.ExecuteNonQuery();
 

@@ -53,6 +53,12 @@ function renderHTML(componentHTML) {
 <body>
   <div id="app"></div>
   <!-- This script adds the Roboto font to our project. For more detail go to this site:  http://www.google.com/fonts#UsePlace:use/Collection:Roboto:400,300,500 -->
+<script
+  src="https://code.jquery.com/jquery-1.12.4.min.js"
+  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+  crossorigin="anonymous"></script>
+  <script src="https://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.js"></script>
+  <script src="${process.env.SIGNALR_HUBS_URL}"></script>
   <script>
     var WebFontConfig = {
       google: { families: [ 'Roboto:400,300,500:latin' ] }

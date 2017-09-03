@@ -32,7 +32,7 @@ let getZoneState = function (zone, actions) {
     if (zone.Usages == undefined || zone.Usages.length == 0){
         return unknown;
     }
-    if (_.some(zone.Usages, { ClosedAt: null})) {
+    if (_.some(zone.Usages, { ClosedAt: null}) || zone.Usages.length == 1) {
         return inProcess;
     }
 

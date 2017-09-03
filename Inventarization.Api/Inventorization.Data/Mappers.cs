@@ -46,7 +46,10 @@ namespace Inventorization.Data
             return new Company()
             {
                 Id = reader.GetGuid(0),
-                Name = reader.GetString(1)
+                Name = reader.GetString(1),
+                Customer = reader.GetString(2),
+                Address = reader.GetString(3),
+                Manager = reader.GetString(4),
             };
         }
 

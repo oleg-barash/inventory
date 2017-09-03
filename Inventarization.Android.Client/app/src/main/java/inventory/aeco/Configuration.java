@@ -7,5 +7,5 @@ package inventory.aeco;
 public class Configuration {
     //public static String BaseUrl = "http://193.124.113.47:81/api/";
     //public static String BaseUrl = "http://192.168.0.101/api/";
-    public static String BaseUrl = "http://192.168.0.104/api/";
+    public static String BaseUrl = "http://192.168.1.66/api/";
 }

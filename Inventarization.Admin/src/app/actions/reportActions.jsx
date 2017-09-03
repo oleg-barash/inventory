@@ -7,8 +7,20 @@ export function loadINV3(inventarizationId, userToken){
             .then(response => response.blob())
             .then(blob => {
                 dispatch(hideLoading())
-                debugger
                 window.open( URL.createObjectURL(blob),'_blank');
+
+            })
+    }
+}
+
+export function loadCustomReport(inventarizationId, type, userToken){
+    return function (dispatch){
+        dispatch(showLoading())
+        return fetch(process.env.API_URL + 'report/'+ inventarizationId + '/custom?type=' + type, { headers: { "Authorization": userToken } })
+            .then(response => response.blob())
+            .then(blob => {
+                dispatch(hideLoading())
+                window.open(URL.createObjectURL(blob),'_blank');
 
             })
     }

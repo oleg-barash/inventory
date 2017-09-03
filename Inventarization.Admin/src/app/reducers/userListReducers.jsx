@@ -5,7 +5,7 @@ export default function users(state = { isFetching: false }, action) {
         case FETCH_USERS:
             return Object.assign({}, state, { isFetching: true });
         case USERS_RECEIVED:
-            return Object.assign({}, state, { isFetching: false, list: action.users });
+            return Object.assign({}, state, { isFetching: false, list: _.sortBy(action.users, x => x.FamilyName + x.FirstName) });
         case USER_DELETED:
             return Object.assign({}, state, { list: _.without(state.list, action.user) });
         case USER_SAVED:

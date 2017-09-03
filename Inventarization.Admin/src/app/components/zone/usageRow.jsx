@@ -16,6 +16,12 @@ import { openUsage, closeUsage, clearUsage } from '../../actions/usageActions';
 import { setCurrentAction } from '../../actions/actionActions';
 import Add from 'material-ui/svg-icons/Content/add';
 import { Link, browserHistory } from 'react-router'
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import moment from 'moment';
+moment.locale("ru-RU")
 import _ from 'lodash'
 
 class UsageRow extends Component {
@@ -53,50 +59,34 @@ class UsageRow extends Component {
             }
         }
 
-        // let getStyle = function(zone){
-        //     switch(zone.Status){
-        //         default:
-        //             return { backgroundColor:  white}
-        //     }
-        // }
         let sum = _.sum(actions.map(a => a.Quantity));
-        let status = "не открыта";
-        if (usage.OpenedAt !== null){
-            if (usage.ClosedAt !== null){
-                status = "закрыта";
+        let status = "не открыт";
+        if (usage.OpenedAt !== null) {
+            if (usage.ClosedAt !== null) {
+                status = "закрыт " + moment(usage.ClosedAt).format('D MMM hh:mm');
             }
-            else status = usage.AssignedAt !== null ? "в работе" : "открыта";
-        } 
-        let assigned = usage.AssignedAt !== null ? usage.AssignedAt : "не назначена";
+            else status = usage.AssignedAt !== null ? "в работе" : "открыт";
+        }
+        let assigned = usage.AssignedAt !== null ? usage.AssignedAt : "не назначен";
         return (
             <TableRow>
                 <TableRowColumn style={{ width: '120px' }}>{getTypeText(usage.Type)}</TableRowColumn>
-                <TableRowColumn style={{ width: '80px' }}>
+                <TableRowColumn style={{ width: '30px' }}>
                     <Link key={zone} to={{ pathname: "/actions", query: { ZoneName: zone.ZoneName, Type: usage.Type } }}>{sum}</Link>
                 </TableRowColumn>
-                <TableRowColumn style={{ width: '80px' }}>{status}</TableRowColumn>
-                <TableRowColumn style={{ width: '200px' }}>{assigned}</TableRowColumn>
+                <TableRowColumn style={{ width: '150px' }}>{status}</TableRowColumn>
+                <TableRowColumn style={{ width: '150px' }}>{assigned}</TableRowColumn>
                 <TableRowColumn >
-                    <FlatButton disabled={!usage.ClosedAt && !!usage.OpenedAt}
-                        hoverColor={blue}
-                        icon={<Add />}
-                        onClick={newAction}
-                    />
-                    <FlatButton disabled={!!usage.OpenedAt && !usage.ClosedAt}
-                        hoverColor={red}
-                        icon={<Replay />}
-                        onClick={openFunc}
-                    />
-                    <FlatButton disabled={!!usage.ClosedAt}
-                        hoverColor={green}
-                        icon={<Done />}
-                        onClick={closeFunc}
-                    />
-                    <FlatButton
-                        hoverColor={red}
-                        icon={<Clear />}
-                        onClick={clearFunc}
-                    />
+                    <IconMenu
+                        iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
+                        anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
+                        targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+                    >
+                        <MenuItem disabled={!!usage.ClosedAt && !usage.OpenedAt} color={blue} primaryText="Добавить действие" onClick={newAction} leftIcon={<Add />}/>
+                        <MenuItem disabled={!!usage.OpenedAt && !usage.ClosedAt} color={red} primaryText="Открыть зону" onClick={openFunc} leftIcon={<Replay />}/>
+                        <MenuItem disabled={!!usage.ClosedAt} color={green} primaryText="Закрыть зону" onClick={closeFunc} leftIcon={<Done />}/>
+                        <MenuItem color={red} primaryText="Очистить зону" onClick={clearFunc} leftIcon={<Clear />}/>
+                    </IconMenu>
                 </TableRowColumn>
             </TableRow>
         )

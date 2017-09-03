@@ -6,7 +6,7 @@ namespace Inventorization.Business.Interfaces
 {
     public interface ICompanyRepository
     {
-        Company CreateCompany(string name);
+        Company CreateCompany(Company company);
         void CreateItem(Guid companyId, Item item);
         void DeleteCompany(Guid id);
         List<Company> GetCompanies();

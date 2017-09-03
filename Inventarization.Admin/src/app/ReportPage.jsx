@@ -7,7 +7,7 @@ import { Tabs, Tab } from 'material-ui/Tabs';
 import AuthorizedComponent from './components/authorizedComponent'
 import { fetchUsers } from './actions/userActions'
 import { fetchActions } from './actions/actionActions'
-import { loadINV3 } from './actions/reportActions'
+import { loadINV3, loadCustomReport } from './actions/reportActions'
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
@@ -22,12 +22,12 @@ const styles = {
 };
 
 const paperStyle = {
-  height: 100,
-  width: 300,
-  margin: 20,
-  padding: 20,
-  textAlign: 'center',
-  display: 'inline-block',
+    height: 100,
+    width: 300,
+    margin: 20,
+    padding: 20,
+    textAlign: 'center',
+    display: 'inline-block',
 };
 
 class ReportPage extends AuthorizedComponent {
@@ -40,18 +40,28 @@ class ReportPage extends AuthorizedComponent {
     render() {
         let { users, userInfo, dispatch, report } = this.props;
 
-        let loadINV3Handler = function(){
+        let loadINV3Handler = function () {
             dispatch(loadINV3(userInfo.SelectedInventorization.Id, userInfo.Token));
+        }
+
+        let loadResultsHandler = function () {
+            dispatch(loadCustomReport(userInfo.SelectedInventorization.Id, 'results', userInfo.Token));
         }
 
         return (
             <div>
                 <h2 style={styles.headline}>Отчёты</h2>
                 <Tabs >
+                    <Tab label="Заказной">
+                        <Paper style={paperStyle}>
+                            <CircularProgress size={50} style={{ display: this.props.report.BuildInProcess ? 'inline-block' : 'none' }} thickness={5} />
+                            <RaisedButton label="Выгрузка результатов" style={{ display: this.props.report.BuildInProcess ? 'none' : 'block' }} onClick={loadResultsHandler} />
+                        </Paper>
+                    </Tab>
                     <Tab label="ИНВ">
                         <Paper style={paperStyle}>
-                            <CircularProgress size={50} style={{display: this.props.report.BuildInProcess ? 'inline-block' : 'none'}} thickness={5}/>
-                            <RaisedButton label="ИНВ-3" style={{display: this.props.report.BuildInProcess ? 'none' : 'block'}} onClick={loadINV3Handler}/>
+                            <CircularProgress size={50} style={{ display: this.props.report.BuildInProcess ? 'inline-block' : 'none' }} thickness={5} />
+                            <RaisedButton label="ИНВ-3" style={{ display: this.props.report.BuildInProcess ? 'none' : 'block' }} onClick={loadINV3Handler} />
                         </Paper>
                     </Tab>
                     <Tab label="Сотрудники">
@@ -70,7 +80,6 @@ class ReportPage extends AuthorizedComponent {
 }
 
 const mapStateToProps = (state) => {
-    debugger
     return {
         userInfo: state.auth,
         dispatch: state.dispatch,

@@ -7,6 +7,7 @@ using System.Web.Http;
 using Inventorization.Api.ViewModels.Builders;
 using Inventorization.Data.Repositories;
 using Unity.WebApi;
+using Inventorization.Api.Models;
 
 namespace Inventorization.Api
 {
@@ -29,7 +30,8 @@ namespace Inventorization.Api
             container.RegisterInstance<IUsageRepository>(new UsageRepository(connectionString));
             container.RegisterType<IUsageBuilder, UsageBuilder>();
             container.RegisterInstance<IUserRepository>(new UserRepository(connectionString));
-            
+            container.RegisterType<IUsageBuilder, UsageBuilder>();
+            container.RegisterInstance<ActionsHub>(new ActionsHub());
 
 
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
