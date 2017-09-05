@@ -10,16 +10,15 @@ namespace Inventorization.Api.Models
 {
     public class ActionsHub : Hub
     {
+        private readonly IHubContext _context;
+        public ActionsHub()
+        {
+            _context = GlobalHost.ConnectionManager.GetHubContext<ActionsHub>();
+        }
 
         public void AddAction(Action action)
         {
-            var context = GlobalHost.ConnectionManager.GetHubContext<ActionsHub>();
-            context.Clients.All.addAction(action);
-        }
-        public void Connect(string userName)
-        {
-            var context = GlobalHost.ConnectionManager.GetHubContext<ActionsHub>();
-            var id = Context.ConnectionId;
+            _context.Clients.All.addAction(action);
         }
     }
 }
