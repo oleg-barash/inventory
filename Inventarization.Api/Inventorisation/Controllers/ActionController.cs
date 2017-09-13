@@ -48,11 +48,20 @@ namespace Inventorization.Api.Controllers
         [Route("{id}")]
         public HttpResponseMessage Get(Guid id)
         {
+            //var res = BuildActionViewModel(id);
+            //return Request.CreateResponse(HttpStatusCode.OK, res);
+            return Request.CreateResponse(HttpStatusCode.OK, _actionRepository.GetAction(id));
+        }
+
+        private ViewModels.Action BuildActionViewModel(Guid id)
+        {
             var action = _actionRepository.GetAction(id);
             var zone = _zoneRepository.GetZone(action.Zone);
             var company = _inventorizationRepository.GetInventorization(action.Inventorization).Company;
-            var items = _companyRepository.GetItems(company, new[] { action.BarCode });
-            List<ZoneUsage> states = _usageRepository.GetZoneUsages(action.Inventorization).Where(x => x.ZoneId != zone.Id).ToList();
+            var items = _companyRepository.GetItems(company, new[] {action.BarCode});
+            List<ZoneUsage> states = _usageRepository.GetZoneUsages(action.Inventorization)
+                .Where(x => x.ZoneId != zone.Id)
+                .ToList();
 
             var foundItem = items.FirstOrDefault(i => i.Code == action.BarCode);
 
@@ -70,17 +79,15 @@ namespace Inventorization.Api.Controllers
                 DateTime = action.DateTime,
                 Quantity = action.Quantity,
                 Type = action.Type,
-                User = action.UserId.ToString(),
+                User = action.UserId,
                 Zone = zoneVm,
                 BarCode = action.BarCode,
                 FoundInItems = foundItem != null,
                 Name = foundItem != null ? foundItem.Name : "Не найдена в номенклатуре",
                 Description = foundItem != null ? foundItem.Description : "Не найдена в номенклатуре",
             };
-            return Request.CreateResponse(HttpStatusCode.OK, res);
+            return res;
         }
-
-
 
 
         [HttpPost]
@@ -90,7 +97,7 @@ namespace Inventorization.Api.Controllers
             var userClaims = Request.GetOwinContext().Authentication.User;
             var userId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value);
             _actionRepository.UpdateAction(id, userId, action.Quantity);
-            return Request.CreateResponse(HttpStatusCode.OK, _actionRepository.GetAction(id));
+            return Request.CreateResponse(HttpStatusCode.OK, BuildActionViewModel(id));
         }
 
         [HttpDelete]

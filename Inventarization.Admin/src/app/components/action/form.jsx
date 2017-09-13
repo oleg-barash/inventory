@@ -48,7 +48,8 @@ class Form extends Component {
     }
 
     render() {
-        let {action, dispatch, availabledItems, inventorization, userInfo} = this.props;
+        let {action, dispatch, availabledItems, inventorization, userInfo, availabledZones } = this.props;
+        let zone = availabledZones.find(x => x.Id === action.Zone)
         if (!availabledItems.items && ! availabledItems.isFetching){
              dispatch(fetchItems(inventorization.Company, {}, userInfo.Token));
         }
@@ -57,7 +58,7 @@ class Form extends Component {
         }
         
         let onZoneChange = function(value) {
-            dispatch(validateAction({Zone: value }));
+            dispatch(validateAction({Zone: value.Id }));
         }
         let onQuantityChange = function(event) {
             dispatch(validateAction({Quantity: event.target.value}));
@@ -111,7 +112,7 @@ class Form extends Component {
                 <Divider />
                 <TextField id="Quantity" hintText="0" value={action.Quantity} onChange={onQuantityChange} floatingLabelText="Количество единиц товара" errorText={action != null ? action.QuantityError || '' : '' }/>
                 <Divider />
-                <ZoneSelect zone={!!action ? action.Zone : {}} 
+                <ZoneSelect zone={zone} 
                     onZoneChange={onZoneChange}  
                     errorText={action != null ? action.ZoneError || '' : '' }/>
                 <Divider />

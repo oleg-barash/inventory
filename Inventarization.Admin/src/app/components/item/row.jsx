@@ -12,6 +12,12 @@ import Edit from 'material-ui/svg-icons/Content/create';
 import { Link, browserHistory } from 'react-router'
 import _ from 'lodash'
 moment.locale("ru-RU")
+
+let getCountInZone = function(actions, zoneId){
+    var actionsInZone = _.filter(actions, (a) => a.Zone.Id == zoneId);
+    return _.sumBy(actionsInZone, (a) => a.Quantity);
+}
+
 class ItemRow extends Component {
     constructor(props) {
         super(props);
@@ -43,12 +49,13 @@ class ItemRow extends Component {
         let rowStyle = {
             backgroundColor: totalFact === 0 ? red : totalFact < item.Count ? yellow : green
         }
+        
         return (
             <TableRow style={rowStyle}>
                 <TableRowColumn style={{ width: '280px' }}>{item.Name}</TableRowColumn>
                 <TableRowColumn style={{ width: '120px' }}>{item.Code}</TableRowColumn>
                 <TableRowColumn style={{ width: '90px' }}>{_.uniq(zones).map((zone) => {
-                    return <Link key={zone} to={{ pathname: "/actions", query: { ZoneName: zone.ZoneName, Code: item.Code } }}>{zone.ZoneName}({_.sumBy(_.filter(actions, (a) => a.Zone.ZoneId == zone.ZoneId), (a) => a.Quantity)})<br />
+                    return <Link key={zone} to={{ pathname: "/actions", query: { ZoneName: zone.ZoneName, Code: item.Code } }}>{zone.ZoneName}({getCountInZone(actions, zone.Id)})<br />
                     </Link>
                 }
                 )}</TableRowColumn>

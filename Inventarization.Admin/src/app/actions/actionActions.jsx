@@ -57,7 +57,7 @@ export function saveAction(action, inventorization, userToken){
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(Object.assign({}, action, { Zone: action.Zone.Id}))})
+                    body: JSON.stringify(action)})
                 .then(response => { return response.json()})
                 .then(response => {
                     if (typeof response === "string" || response.ErrorMessage){
@@ -65,7 +65,6 @@ export function saveAction(action, inventorization, userToken){
                     }
                     else{
                         toastr.success("Действие успешно сохранено")
-                        dispatch(actionSaved(response.action.Id))
                     }
                 })
     }

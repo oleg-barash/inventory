@@ -1,35 +1,36 @@
 /**
  * Created by Барашики on 27.03.2017.
  */
-import { FILTER_ACTION, 
-    REQUEST_ACTION, 
+import {
+    FILTER_ACTION,
+    REQUEST_ACTION,
     RECEIVE_ACTIONS,
-    DELETING_ACTION, 
-    ACTION_DELETED, 
-    SHOW_LOADING, 
-    HIDE_LOADING, 
+    DELETING_ACTION,
+    ACTION_DELETED,
+    SHOW_LOADING,
+    HIDE_LOADING,
     UPDATE_ACTIONS_FILTER,
     ACTION_SAVED
 } from '../constants/actionTypes'
 import _ from 'lodash'
 
 const filterActions = (items, filter) => {
-    if (items == undefined){
+    if (items == undefined) {
         return [];
     }
     var result = items;
-    if (filter !== undefined){
-        if (filter.ZoneName !== undefined){
+    if (filter !== undefined) {
+        if (filter.ZoneName !== undefined) {
             result = result.filter((item) => {
                 return item.Zone.ZoneName.toUpperCase().startsWith(filter.ZoneName.toUpperCase());
             })
         }
-        if (filter.Code !== undefined){
+        if (filter.Code !== undefined) {
             result = result.filter((item) => {
                 return item.BarCode.toUpperCase().startsWith(filter.Code.toUpperCase());
             })
         }
-        if (filter.Type != undefined){
+        if (filter.Type != undefined) {
             result = result.filter((item) => {
                 return item.Type == filter.Type;
             })
@@ -39,13 +40,12 @@ const filterActions = (items, filter) => {
 }
 
 
-let getTypes = function(actions){
-   return _.uniq(actions.map(x => { return { id: x.Type, text: getTypeLabel(x.Type) } }, (x, y) => x.id === y.id ));
+let getTypes = function (actions) {
+    return _.uniq(actions.map(x => { return { id: x.Type, text: getTypeLabel(x.Type) } }, (x, y) => x.id === y.id));
 }
 
-export function actionList(state = { isFetching: false, items: [], filter: {}, action: {}, filtredActions: [] }, action)
-{
-    switch (action.type){
+export function actionList(state = { isFetching: false, items: [], filter: {}, action: {}, filtredActions: [] }, action) {
+    switch (action.type) {
         case ACTION_DELETED:
             var items = state.items.filter((actionItem) => actionItem.Id !== action.action.Id);
             var filtredActions = filterActions(items, state.filter);
@@ -54,8 +54,7 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
             return Object.assign({}, state, {
                 isFetching: false,
                 items: state.items.map((actionItem) => {
-                    if (actionItem.Id === action.id)
-                    {
+                    if (actionItem.Id === action.id) {
                         actionItem.IsDeleting = true;
                     }
                     return actionItem;
@@ -70,7 +69,7 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
         case UPDATE_ACTIONS_FILTER:
             var filter = Object.assign(state.filter, action.filter)
             var items = filterActions(state.items, filter)
-            return Object.assign({}, state, { filter, filtredActions: items  })
+            return Object.assign({}, state, { filter, filtredActions: items })
         case REQUEST_ACTION:
             return Object.assign({}, state, {
                 isFetching: true
@@ -78,24 +77,29 @@ export function actionList(state = { isFetching: false, items: [], filter: {}, a
         case RECEIVE_ACTIONS:
             var items = filterActions(action.items, state.filter)
             return Object.assign({}, state, {
-                    isFetching: false,
-                    items: action.items.map(x => {
-                        x.key = x.Id;
-                        return x;
-                    }),
-                    filtredActions: items,
-                    lastUpdated: action.receivedAt
+                isFetching: false,
+                items: action.items.map(x => {
+                    x.key = x.Id;
+                    return x;
+                }),
+                filtredActions: items,
+                lastUpdated: action.receivedAt
             })
-        case ACTION_SAVED:
-            return Object.assign({}, state, {
-                items: state.items.map((actionItem) => {
-                    if (actionItem.Id === action.action.Id)
-                    {
-                        Object.assign({}, actionItem, action.action);
-                    }
-                    return actionItem;
-                })
-            })
+        // case ACTION_ADDED:
+        //     return Object.assign({}, state, {
+        //         items: action.items.push(action.action),
+        //         filtredActions: items,
+        //         lastUpdated: action.receivedAt
+        //     })
+        // case ACTION_SAVED:
+        //     return Object.assign({}, state, {
+        //         items: state.items.map((actionItem) => {
+        //             if (actionItem.Id === action.action.Id) {
+        //                 return Object.assign({}, actionItem, action.action);
+        //             }
+        //             return actionItem;
+        //         })
+        //     })
         default:
             return state
     }
