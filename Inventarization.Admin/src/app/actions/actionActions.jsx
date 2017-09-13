@@ -65,7 +65,7 @@ export function saveAction(action, inventorization, userToken){
                     }
                     else{
                         toastr.success("Действие успешно сохранено")
-                        dispatch(actionSaved(response.id))
+                        dispatch(actionSaved(response.action.Id))
                     }
                 })
     }
