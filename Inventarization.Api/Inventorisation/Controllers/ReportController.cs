@@ -73,7 +73,7 @@ namespace Inventorization.Api.Controllers
             }
 
             List<Business.Model.Action> actions = _actionRepository.GetActionsByInventorization(inventorizationId);
-            string[] codes = actions.Select(x => x.BarCode).Distinct().ToArray();
+            string[] codes = actions.Where(x => x.Type == ActionType.FirstScan).Select(x => x.BarCode).Distinct().ToArray();
             IEnumerable<Item> items = _companyRepository.GetItems(inventorization.Company).Where(x => x.Source == ItemSource.Import && codes.Any(r => r == x.Code));
             var report = items.Select(x => string.Format($"{x.Code},{actions.Where(a => a.BarCode == x.Code).Sum(a => a.Quantity)}"));
             var result = new HttpResponseMessage(HttpStatusCode.OK)

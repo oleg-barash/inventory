@@ -10,6 +10,7 @@ import {
     SHOW_LOADING,
     HIDE_LOADING,
     UPDATE_ACTIONS_FILTER,
+    RECEIVE_ZONES,
     ACTION_SAVED
 } from '../constants/actionTypes'
 import _ from 'lodash'
@@ -20,20 +21,23 @@ const filterActions = (items, filter) => {
     }
     var result = items;
     if (filter !== undefined) {
-        if (filter.ZoneName !== undefined) {
+        if (filter.Zone !== undefined) {
             result = result.filter((item) => {
-                return item.Zone.ZoneName.toUpperCase().startsWith(filter.ZoneName.toUpperCase());
+                return item.Zone === filter.Zone.Id;
             })
         }
-        if (filter.Code !== undefined) {
+        if (!!filter.Code) {
             result = result.filter((item) => {
                 return item.BarCode.toUpperCase().startsWith(filter.Code.toUpperCase());
             })
         }
         if (filter.Type != undefined) {
-            result = result.filter((item) => {
-                return item.Type == filter.Type;
-            })
+            debugger
+            if (filter.Type != 3) {
+                result = result.filter((item) => {
+                    return item.Type == filter.Type;
+                })
+            }
         }
     }
     return result;

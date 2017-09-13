@@ -44,7 +44,7 @@ class UserList extends AuthorizedComponent {
 
         return (<Paper style={paperStyle} zDepth={3} rounded={false} >
             Здесь можно назначить пользователей на инвентаризацию
-                        <List>{users != undefined ? _.sortBy(users, x => x.Inventorization != id).map(x => 
+                        <List>{users != undefined ? _.sortBy(users, x => x.Login).map(x => 
                             {
                                 return <ListItem key={x.Id} id={x} leftCheckbox={<Checkbox checked={x.Inventorization == id} onCheck={function(ev, val){toggleUser(x, val)}} />} primaryText={x.Login} />
                             })

@@ -71,7 +71,7 @@ class UsageRow extends Component {
             <TableRow>
                 <TableRowColumn style={{ width: '120px' }}>{getTypeText(usage.Type)}</TableRowColumn>
                 <TableRowColumn style={{ width: '30px' }}>
-                    <Link key={zone} to={{ pathname: "/actions", query: { ZoneName: zone.ZoneName, Type: usage.Type } }}>{sum}</Link>
+                    <Link key={zone} to={{ pathname: "/actions", query: { ZoneNumber: zone.Number, Type: usage.Type } }}>{sum}</Link>
                 </TableRowColumn>
                 <TableRowColumn style={{ width: '150px' }}>{status}</TableRowColumn>
                 <TableRowColumn style={{ width: '150px' }}>{assigned}</TableRowColumn>

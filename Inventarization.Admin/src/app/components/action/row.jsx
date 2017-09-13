@@ -33,7 +33,7 @@ class Row extends Component {
     }
 
     render() {
-        var {action, dispatch, userInfo} = this.props;
+        var {action, dispatch, userInfo, zones} = this.props;
         var rowStyle = {backgroundColor: action.FoundInItems ? green : white}
 
         var deleteFunc = function(){
@@ -49,14 +49,17 @@ class Row extends Component {
         var editAction = function() {
             browserHistory.push('/editAction?id=' + action.Id);
         }
+
+        let zone = _.find(zones, z => z.Id === action.Zone);
+
         return (
             <TableRow style={rowStyle}>
                 <TableRowColumn style={{width: '200px'}}>{action.Name}</TableRowColumn>
-                <TableRowColumn style={{width: '100px'}}>{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
+                <TableRowColumn style={{width: '120px'}}>{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}><small>{getTypeName(action.Type)}</small></TableRowColumn>
                 {/*<TableRowColumn >{action.User}</TableRowColumn>*/}
                 <TableRowColumn style={{width: '100px'}}>{action.BarCode}</TableRowColumn>
-                <TableRowColumn style={{width: '80px'}}>{action.Zone.ZoneName}</TableRowColumn>
+                <TableRowColumn style={{width: '80px'}}>{zone != null ? zone.Number : 'не определена'}</TableRowColumn>
                 <TableRowColumn style={{width: '40px'}}>{action.Quantity}</TableRowColumn>
                 <TableRowColumn >
                     <FlatButton disabled={action.IsDeleting}
@@ -88,7 +91,8 @@ Row.propTypes = {
 }
 const mapStateToProps = (state) => {
     return {
-        userInfo: state.auth
+        userInfo: state.auth,
+        zones: state.zones.items
     }
 }
 

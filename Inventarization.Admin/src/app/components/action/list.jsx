@@ -9,12 +9,16 @@ import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import { filterActions, updateActionsFilter } from '../../actions/actionActions'
+import { fetchZones } from '../../actions/zoneActions'
 
 const mapStateToProps = (state) => {
     return {
         actions: state.actions.filtredActions,
         availableTypes: state.actions.availableTypes,
-        filter: state.actions.filter
+        userInfo: state.auth,
+        inventorization: state.auth.SelectedInventorization,
+        filter: state.actions.filter,
+        zones: state.zones.items
     }
 }
 
@@ -28,22 +32,33 @@ class List extends Component {
         super(props)
     }
 
+    componentDidMount() {
+        const { dispatch, inventorization, userInfo, zones } = this.props
+        dispatch(fetchZones(inventorization.Id, userInfo.Token))
+    }
+
     render() {
-        let { actions, availableTypes, dispatch } = this.props;
+        let { actions, availableTypes, dispatch, zones } = this.props;
         function handleZoneChange(event, value) {
-            dispatch(updateActionsFilter({ ZoneName: value }))
+            let filterZone = _.find(zones, x => x.Number == value);
+            if (filterZone != undefined){
+                dispatch(updateActionsFilter({ Zone: filterZone }));
+            }
+            else{
+                dispatch(updateActionsFilter({ Zone: undefined }));
+            }
         };
-        function handleCodeChange(event, value) {ё
-            dispatch(updateActionsFilter({ Code: value }))
+        function handleCodeChange(event, value) {
+            dispatch(updateActionsFilter({ Code: value }));
         };
         function handleTypeChange() {
-            dispatch(updateActionsFilter({ Type: arguments[2] }))
+            dispatch(updateActionsFilter({ Type: arguments[2] }));
         };
         return (
             <div>
                 <TextField
                     id="zone-filter"
-                    value={this.props.filter.ZoneName}
+                    value={!!this.props.filter.Zone ? this.props.filter.Zone.Number : undefined}
                     onChange={handleZoneChange}
                     hintText="Поиск по зоне" />
                 <TextField
@@ -52,16 +67,17 @@ class List extends Component {
                     onChange={handleCodeChange}
                     hintText="Поиск по коду" />
                 <SelectField floatingLabelText="Поиск по типу просчёта" value={this.props.filter.Type} onChange={handleTypeChange}>
-                        <MenuItem value={'0'} primaryText="первое сканирование" />
-                        <MenuItem value={'1'} primaryText="второе сканирование" />
-                        <MenuItem value={'2'} primaryText="слепой пересчёт" />
-                        </SelectField>
+                    <MenuItem value={'0'} primaryText="первое сканирование" />
+                    <MenuItem value={'1'} primaryText="второе сканирование" />
+                    <MenuItem value={'2'} primaryText="слепой пересчёт" />
+                    <MenuItem value={'3'} primaryText="всё" />
+                </SelectField>
 
                 <Table selectable={true} fixedHeader={true} height={'600px'}>
                     <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
                         <TableRow>
                             <TableHeaderColumn style={{ width: '200px' }}>Описание</TableHeaderColumn>
-                            <TableHeaderColumn style={{ width: '100px' }}>Время</TableHeaderColumn>
+                            <TableHeaderColumn style={{ width: '120px' }}>Время</TableHeaderColumn>
                             <TableHeaderColumn style={{ width: '100px' }}>Тип</TableHeaderColumn>
                             {/*<TableHeaderColumn >Пользователь</TableHeaderColumn>*/}
                             <TableHeaderColumn style={{ width: '100px' }}>Код</TableHeaderColumn>
