@@ -58,7 +58,6 @@ class UsageRow extends Component {
                     return "Неизвестно"
             }
         }
-
         let sum = _.sum(actions.map(a => a.Quantity));
         let status = "не открыт";
         if (usage.OpenedAt !== null) {

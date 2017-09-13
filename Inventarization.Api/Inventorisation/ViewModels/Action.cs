@@ -12,7 +12,7 @@ namespace Inventorization.Api.ViewModels
         public DateTime DateTime { get; set; }
         public ActionType Type { get; set; }
         public Guid Inventorization { get; set; }
-        public string User { get; set; }
+        public Guid User { get; set; }
         public string BarCode { get; set; }
         public ZoneViewModel Zone { get; set; }
         public int Quantity { get; set; }

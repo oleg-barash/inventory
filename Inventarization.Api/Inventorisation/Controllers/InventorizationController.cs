@@ -194,8 +194,10 @@ namespace Inventorization.Api.Controllers
                         Business.Model.Action foundAction = foundActions.Single();
                         action.Id = foundAction.Id;
                     }
+
                     Business.Model.Action updatedAction = _actionDomain.UpsertAction(action);
-                    return Request.CreateResponse(HttpStatusCode.OK, new { ok = true, action = updatedAction });
+                    _actionHub.AddAction(updatedAction);
+                    return Request.CreateResponse(HttpStatusCode.OK, new { ok = true });
                 }
 
                 var inventarization = _inventorizationRepository.GetInventorization(inventorization);
@@ -206,9 +208,10 @@ namespace Inventorization.Api.Controllers
                 {
 
                     Business.Model.Action updatedAction = _actionDomain.UpsertAction(action);
+
                     _actionHub.AddAction(updatedAction);
                     
-                    return Request.CreateResponse(HttpStatusCode.OK, new {foundItem, action = updatedAction});
+                    return Request.CreateResponse(HttpStatusCode.OK, new { foundItem });
 
                 }
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "Товар не был найден в справочнике. Действие не зафиксировано.");
@@ -225,53 +228,52 @@ namespace Inventorization.Api.Controllers
         [Route("{inventorizationId}/actions")]
         public HttpResponseMessage GetActions(Guid inventorizationId)
         {
-            var inventorization = _inventorizationRepository.GetInventorization(inventorizationId);
             var actions = _inventorizationDomain.GetActions(inventorizationId);
-            var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
-            var items = _companyRepository.GetItems(inventorization.Company, actions.Select(x => x.BarCode).ToArray());
-            List<ZoneUsage> usages = _usageRepository.GetZoneUsages(inventorizationId).Where(x => x.ZoneId != Guid.Empty).ToList();
-            var result = actions.Select(x =>
-            {
-                var foundZone = zones.First(z => z.Id == x.Zone);
-                var currentZoneUsages = usages.Where(z => z.ZoneId == foundZone.Id);
+            //var zones = _zoneRepository.GetZones(actions.Select(x => x.Zone).ToArray());
+            //var items = _companyRepository.GetItems(inventorization.Company, actions.Select(x => x.BarCode).ToArray());
+            //List<ZoneUsage> usages = _usageRepository.GetZoneUsages(inventorizationId).Where(x => x.ZoneId != Guid.Empty).ToList();
+            //var result = actions.Select(x =>
+            //{
+            //    var foundZone = zones.First(z => z.Id == x.Zone);
+            //    var currentZoneUsages = usages.Where(z => z.ZoneId == foundZone.Id);
 
-                var zoneVm = new ZoneViewModel()
-                {
-                    Id = foundZone.Id,
-                    Number = foundZone.Number,
-                    Usages = _usageBuilder.GetUsageViewModels(currentZoneUsages.ToList()).ToArray(),
-                    ZoneName = foundZone.Name
-                };
-                var res = new ViewModels.Action()
-                {
-                    Id = x.Id,
-                    DateTime = x.DateTime,
-                    Quantity = x.Quantity,
-                    Type = x.Type,
-                    User = x.UserId.ToString(),
-                    Inventorization = x.Inventorization,
-                    Zone = zoneVm,
-                    BarCode = x.BarCode
-                };
+            //    var zoneVm = new ZoneViewModel()
+            //    {
+            //        Id = foundZone.Id,
+            //        Number = foundZone.Number,
+            //        Usages = _usageBuilder.GetUsageViewModels(currentZoneUsages.ToList()).ToArray(),
+            //        ZoneName = foundZone.Name
+            //    };
+            //    var res = new ViewModels.Action()
+            //    {
+            //        Id = x.Id,
+            //        DateTime = x.DateTime,
+            //        Quantity = x.Quantity,
+            //        Type = x.Type,
+            //        User = x.UserId,
+            //        Inventorization = x.Inventorization,
+            //        Zone = zoneVm,
+            //        BarCode = x.BarCode
+            //    };
 
-                if (x.Type != ActionType.BlindScan && !string.IsNullOrWhiteSpace(x.BarCode))
-                {
-                    var foundItem = items.FirstOrDefault(i => i.Code == x.BarCode);
-                    if (foundItem != null)
-                    {
-                        res.FoundInItems = true;
-                        res.Name = foundItem.Name;
-                        res.Description = foundItem.Description;
-                    }
-                    else
-                    {
-                        res.Name = "Не найдена в номенклатуре";
-                        res.Description = "Не найдена в номенклатуре";
-                    }
-                }
-                return res;
-            });
-            return Request.CreateResponse(HttpStatusCode.OK, result.OrderByDescending(x => x.DateTime));
+            //    if (x.Type == ActionType.BlindScan || string.IsNullOrWhiteSpace(x.BarCode)) return res;
+
+            //    var foundItem = items.FirstOrDefault(i => i.Code == x.BarCode);
+            //    if (foundItem != null)
+            //    {
+            //        res.FoundInItems = true;
+            //        res.Name = foundItem.Name;
+            //        res.Description = foundItem.Description;
+            //    }
+            //    else
+            //    {
+            //        res.Name = "Не найдена в номенклатуре";
+            //        res.Description = "Не найдена в номенклатуре";
+            //    }
+            //    return res;
+            //});
+            //return Request.CreateResponse(HttpStatusCode.OK, result.OrderByDescending(x => x.DateTime));
+            return Request.CreateResponse(HttpStatusCode.OK, actions.OrderByDescending(x => x.DateTime));
         }
 
         [HttpGet]
@@ -279,7 +281,7 @@ namespace Inventorization.Api.Controllers
         public HttpResponseMessage GetItem(Guid inventorizationId, [FromUri]int id)
         {
             var item = _inventorizationDomain.GetItem(id);
-            ViewModels.ActiveItem res = new ViewModels.ActiveItem();
+            ActiveItem res = new ActiveItem();
             res.BarCode = item.Code;
             res.Description = item.Description;
             res.Number = item.ItemNumber;
@@ -316,17 +318,8 @@ namespace Inventorization.Api.Controllers
         [Route("{inventorizationId}/rests")]
         public HttpResponseMessage GetRests(Guid inventorizationId, [FromUri]ActionType type = ActionType.FirstScan)
         {
-            //string code = Convert.ToBase64String(Encoding.Unicode.GetBytes(items.GetHashCode().ToString()));
-            //var requestedETag = Request.Headers.IfNoneMatch.ToString();
-            //if (requestedETag == code)
-            //    return Request.CreateResponse(HttpStatusCode.NotModified);
-
             var rests = _inventorizationDomain.GetAllRests(inventorizationId);
-
             HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, rests);
-            //response.Headers.ETag = new EntityTagHeaderValue(string.Format($"\"${code}\""));
-            //response.Headers.CacheControl = new CacheControlHeaderValue() { MaxAge = new TimeSpan(10, 0, 0) };
-            //response.Headers. Vary = new HttpHeaderValueCollection<string>("origin");
             return response;
         }
 

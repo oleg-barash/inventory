@@ -35,7 +35,12 @@ import LeftMenu from './components/user/leftMenu'
 import InventorizationDialog from './components/inventorizationDialog'
 
 import { withCookies } from 'react-cookie';
-import { LOGIN_FINISHED, LOGOUT, INVENTORIZATION_SELECTED, CLOSE_INVENTORIZATION_DIALOG, TOGGLE_DRAWER, ACTION_SAVED } from './constants/actionTypes'
+import { LOGIN_FINISHED
+    , LOGOUT
+    , INVENTORIZATION_SELECTED
+    , CLOSE_INVENTORIZATION_DIALOG
+    , TOGGLE_DRAWER
+    , ACTION_SAVED} from './constants/actionTypes'
 import { toggleDrawer } from './actions/globalActions'
 import { browserHistory } from 'react-router'
 
@@ -74,8 +79,8 @@ function authCookies({ getState }) {
                     document.cookie = "UserData="
                     browserHistory.push('/login');
                     break
-                case ACTION_SAVED:
-                    browserHistory.push('/editAction?id=' + action.id);
+                // case ACTION_SAVED:
+                //     browserHistory.push('/editAction?id=' + action.id);
             }
         }
 
@@ -121,14 +126,34 @@ class App extends Component {
     render() {
         let { dispatch } = this.props;
         const childrenWithCookies = React.Children.map(this.props.children,
-            (child) => React.cloneElement(child,
-                {
-                    cookies: this.props.cookies
-                })
+            (child) => {
+                return React.cloneElement(child,
+                    {
+                        cookies: this.props.cookies
+                    })
+            }
         );
         let handleToggle = function () {
             store.dispatch(toggleDrawer());
         };
+
+        if (typeof $ !== "undefined") {
+            try {
+                var actionshub = $.connection.actionsHub;
+                if (actionshub !== undefined) {
+                    actionshub.client.addAction = function (action) {
+                        store.dispatch({ type: ACTION_SAVED, action });
+                    };
+                    $.connection.hub.url = "http://localhost/signalr"
+                    $.connection.hub.start().done(function () {
+                        console.log("signalr connected");
+                    });
+                }
+            }
+            catch (ex) {
+                console.warn("signalr not connected!!! reason: " + ex);
+            }
+        }
 
         return (
 

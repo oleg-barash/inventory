@@ -35,9 +35,9 @@ let getZoneState = function (zone, actions) {
     if (_.some(zone.Usages, { ClosedAt: null}) || zone.Usages.length == 1) {
         return inProcess;
     }
-
     let counts = zone.Usages.map(x => {
         let currentActions = actions.filter(a => a.Type === x.Type);
+        
         return currentActions != undefined ? _.sum(currentActions.map(a => a.Quantity)) : 0;
     }, true);
 
@@ -61,7 +61,7 @@ class Row extends Component {
     render() {
         let { zone, actions, dispatch, inventorization, userInfo } = this.props;
         let usages = zone !== undefined ? _.sortBy(zone.Usages, x => x.Type) : [];
-        let currentActions = actions.filter(a => a.Zone.Id === zone.Id)
+        let currentActions = actions.filter(a => a.Zone === zone.Id)
         let state = getZoneState(zone, currentActions);
         let backgroundColor = getBackgroundColor(state);
         let style = { backgroundColor };
