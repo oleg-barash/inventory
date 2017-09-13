@@ -56,4 +56,5 @@
     <string name="second_scan">Повторное сканирование</string>
     <string name="blind_scan">Слепой пересчёт</string>
     <string name="pick_zone">Укажите зону</string>
+    <string name="title_activity_select_inventorization">Выберите инвентаризацию</string>
 </resources>
