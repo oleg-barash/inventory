@@ -43,7 +43,7 @@ namespace Inventorization.Api.Controllers
             }
             List<Rests> rests = _inventorizationRepository.GetRests(inventorizationId);
             List<Business.Model.Action> actions = _actionRepository.GetActionsByInventorization(inventorizationId);
-            string[] codes = rests.Select(x => x.Code).Union(actions.Select(x => x.BarCode)).Distinct().ToArray();
+            string[] codes = rests.Select(x => x.Code).Union(actions.Where(x => x.Type == ActionType.FirstScan).Select(x => x.BarCode)).Distinct().ToArray();
             IEnumerable<Item> items = _companyRepository.GetItems(inventorization.Company).Where(x => x.Source == ItemSource.Import && codes.Any(r => r == x.Code));
 
             using (MemoryStream stream = generator.Generate(items.ToList(), actions, rests))
@@ -80,11 +80,14 @@ namespace Inventorization.Api.Controllers
             {
                 Content = new StringContent(string.Join(Environment.NewLine, report))
             };
+
+            result.Content.Headers.ContentDisposition =
+                new ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = "customeReport.csv"
+                };
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-            {
-                FileName = "customeReport.csv"
-            };
+            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
             return ResponseMessage(result);
         }
 

@@ -144,7 +144,7 @@ class App extends Component {
                     actionshub.client.addAction = function (action) {
                         store.dispatch({ type: ACTION_SAVED, action });
                     };
-                    $.connection.hub.url = "http://localhost/signalr"
+                    $.connection.hub.url = process.env.SIGNALR_HUBS_URL
                     $.connection.hub.start().done(function () {
                         console.log("signalr connected");
                     });

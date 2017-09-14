@@ -20,7 +20,7 @@ const configs = [{
         new webpack.DefinePlugin({
             'process.env':{
                 'NODE_ENV': JSON.stringify('production'),
-                'SIGNALR_HUBS_URL': JSON.stringify('http://localhost/signalr/hubs'),
+                'SIGNALR_HUBS_URL': JSON.stringify('http://193.124.113.47:81/signalr'),
                 'PORT': 91,
                 'ASSETS_URL': JSON.stringify('http://193.124.113.47:82/')
             }
@@ -66,7 +66,7 @@ const configs = [{
     new webpack.DefinePlugin({
       'process.env':{
         'NODE_ENV': JSON.stringify('production'),
-        'SIGNALR_HUBS_URL': JSON.stringify('ttp://193.124.113.47:81/signalr/hubs'),
+        'SIGNALR_HUBS_URL': JSON.stringify('http://193.124.113.47:81/signalr'),
         'API_URL': JSON.stringify('http://193.124.113.47:81/api/'),
         'ASSETS_URL': JSON.stringify('http://193.124.113.47:82/api/')
       }

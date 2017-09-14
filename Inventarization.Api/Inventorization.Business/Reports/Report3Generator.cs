@@ -30,14 +30,14 @@ namespace Inventorization.Business.Reports
             using (XLWorkbook book = new XLWorkbook(pathToTemplate))
             {
                 IXLWorksheet worksheet = book.Worksheets.Skip(1).First();
-                IEnumerable<IXLRow> dataRows = worksheet.Rows().Where(r => r.RowNumber() >= firstDataRowIndex);
+                IEnumerable<IXLRow> dataRows = worksheet.Rows().Where(r => r.RowNumber() >= firstDataRowIndex).ToList();
                 dataRows.ForEach(dr => dr.Delete());
                 IXLRow currentDataRow = GetFirstDataRow(worksheet.Rows());
                 currentDataRow.InsertRowsBelow(items.Count);
-                IEnumerable<IGrouping<string, Model.Action>> grouppedActions = actions.GroupBy(x => x.BarCode);
+                IEnumerable<IGrouping<string, Model.Action>> grouppedActions = actions.GroupBy(x => x.BarCode).ToList();
 
                 int counter = 1;
-                var bunches = BuildBunches(items);
+                var bunches = BuildBunches(items).ToList();
                 var lastBunch = bunches.Last();
                 foreach (var bunch in bunches)
                 {
@@ -130,6 +130,12 @@ namespace Inventorization.Business.Reports
             numberCell.Value = index++;
             nameCell.Value = item.Name;
             itemNumberCell.Value = item.ItemNumber;
+
+            if (fact.HasValue)
+            {
+                countFactCell.Value = fact.Value;
+            }
+
             if (rests != null)
             {
                 if (rests.Price > default(decimal))
@@ -138,17 +144,13 @@ namespace Inventorization.Business.Reports
                     priceCell.Value = rests.Price;
                 }
                 inventNumberCell.Value = item.Code;
-                if (fact.HasValue)
-                {
-                    countFactCell.Value = fact.Value;
-                    if (rests.Price != default(decimal))
-                    {
-                        sumFactCell.FormulaA1 = $"=Q{countFactCell.Address.RowNumber} * L{countFactCell.Address.RowNumber}";
-                    }
-                }
                 countPlanCell.Value = rests?.Count;
                 if (rests.Price != default(decimal))
                 {
+                    if (fact.HasValue)
+                    {
+                        sumFactCell.FormulaA1 = $"=Q{countFactCell.Address.RowNumber} * L{countFactCell.Address.RowNumber}";
+                    }
                     sumPlanCell.FormulaA1 = $"=T{countPlanCell.Address.RowNumber} * L{countPlanCell.Address.RowNumber}";
                 }
             }

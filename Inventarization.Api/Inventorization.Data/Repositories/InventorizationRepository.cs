@@ -128,12 +128,11 @@ namespace Inventorization.Data
                 {
                     cmd.Connection = conn;
                     cmd.CommandText = @"UPDATE public.""Inventorizations"" 
-                        SET ""ClosedAt"" = @closedAt,
+                        SET 
                             ""Date"" = @date,
                             ""Name"" = @name
                         WHERE ""Id"" = @id";
                     cmd.Parameters.Add(new NpgsqlParameter("id", inventorization.Id));
-                    cmd.Parameters.Add(new NpgsqlParameter("closedAt", inventorization.ClosedAt));
                     cmd.Parameters.Add(new NpgsqlParameter("date", inventorization.Date));
                     cmd.Parameters.Add(new NpgsqlParameter("name", inventorization.Name));
                     cmd.ExecuteNonQuery();
