@@ -69,11 +69,11 @@ class Form extends Component {
                 dispatch(validateInventorization({ Company: companyId }));
             }
         }
-
         let onNameChange = function (event, value) {
             dispatch(validateInventorization({ Name: value }));
         }
         let onDateChange = function (event, value) {
+            debugger
             dispatch(validateInventorization({ Date: value }));
         }
 
@@ -169,7 +169,7 @@ class Form extends Component {
                         <FlatButton label="Назад" onClick={goBack} />
                         <FlatButton disabled={inventorization.Readonly} label="Сохранить" onClick={save} disabled={!!inventorization.NameError} />
                     </Paper>
-                    <Paper style={paperStyle} zDepth={3} rounded={false} >
+                    <Paper style={paperStyle} zDepth={3} rounded={false}>
                         <FlatButton label="Импорт справочника остатков" disabled={inventorization.Id === undefined} hoverColor={green} onClick={handleOpen} />
                         <Dialog
                             title="Загрузка справочника остатков"

@@ -19,7 +19,7 @@ class List extends Component {
                     <TableRow>
                         <TableHeaderColumn style={{ width: '280px' }}>Наименование</TableHeaderColumn>
                         <TableHeaderColumn style={{ width: '120px' }}>Код</TableHeaderColumn>
-                        <TableHeaderColumn style={{ width: '90px' }}>Зоны</TableHeaderColumn>
+                        <TableHeaderColumn style={{ width: '90px' }}>Действия</TableHeaderColumn>
                         <TableHeaderColumn style={{ width: '70px' }}>Факт/План</TableHeaderColumn>
                         <TableHeaderColumn style={{ width: '100px' }}>Сумма</TableHeaderColumn>
                     </TableRow>

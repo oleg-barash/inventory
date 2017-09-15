@@ -14,7 +14,7 @@ import _ from 'lodash'
 moment.locale("ru-RU")
 
 let getCountInZone = function(actions, zoneId){
-    var actionsInZone = _.filter(actions, (a) => a.Zone.Id == zoneId);
+    var actionsInZone = _.filter(actions, (a) => a.Zone == zoneId);
     return _.sumBy(actionsInZone, (a) => a.Quantity);
 }
 
@@ -35,7 +35,6 @@ class ItemRow extends Component {
         let zones = [];
         let totalFact = 0;
         if (actions != undefined) {
-            zones = actions.reduce((previousValue, currentValue) => previousValue.concat(currentValue.Zone), []);
             totalFact = _.sumBy(actions, (a) => a.Quantity);
         }
         quantityValue = (totalFact != undefined ? totalFact : '-') + '/' + (item.Count != undefined ? item.Count : '-');
@@ -54,11 +53,9 @@ class ItemRow extends Component {
             <TableRow style={rowStyle}>
                 <TableRowColumn style={{ width: '280px' }}>{item.Name}</TableRowColumn>
                 <TableRowColumn style={{ width: '120px' }}>{item.Code}</TableRowColumn>
-                <TableRowColumn style={{ width: '90px' }}>{_.uniq(zones).map((zone) => {
-                    return <Link key={zone} to={{ pathname: "/actions", query: { ZoneName: zone.ZoneName, Code: item.Code } }}>{zone.ZoneName}({getCountInZone(actions, zone.Id)})<br />
-                    </Link>
-                }
-                )}</TableRowColumn>
+                <TableRowColumn style={{ width: '90px' }}>
+                    <Link key={item.Code} to={{ pathname: "/actions", query: { Code: item.Code } }}>{_.sumBy(actions, (a) => a.Quantity)}<br /></Link>
+                </TableRowColumn>
                 <TableRowColumn style={{ width: '70px' }}>{quantityValue}</TableRowColumn>
                 <TableRowColumn style={{ width: '100px' }}>{priceValue}</TableRowColumn>
             </TableRow>)

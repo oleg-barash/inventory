@@ -32,7 +32,6 @@ const filterActions = (items, filter) => {
             })
         }
         if (filter.Type != undefined) {
-            debugger
             if (filter.Type != 3) {
                 result = result.filter((item) => {
                     return item.Type == filter.Type;

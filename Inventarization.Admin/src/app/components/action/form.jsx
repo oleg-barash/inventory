@@ -23,6 +23,7 @@ import MenuItem from 'material-ui/MenuItem';
 moment.locale("ru-RU")
 
 const mapStateToProps = (state) => {
+    debugger
     return {
         userInfo: state.auth,
         inventorization: state.auth.SelectedInventorization,

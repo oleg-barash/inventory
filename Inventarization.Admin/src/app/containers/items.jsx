@@ -68,7 +68,6 @@ class Items extends Component {
 
     render() {
         var { dispatch, userInfo, filter, actions, items } = this.props;
-
         if (!userInfo.SelectedInventorization) {
             return null;
         }

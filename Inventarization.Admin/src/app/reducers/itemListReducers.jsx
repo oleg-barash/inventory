@@ -18,17 +18,17 @@ function _applyFilter(items, filter) {
     if (filter.type !== undefined) {
         switch (filter.type) {
             case '1':
-                result = _.filter(result, (item) => item.Actions !== undefined && item.Fact < item.Count);
+                result = _.filter(result, (item) => item.Actions !== undefined && _.sumBy(item.Actions, x => x.Quantity) < item.Count);
                 break
             case '2':
-                result = _.filter(result, (item) => item.Actions !== undefined && item.Fact > item.Count)
+                result = _.filter(result, (item) => item.Actions !== undefined && _.sumBy(item.Actions, x => x.Quantity) > item.Count)
                 break
             default:
                 break
         }
 
     }
-    if (filter.text !== undefined && filter.text.length > 4) {
+    if (filter.text !== undefined) {
         result = _.filter(result, (item) => {
             let val = filter.text.toUpperCase();
             return item.Code && item.Code.toUpperCase().startsWith(val)
@@ -48,7 +48,7 @@ function _applyFilter(items, filter) {
         let devation = parseInt(filter.devation);
         if (!isNaN(devation)) {
             result = _.filter(result, (item) => {
-                return item.Count - item.Fact >= devation
+                return Math.abs(item.Count - _.sumBy(item.Actions, x => x.Quantity)) >= devation
             });
         }
     }
@@ -56,7 +56,7 @@ function _applyFilter(items, filter) {
         let priceDevation = parseInt(filter.priceDevation);
         if (!isNaN(priceDevation)) {
             result = _.filter(result, (item) => {
-                return item.Count != undefined && item.Price != undefined && (item.Count * item.Price - item.Fact * item.Price >= priceDevation)
+                return item.Count != undefined && item.Price != undefined && (item.Count * item.Price - _.sumBy(item.Actions, x => x.Quantity) * item.Price >= priceDevation)
             });
         }
     }

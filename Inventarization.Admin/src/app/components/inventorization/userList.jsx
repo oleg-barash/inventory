@@ -42,7 +42,7 @@ class UserList extends AuthorizedComponent {
             }
         }
 
-        return (<Paper style={paperStyle} zDepth={3} rounded={false} >
+        return id == undefined ? null : (<Paper style={paperStyle} zDepth={3} rounded={false} >
             Здесь можно назначить пользователей на инвентаризацию
                         <List>{users != undefined ? _.sortBy(users, x => x.Login).map(x => 
                             {

@@ -24,16 +24,13 @@ class InventorizationPage extends AuthorizedComponent {
     constructor(props) {
         super(props);
     }
-    componentDidMount() {
-        const { dispatch, userInfo } = this.props
+    render() {
+        const { dispatch, userInfo, inventorization } = this.props
         const { id, companyId } = this.props.location.query
-        if (id !== undefined) {
+        debugger
+        if (inventorization == undefined && id !== undefined) {
             dispatch(loadInventorizationInfo(id, userInfo.Token));
         }
-    }
-    render() {
-        const { inventorization } = this.props
-        const { companyId } = this.props.location.query
         return (
             <div>
                 <h2 style={styles.headline}>Карточка инверторизации</h2>

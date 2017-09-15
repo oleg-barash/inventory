@@ -17,6 +17,7 @@ import { fullWhite as white}  from 'material-ui/styles/colors';
 import { deleteAction, setCurrentAction } from '../../actions/actionActions';
 import { setCurrentItem } from '../../actions/itemActions';
 import { Link, browserHistory } from 'react-router'
+import _ from 'lodash'
 moment.locale("ru-RU")
 function getTypeName(type){
     switch(type){

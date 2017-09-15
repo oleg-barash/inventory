@@ -40,6 +40,7 @@ import { LOGIN_FINISHED
     , INVENTORIZATION_SELECTED
     , CLOSE_INVENTORIZATION_DIALOG
     , TOGGLE_DRAWER
+    , INVENTORIZATION_SAVED
     , ACTION_SAVED} from './constants/actionTypes'
 import { toggleDrawer } from './actions/globalActions'
 import { browserHistory } from 'react-router'
@@ -61,7 +62,7 @@ function authCookies({ getState }) {
                 case LOGIN_FINISHED:
                     if (action.userInfo.IsAuthorized) {
                         action.userInfo.Token = "Basic " + btoa(action.userInfo.Username + ":" + action.userInfo.Password)
-                        state.auth = action.userInfo
+                        state.auth = Object.assign({}, state.auth, action.userInfo);
                         document.cookie = "UserData=" + JSON.stringify(action.userInfo)
                         browserHistory.push('/items');
                     }
@@ -69,16 +70,19 @@ function authCookies({ getState }) {
                         delete document.cookie;
                         browserHistory.push('/login');
                     }
-                    break
+                    break;
                 case INVENTORIZATION_SELECTED:
                     //browserHistory.push('/items');
                     state.auth.SelectedInventorization = action.inventorization;
                     document.cookie = "UserData=" + JSON.stringify(state.auth);
-                    break
+                    break;
+                case INVENTORIZATION_SAVED:
+                    browserHistory.push('/editInventorization?id=' + action.inventorization.Id);
+                    break;
                 case LOGOUT:
                     document.cookie = "UserData="
                     browserHistory.push('/login');
-                    break
+                    break;
                 // case ACTION_SAVED:
                 //     browserHistory.push('/editAction?id=' + action.id);
             }
