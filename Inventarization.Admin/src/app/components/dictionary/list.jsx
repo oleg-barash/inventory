@@ -16,6 +16,7 @@ class DictionaryList extends Component {
                     <TableRow>
                         <TableHeaderColumn style={{ width: '280px' }}>Наименование</TableHeaderColumn>
                         <TableHeaderColumn>Код</TableHeaderColumn>
+                        <TableHeaderColumn>Артикульный номер</TableHeaderColumn>
                         <TableHeaderColumn>Источник</TableHeaderColumn>
                     </TableRow>
                 </TableHeader>

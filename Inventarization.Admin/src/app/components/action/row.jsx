@@ -34,7 +34,7 @@ class Row extends Component {
     }
 
     render() {
-        var {action, dispatch, userInfo, zones} = this.props;
+        var {action, dispatch, userInfo, zones, item} = this.props;
         var rowStyle = {backgroundColor: action.FoundInItems ? green : white}
 
         var deleteFunc = function(){
@@ -52,10 +52,9 @@ class Row extends Component {
         }
 
         let zone = _.find(zones, z => z.Id === action.Zone);
-
         return (
             <TableRow style={rowStyle}>
-                <TableRowColumn style={{width: '200px'}}>{action.Name}</TableRowColumn>
+                <TableRowColumn style={{width: '200px'}}>{item == undefined ? "Не найден в номенклатуре" : item.Name}</TableRowColumn>
                 <TableRowColumn style={{width: '120px'}}>{moment(action.DateTime).format("DD MMM hh:mm:ss")}</TableRowColumn>
                 <TableRowColumn style={{width: '100px'}}><small>{getTypeName(action.Type)}</small></TableRowColumn>
                 {/*<TableRowColumn >{action.User}</TableRowColumn>*/}

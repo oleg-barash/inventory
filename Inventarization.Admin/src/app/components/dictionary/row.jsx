@@ -33,6 +33,7 @@ class ItemRow extends Component {
             <TableRow>
                 <TableRowColumn style={{width: '280px'}}>{item.Name}</TableRowColumn>
                 <TableRowColumn>{item.Code}</TableRowColumn>
+                <TableRowColumn>{item.ItemNumber}</TableRowColumn>
                 <TableRowColumn>{getSourceName(item.Source)}</TableRowColumn>
             </TableRow>)
     }

@@ -16,11 +16,11 @@ import _ from 'lodash'
 function _applyFilter(items, filter){
             var result = items,
                 counter = 0;
-            if (filter.text !== undefined && filter.text.length > 4){
+            if (filter.text !== undefined && filter.text.length > 2){
+                let val = filter.text.toUpperCase();
                 result = _.filter(result, (item) => {
-                    let val = filter.text.toUpperCase();
-                    return item.BarCode && item.BarCode.toUpperCase().startsWith(val) 
-                        || item.Number && item.Number.toUpperCase().startsWith(val) 
+                    return item.Code && item.Code.toUpperCase().startsWith(val) 
+                        || item.ItemNumber && item.ItemNumber.toUpperCase().startsWith(val) 
                         || item.Name && item.Name.toUpperCase().startsWith(val) 
                         || item.Description && item.Description.toUpperCase().startsWith(val);
                 })

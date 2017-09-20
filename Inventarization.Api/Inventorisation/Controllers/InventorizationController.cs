@@ -174,6 +174,8 @@ namespace Inventorization.Api.Controllers
                 
                 var userClaims = Request.GetOwinContext().Authentication.User;
 
+                string role = userClaims.Claims.Single(x => x.Type == ClaimTypes.Role).Value;
+
                 Business.Model.Action action = new Business.Model.Action()
                 {
                     Id = actionVm.Id.GetValueOrDefault(),
@@ -185,6 +187,11 @@ namespace Inventorization.Api.Controllers
                     Zone = actionVm.Zone,
                     UserId = Guid.Parse(userClaims.Claims.Single(x => x.Type == ClaimTypes.Sid).Value)
                 };
+
+                if (role == "Scaner")
+                {
+                    _actionDomain.CheckZoneAccess(action);
+                }
 
                 if (actionVm.Type == ActionType.BlindScan)
                 {

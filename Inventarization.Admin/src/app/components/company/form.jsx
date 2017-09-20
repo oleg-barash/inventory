@@ -191,11 +191,11 @@ class Form extends Component {
                         title="Загрузка справочника товаров"
                         actions={actionButtons}
                         modal={false}
-                        read
                         open={this.props.isDialogOpened}
                         onRequestClose={handleClose}>
                         {this.props.importInProgress ? 'Идёт загрузка...' : 'Для загрузки справочника выберите файл и нажмите "Загрузить"'}
                         <br />
+                        Содержимое файла должно иметь формат: [ШТРИХ-КОД],[АРТИКУЛ],[НАИМЕНОВАНИЕ]
                         {!!this.props.dataForImport ? 'Распознано ' + this.props.dataForImport.length + ' товаров' : ''}
                     </Dialog>
 

@@ -45,7 +45,7 @@ class UsageRow extends Component {
         }
 
         let newAction = function () {
-            dispatch(setCurrentAction({ Zone: zone, Type: usage.Type }))
+            dispatch(setCurrentAction({ Zone: zone.Id, Type: usage.Type }))
             browserHistory.push('/editAction');
         }
 

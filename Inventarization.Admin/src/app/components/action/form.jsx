@@ -23,9 +23,9 @@ import MenuItem from 'material-ui/MenuItem';
 moment.locale("ru-RU")
 
 const mapStateToProps = (state) => {
-    debugger
     return {
         userInfo: state.auth,
+        items: state.dictionary.items,
         inventorization: state.auth.SelectedInventorization,
         action: state.action,
         availabledZones: state.zones.items || [],
@@ -50,11 +50,12 @@ class Form extends Component {
 
     render() {
         let {action, dispatch, availabledItems, inventorization, userInfo, availabledZones } = this.props;
-        let zone = availabledZones.find(x => x.Id === action.Zone)
+        let zone = availabledZones.find(x => x.Id === action.Zone);
         if (!availabledItems.items && ! availabledItems.isFetching){
              dispatch(fetchItems(inventorization.Company, {}, userInfo.Token));
         }
         let onItemChange = function(value) {
+            debugger
             dispatch(validateAction({Name: value.Name, BarCode: value.Code}));
         }
         
@@ -78,6 +79,8 @@ class Form extends Component {
                 dispatch(validateAction({BarCode: action.BarCode || '', Name: action.Name || '', Zone: action.Zone, Quantity: action.Quantity || ''}));
             }
         }
+        let item = _.find(availabledItems.items, x => x.Code == action.BarCode);
+        let name = item !== undefined ? item.Name : '';
         return (
             <Paper>
                 <AutoComplete 
@@ -101,7 +104,7 @@ class Form extends Component {
                     disabled={action.Id != undefined}
                     id="Name"
                     hintText="Велотренажер" 
-                    searchText={action.Name} 
+                    searchText={name} 
                     floatingLabelText="Укажите наименование товара" 
                     dataSource={availabledItems.items || []}
                     onNewRequest={onItemChange} 
@@ -113,7 +116,7 @@ class Form extends Component {
                 <Divider />
                 <TextField id="Quantity" hintText="0" value={action.Quantity} onChange={onQuantityChange} floatingLabelText="Количество единиц товара" errorText={action != null ? action.QuantityError || '' : '' }/>
                 <Divider />
-                <ZoneSelect zone={zone} 
+                <ZoneSelect zone={zone} disabled={action.Id != undefined}
                     onZoneChange={onZoneChange}  
                     errorText={action != null ? action.ZoneError || '' : '' }/>
                 <Divider />

@@ -53,14 +53,21 @@ export default function company(state = { isLoading: false, isListLoading: false
             })
         case PARSE_DATA:
             let rows = action.data.split("\n");
-            let itemsToUpload = rows.map((row) => {
-                let columns = row.split(",")
-                return {
-                    BarCode: columns[0],
-                    Name: columns[1],
- 
+            let itemsToUpload = []; 
+            rows.forEach((element, index, array) => {
+                let columns = element.split(",");
+                if (columns.length != 3){
+                    console.error("Строка в справочнике имеет неправильный формат:\n " + element);
+                }
+                else{
+                    itemsToUpload.push({
+                        BarCode: columns[0].trim(),
+                        Number: columns[1].trim(),
+                        Name: columns[2].trim()
+                    });
                 }
             });
+            debugger
             return Object.assign({}, state, { dataForImport: itemsToUpload })
         case DATA_IMPORTED:
             return Object.assign({}, state, { dataForImport: undefined, importInProgress: false })

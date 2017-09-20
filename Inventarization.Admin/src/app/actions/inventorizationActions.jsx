@@ -81,6 +81,7 @@ export function validateInventorization(inventorization) {
 }
 
 export function saveInventorization(inventorization, token) {
+    debugger
     return function (dispatch) {
         dispatch({ type: INVENTORIZATION_SAVING });
         return fetch(process.env.API_URL + 'inventorization/save',
@@ -94,6 +95,7 @@ export function saveInventorization(inventorization, token) {
             })
             .then(response => response.json())
             .then(json => {
+                debugger
                 toastr.success("Информация об инверторизации сохранена")
                 dispatch({ type: INVENTORIZATION_SAVED, inventorization: json })
             })

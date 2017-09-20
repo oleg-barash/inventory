@@ -10,9 +10,13 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import { filterActions, updateActionsFilter } from '../../actions/actionActions'
 import { fetchZones } from '../../actions/zoneActions'
+import {
+    fetchItems
+} from '../../actions/dictionaryActions'
 
 const mapStateToProps = (state) => {
     return {
+        items: state.dictionary.items,
         actions: state.actions.filtredActions,
         availableTypes: state.actions.availableTypes,
         userInfo: state.auth,
@@ -32,19 +36,28 @@ class List extends Component {
         super(props)
     }
 
+    componentWillMount() {
+        if (this.props.userInfo.Token != undefined) {
+            this.props.dispatch(fetchItems(this.props.inventorization.Company, {}, this.props.userInfo.Token))
+        }
+        else {
+            this.props.dispatch(openInventorizationDialog());
+        }
+    }
+
     componentDidMount() {
         const { dispatch, inventorization, userInfo, zones } = this.props
         dispatch(fetchZones(inventorization.Id, userInfo.Token))
     }
 
     render() {
-        let { actions, availableTypes, dispatch, zones } = this.props;
+        let { actions, availableTypes, dispatch, zones, items } = this.props;
         function handleZoneChange(event, value) {
             let filterZone = _.find(zones, x => x.Number == value);
-            if (filterZone != undefined){
+            if (filterZone != undefined) {
                 dispatch(updateActionsFilter({ Zone: filterZone }));
             }
-            else{
+            else {
                 dispatch(updateActionsFilter({ Zone: undefined }));
             }
         };
@@ -87,7 +100,12 @@ class List extends Component {
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
-                        {actions.map(action => <Row dispatch={dispatch} action={action} key={action.Id} />)}
+                        {
+                            actions.map(action => {
+                                var item = _.find(items, i => i.Code == action.BarCode);
+                                return (<Row dispatch={dispatch} action={action} item={item} key={action.Id} />);
+                            })
+                        }
                     </TableBody>
                 </Table>
             </div>)

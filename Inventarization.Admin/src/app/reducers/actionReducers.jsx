@@ -13,7 +13,7 @@ export function action(state = { Type: 0 }, action)
             actionItem.ZoneError = actionItem.Zone !== undefined ? '' : 'Зону нужно обязательно указать'
             return Object.assign({}, state, actionItem);
         case SET_CURRENT_ACTION:
-            return Object.assign({}, state,  action.action);
+            return Object.assign({}, action.action);
         // case ACTION_SAVED:
         //     return Object.assign({}, state, action.action);
         default:

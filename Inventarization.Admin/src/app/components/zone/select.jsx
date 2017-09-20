@@ -17,7 +17,7 @@ class Select extends Component {
         super(props);
     }
     render() {
-        let { zone, onZoneChange, errorText, availabledZones, dispatch, userInfo } = this.props;
+        let { zone, onZoneChange, errorText, availabledZones, dispatch, userInfo, disabled } = this.props;
         if (!availabledZones.items && !availabledZones.isFetching) {
             dispatch(fetchZones(userInfo.SelectedInventorization.Id, userInfo.Token));
         }
@@ -25,6 +25,7 @@ class Select extends Component {
             <AutoComplete
                 id="Zone"
                 floatingLabelText="Зона"
+                disabled={disabled}
                 dataSource={availabledZones.items || []}
                 searchText={zone ? zone.ZoneName : ''}
                 onNewRequest={onZoneChange}

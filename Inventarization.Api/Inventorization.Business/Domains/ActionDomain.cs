@@ -26,7 +26,6 @@ namespace Inventorization.Business.Domains
         }
 
         public Action InsertAction(Action action) {
-            CheckZoneAccess(action);
             if (action.Id == Guid.Empty)
             {
                 action.Id = Guid.NewGuid();
@@ -35,7 +34,7 @@ namespace Inventorization.Business.Domains
             return action;
         }
 
-        private void CheckZoneAccess(Action action)
+        public void CheckZoneAccess(Action action)
         {
             ZoneUsage zoneUsage = _usageRepository.GetZoneUsages(action.Inventorization, action.Zone).FirstOrDefault(x => x.Type == action.Type);
             if (zoneUsage == null)
@@ -49,7 +48,6 @@ namespace Inventorization.Business.Domains
         }
 
         public void UpdateAction(Action action) {
-            CheckZoneAccess(action);
             _actionRepository.UpdateAction(action);
         }
 

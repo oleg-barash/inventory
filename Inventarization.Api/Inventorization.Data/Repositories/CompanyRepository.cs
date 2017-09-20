@@ -215,7 +215,6 @@ namespace Inventorization.Data
 
         public void CreateItem(Guid companyId, Item item)
         {
-            Business.Model.Inventorization result = new Business.Model.Inventorization();
             using (var conn = new NpgsqlConnection(_connectionString))
             {
                 conn.Open();
@@ -223,9 +222,10 @@ namespace Inventorization.Data
                 {
                     Guid id = Guid.NewGuid();
                     cmd.Connection = conn;
-                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""CreatedAt"", ""Name"", ""Source"") VALUES(:Company, :Code, :Description, :CreatedAt, :Name, :Source)";
+                    cmd.CommandText = @"INSERT INTO public.""Item""(""CompanyId"", ""Code"", ""Description"", ""CreatedAt"", ""Name"", ""Source"", ""ItemNumber"") VALUES(:Company, :Code, :Description, :CreatedAt, :Name, :Source, :Number)";
                     cmd.Parameters.Add(new NpgsqlParameter("Company", companyId));
                     cmd.Parameters.Add(new NpgsqlParameter("Name", item.Name));
+                    cmd.Parameters.Add(new NpgsqlParameter("Number", item.ItemNumber));
                     cmd.Parameters.Add(new NpgsqlParameter("Code", item.Code));
                     cmd.Parameters.Add(new NpgsqlParameter("Description", string.IsNullOrWhiteSpace(item.Description) ? string.Empty : item.Description));
                     cmd.Parameters.Add(new NpgsqlParameter("CreatedAt", item.CreatedAt));

@@ -1,4 +1,5 @@
-﻿using Inventorization.Api;
+﻿using System;
+using Inventorization.Api;
 using Inventorization.Data;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
@@ -8,6 +9,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Inventorization.Business.Interfaces;
+using Inventorization.Business.Model;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Cors;
 using Thinktecture.IdentityModel.Owin;
@@ -58,7 +60,7 @@ namespace Inventorization
                 return new List<Claim> {
                     new Claim(ClaimTypes.Sid, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Login),
-                    new Claim(ClaimTypes.Role, "admin")
+                    new Claim(ClaimTypes.Role, Enum.GetName(typeof(UserLevel), user.Level))
                 };
             }
 
