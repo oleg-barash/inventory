@@ -9,7 +9,6 @@ namespace Inventorization.Business.Reports
     public class Report3Generator : ReportGenerator, IReportGenerator
     {
         private string pathToTemplate;
-        private List<IXLRow> dataRows;
         private const int firstDataRowIndex = 4;
         public Report3Generator(string pathToTemplate) : base()
         {
@@ -23,7 +22,6 @@ namespace Inventorization.Business.Reports
             }
 
             this.pathToTemplate = pathToTemplate;
-            dataRows = new List<IXLRow>();
         }
         public override MemoryStream Generate(List<Item> items, List<Model.Action> actions, List<Rests> rests)
         {
@@ -32,32 +30,39 @@ namespace Inventorization.Business.Reports
                 IXLWorksheet worksheet = book.Worksheets.Skip(1).First();
                 IEnumerable<IXLRow> dataRows = worksheet.Rows().Where(r => r.RowNumber() >= firstDataRowIndex).ToList();
                 dataRows.ForEach(dr => dr.Delete());
-                IXLRow currentDataRow = GetFirstDataRow(worksheet.Rows());
-                currentDataRow.InsertRowsBelow(items.Count);
-                IEnumerable<IGrouping<string, Model.Action>> grouppedActions = actions.GroupBy(x => x.BarCode).ToList();
-
-                int counter = 1;
-                var bunches = BuildBunches(items).ToList();
-                var lastBunch = bunches.Last();
-                foreach (var bunch in bunches)
+                if (items.Count > 0)
                 {
-                    var firstRowInBunch = currentDataRow;
-                    foreach (Item item in bunch)
+                    IXLRow currentDataRow = GetFirstDataRow(worksheet.Rows());
+                    currentDataRow.InsertRowsBelow(items.Count);
+                    IEnumerable<IGrouping<string, Model.Action>> grouppedActions =
+                        actions.GroupBy(x => x.BarCode).ToList();
+
+                    int counter = 1;
+                    var bunches = BuildBunches(items).ToList();
+                    var lastBunch = bunches.Last();
+                    foreach (var bunch in bunches)
                     {
-                        long? quantity = grouppedActions.FirstOrDefault(x => x.Key == item.Code)?.Sum(x => x.Quantity);
-                        Rests itemRests = rests.FirstOrDefault(x => x.Code == item.Code);
-                        SetRowData(worksheet, currentDataRow, item, itemRests, quantity, counter++);
-                        currentDataRow = currentDataRow.RowBelow();
+                        var firstRowInBunch = currentDataRow;
+                        foreach (Item item in bunch)
+                        {
+                            long? quantity = grouppedActions.FirstOrDefault(x => x.Key == item.Code)
+                                ?.Sum(x => x.Quantity);
+                            Rests itemRests = rests.FirstOrDefault(x => x.Code == item.Code);
+                            SetRowData(worksheet, currentDataRow, item, itemRests, quantity, counter++);
+                            currentDataRow = currentDataRow.RowBelow();
+                        }
+                        var restsInBunch = rests.Where(x => bunch.Any(b => b.Code == x.Code));
+                        currentDataRow = SetSummary(worksheet, currentDataRow, bunch, restsInBunch, grouppedActions);
+                        if (bunch != lastBunch)
+                        {
+                            currentDataRow.AddHorizontalPageBreak();
+                            currentDataRow = currentDataRow.RowBelow();
+                        }
+                        worksheet.PageSetup.PrintAreas.Add(firstRowInBunch.Cell("A").Address,
+                            currentDataRow.Cell("X").Address);
                     }
-                    var restsInBunch = rests.Where(x => bunch.Any(b => b.Code == x.Code));
-                    currentDataRow = SetSummary(worksheet, currentDataRow, bunch, restsInBunch, grouppedActions);
-                    if (bunch != lastBunch) {
-                        currentDataRow.AddHorizontalPageBreak();
-                        currentDataRow = currentDataRow.RowBelow();
-                    }
-                    worksheet.PageSetup.PrintAreas.Add(firstRowInBunch.Cell("A").Address, currentDataRow.Cell("X").Address);
+                    currentDataRow = SetSummary(worksheet, currentDataRow, items, rests, grouppedActions);
                 }
-                currentDataRow = SetSummary(worksheet, currentDataRow, items, rests, grouppedActions);
                 MemoryStream result = new MemoryStream();
                 book.SaveAs(result);
                 result.Position = 0;
